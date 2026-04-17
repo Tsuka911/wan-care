@@ -1566,8 +1566,8 @@ function updateHomeStats() {
   // 最終通院
   const hospitals = DB.get('hospital');
   if (hospitals.length) {
-    const d = hospitals[0].date;
-    document.getElementById('statHospital').textContent = d ? d.slice(5).replace('-','/') : '--';
+    const d = fmtDate(hospitals[0].date);
+    document.getElementById('statHospital').textContent = d ? d.slice(5) : '--';
   } else {
     document.getElementById('statHospital').textContent = '--';
   }
