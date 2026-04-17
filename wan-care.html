@@ -1,0 +1,1990 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="わんケア">
+<title>🐾 わんケア</title>
+<style>
+  :root {
+    --primary: #e07b54;
+    --primary-light: #f5c4a8;
+    --primary-dark: #b85c35;
+    --secondary: #5b9bd5;
+    --accent: #f0c040;
+    --health: #e07b54;
+    --daily: #6ab89a;
+    --travel: #5b9bd5;
+    --bg: #fdf6f0;
+    --card: #ffffff;
+    --text: #3a2e28;
+    --text-light: #8a7a72;
+    --border: #e8ddd6;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 90px;
+  }
+
+  /* ヘッダー */
+  .header {
+    background: linear-gradient(135deg, var(--primary) 0%, #c86a3c 100%);
+    color: white;
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(224,123,84,0.3);
+  }
+  .header-left { display: flex; align-items: center; gap: 10px; }
+  .dog-name-display {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .header-sub { font-size: 12px; opacity: 0.85; }
+  .paw-icon { font-size: 28px; }
+  .settings-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* タブバー */
+  .tab-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: white;
+    display: flex;
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 8px 4px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    color: var(--text-light);
+    transition: all 0.2s;
+  }
+  .tab-btn .tab-icon { font-size: 22px; }
+  .tab-btn.active { color: var(--primary); }
+  .tab-btn.active.health { color: var(--health); }
+  .tab-btn.active.daily { color: var(--daily); }
+  .tab-btn.active.travel { color: var(--travel); }
+
+  /* コンテンツ */
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+
+  /* カード */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 14px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* ホーム */
+  .home-greeting {
+    background: linear-gradient(135deg, #fff5f0, #ffeedd);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+    text-align: center;
+    border: 1px solid var(--primary-light);
+  }
+  .home-dog-icon { font-size: 60px; margin-bottom: 8px; }
+  .home-dog-photo {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid white;
+    box-shadow: 0 4px 16px rgba(224,123,84,0.3);
+    margin-bottom: 8px;
+    display: block;
+    margin-left: auto; margin-right: auto;
+  }
+  .home-dog-name { font-size: 22px; font-weight: 700; color: var(--primary); }
+  .home-breed { font-size: 13px; color: var(--text-light); margin-top: 2px; }
+  .home-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .stat-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 14px 8px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .stat-icon { font-size: 22px; margin-bottom: 4px; }
+  .stat-value { font-size: 14px; font-weight: 700; color: var(--text); }
+  .stat-label { font-size: 10px; color: var(--text-light); margin-top: 2px; }
+  .quick-section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .recent-list { list-style: none; }
+  .recent-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+  .recent-item:last-child { border-bottom: none; }
+  .recent-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .recent-text { flex: 1; font-size: 13px; }
+  .recent-date { font-size: 11px; color: var(--text-light); }
+
+  /* フォーム */
+  .form-group { margin-bottom: 12px; }
+  .form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    margin-bottom: 4px;
+  }
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 15px;
+    font-family: inherit;
+    background: white;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--primary);
+  }
+  .form-textarea { resize: vertical; min-height: 80px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ボタン */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+    width: 100%;
+  }
+  .btn-primary:active { transform: scale(0.98); background: var(--primary-dark); }
+  .btn-secondary {
+    background: var(--bg);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+  .btn-health { background: var(--health); color: white; width: 100%; }
+  .btn-daily { background: var(--daily); color: white; width: 100%; }
+  .btn-travel { background: var(--travel); color: white; width: 100%; }
+  .btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+  .btn-danger { background: #ff4d4d; color: white; }
+
+  /* セクションタイトル */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title.health { color: var(--health); }
+  .section-title.daily { color: var(--daily); }
+  .section-title.travel { color: var(--travel); }
+
+  /* サブタブ */
+  .subtab-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 14px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .subtab-bar::-webkit-scrollbar { display: none; }
+  .subtab-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: white;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    color: var(--text-light);
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .subtab-btn.active-health { background: var(--health); color: white; border-color: var(--health); }
+  .subtab-btn.active-daily { background: var(--daily); color: white; border-color: var(--daily); }
+  .subtab-btn.active-travel { background: var(--travel); color: white; border-color: var(--travel); }
+  .subtab-content { display: none; }
+  .subtab-content.active { display: block; }
+
+  /* 記録リスト */
+  .record-item {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    position: relative;
+  }
+  .record-item-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .record-item-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .record-item-date { font-size: 11px; color: var(--text-light); }
+  .record-item-body { font-size: 13px; color: var(--text-light); margin-top: 6px; }
+  .record-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 4px;
+    margin-top: 4px;
+  }
+  .delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ccc;
+    font-size: 16px;
+    padding: 2px;
+    flex-shrink: 0;
+  }
+  .delete-btn:hover { color: #ff4d4d; }
+
+  /* 体重チャート */
+  .weight-chart {
+    height: 120px;
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .weight-bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    justify-content: flex-end;
+    gap: 2px;
+  }
+  .weight-bar {
+    width: 100%;
+    background: linear-gradient(to top, var(--primary), var(--primary-light));
+    border-radius: 4px 4px 0 0;
+    transition: height 0.4s ease;
+  }
+  .weight-bar-label { font-size: 9px; color: var(--text-light); text-align: center; }
+
+  /* 散歩カレンダー風 */
+  .walk-today {
+    background: linear-gradient(135deg, #fff8f0, #ffe8d6);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid var(--primary-light);
+    text-align: center;
+  }
+  .walk-today-num { font-size: 36px; font-weight: 700; color: var(--primary); }
+  .walk-today-unit { font-size: 13px; color: var(--text-light); }
+
+  /* 旅行カード */
+  .travel-card {
+    background: white;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+  }
+  .travel-card-header {
+    background: linear-gradient(135deg, var(--travel), #3a7ac4);
+    color: white;
+    padding: 14px 16px;
+  }
+  .travel-card-title { font-size: 16px; font-weight: 700; }
+  .travel-card-dates { font-size: 12px; opacity: 0.85; margin-top: 2px; }
+  .travel-card-body { padding: 12px 16px; }
+  .travel-photo {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+  .travel-info-row {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+  .travel-info-icon { flex-shrink: 0; }
+  .travel-info-text { color: var(--text-light); }
+
+  /* 次の予定 */
+  .upcoming-card {
+    background: linear-gradient(135deg, #fff8f0, #fff3e8);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+    border-left: 4px solid var(--primary);
+  }
+  .upcoming-card.green { background: linear-gradient(135deg, #f0faf5, #e0f5ea); border-left-color: var(--daily); }
+  .upcoming-card.blue { background: linear-gradient(135deg, #f0f6ff, #e0ecff); border-left-color: var(--travel); }
+  .upcoming-title { font-size: 14px; font-weight: 700; }
+  .upcoming-date { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+  /* 設定パネル */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 200;
+    align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-panel {
+    background: white;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: #ddd;
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+
+  /* empty state */
+  .empty-state {
+    text-align: center;
+    padding: 30px 20px;
+    color: var(--text-light);
+  }
+  .empty-icon { font-size: 40px; margin-bottom: 8px; }
+  .empty-text { font-size: 14px; }
+
+  /* アニメーション */
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .record-item { animation: slideUp 0.3s ease; }
+
+  /* リマインダーカード */
+  .remind-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+  .remind-item.urgent {
+    background: #fff0eb;
+    border: 1.5px solid #f5b8a0;
+  }
+  .remind-item.soon {
+    background: #fff9e6;
+    border: 1.5px solid #f5dfa0;
+  }
+  .remind-item.normal {
+    background: #f0f9f4;
+    border: 1.5px solid #a0d8bc;
+  }
+  .remind-days {
+    font-weight: 700;
+    font-size: 15px;
+    flex-shrink: 0;
+    min-width: 36px;
+    text-align: center;
+  }
+  .remind-days.urgent { color: #d94f00; }
+  .remind-days.soon   { color: #b07a00; }
+  .remind-days.normal { color: #2a8a5a; }
+  .remind-label { flex: 1; font-weight: 600; }
+  .remind-date  { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+
+  /* 履歴チップ */
+  .suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+    min-height: 0;
+  }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: white;
+    color: var(--text);
+    transition: all 0.15s;
+    max-width: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .chip:active { transform: scale(0.95); }
+  .chip.hospital { border-color: var(--health); color: var(--health); background: #fff5f2; }
+  .chip.salon    { border-color: var(--daily); color: var(--daily);  background: #f0faf5; }
+  .chip-del {
+    font-size: 11px;
+    opacity: 0.5;
+    flex-shrink: 0;
+    padding: 0 2px;
+  }
+  .chip-del:hover { opacity: 1; color: #ff4d4d; }
+
+  /* 同期ステータスバー */
+  .sync-bar {
+    display: none;
+    position: fixed;
+    top: 64px; left: 0; right: 0;
+    padding: 7px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    z-index: 99;
+    transition: all 0.3s;
+  }
+  .sync-bar.syncing { display: block; background: #fff8e1; color: #b07d00; }
+  .sync-bar.success { display: block; background: #e8f5e9; color: #2e7d32; }
+  .sync-bar.error   { display: block; background: #fdecea; color: #c62828; }
+
+  /* 同期ボタン */
+  .sync-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    margin-left: 4px;
+  }
+  .sync-btn.spinning { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* フローティングボタン */
+  .fab {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(224,123,84,0.4);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99;
+    transition: transform 0.2s;
+  }
+  .fab:active { transform: scale(0.9); }
+  .fab.visible { display: flex; }
+  .fab.health { background: var(--health); box-shadow: 0 4px 16px rgba(224,123,84,0.4); }
+  .fab.daily { background: var(--daily); box-shadow: 0 4px 16px rgba(106,184,154,0.4); }
+  .fab.travel { background: var(--travel); box-shadow: 0 4px 16px rgba(91,155,213,0.4); }
+</style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header class="header">
+  <div class="header-left">
+    <span class="paw-icon">🐾</span>
+    <div>
+      <div class="dog-name-display" id="headerDogName">わんこ</div>
+      <div class="header-sub">愛犬お世話管理アプリ</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:4px;align-items:center">
+    <button class="sync-btn" id="syncBtn" onclick="manualSync()" title="Google Sheetsと同期">🔄</button>
+    <button class="settings-btn" onclick="openSettings()">⚙️</button>
+  </div>
+</header>
+<div class="sync-bar" id="syncBar"></div>
+
+<!-- タブバー -->
+<nav class="tab-bar">
+  <button class="tab-btn active" onclick="showPage('home', this)">
+    <span class="tab-icon">🏠</span>ホーム
+  </button>
+  <button class="tab-btn health" onclick="showPage('health', this)">
+    <span class="tab-icon">❤️</span>健康管理
+  </button>
+  <button class="tab-btn daily" onclick="showPage('daily', this)">
+    <span class="tab-icon">🌿</span>日常ケア
+  </button>
+  <button class="tab-btn travel" onclick="showPage('travel', this)">
+    <span class="tab-icon">✈️</span>旅行記録
+  </button>
+</nav>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openFab()">＋</button>
+
+<!-- ========== ホーム ========== -->
+<main id="page-home" class="page active">
+  <div class="home-greeting">
+    <div class="home-dog-icon" id="homeDogIconWrap">🐕</div>
+    <div class="home-dog-name" id="homeDogName">わんこ</div>
+    <div class="home-breed" id="homeBreed">犬種未設定</div>
+  </div>
+
+  <div class="home-stats">
+    <div class="stat-card">
+      <div class="stat-icon">⚖️</div>
+      <div class="stat-value" id="statWeight">--</div>
+      <div class="stat-label">最新体重(kg)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🦮</div>
+      <div class="stat-value" id="statWalks">--</div>
+      <div class="stat-label">今月の散歩回数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏥</div>
+      <div class="stat-value" id="statHospital">--</div>
+      <div class="stat-label">最終通院</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📅 直近の記録</div>
+    <ul class="recent-list" id="recentList">
+      <li class="empty-state">
+        <div class="empty-icon">🐾</div>
+        <div class="empty-text">記録を追加してみましょう！</div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="card" id="upcomingCard">
+    <div class="card-title" style="justify-content:space-between">
+      <span>🔔 もうすぐの予定</span>
+      <button id="notifBtn" onclick="requestNotifPermission()" style="display:none;font-size:11px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--primary);background:white;color:var(--primary);cursor:pointer;font-weight:600">通知をONにする</button>
+    </div>
+    <div id="upcomingList">
+      <p style="font-size:13px;color:var(--text-light);">予定を登録すると1週間以内のものがここに表示されます</p>
+    </div>
+  </div>
+
+  <div class="card" id="gsCard" style="display:none">
+    <div class="card-title">📊 Google スプレッドシート</div>
+    <a id="gsLink" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display:inline-flex;gap:6px;align-items:center;text-decoration:none;">
+      📋 スプレッドシートを開く
+    </a>
+    <p style="font-size:11px;color:var(--text-light);margin-top:8px;">設定からURLを登録してください</p>
+  </div>
+</main>
+
+<!-- ========== 健康管理 ========== -->
+<main id="page-health" class="page">
+  <div class="section-header">
+    <div class="section-title health">❤️ 健康管理</div>
+  </div>
+
+  <div class="subtab-bar">
+    <button class="subtab-btn active-health" onclick="showSubtab('health','hospital',this)">🏥 通院</button>
+    <button class="subtab-btn" onclick="showSubtab('health','vaccine',this)">💉 ワクチン</button>
+    <button class="subtab-btn" onclick="showSubtab('health','medicine',this)">💊 投薬</button>
+    <button class="subtab-btn" onclick="showSubtab('health','weight',this)">⚖️ 体重</button>
+    <button class="subtab-btn" onclick="showSubtab('health','walk',this)">🦮 散歩</button>
+  </div>
+
+  <!-- 通院 -->
+  <div class="subtab-content active" id="health-hospital">
+    <div class="card">
+      <div class="card-title">🏥 通院記録を追加</div>
+      <div class="form-group">
+        <label class="form-label">日付</label>
+        <input type="date" class="form-input" id="hosp-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">病院名</label>
+        <input type="text" class="form-input" id="hosp-name" placeholder="○○動物病院"
+               onfocus="renderChips('hosp-name','savedHospitals','hospital')"
+               oninput="renderChips('hosp-name','savedHospitals','hospital')">
+        <div class="suggestion-chips" id="chips-hosp-name"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">受診内容</label>
+        <input type="text" class="form-input" id="hosp-reason" placeholder="定期健診、歯の検査など">
+      </div>
+      <div class="form-group">
+        <label class="form-label">診断・処置</label>
+        <textarea class="form-textarea" id="hosp-result" placeholder="診断内容、処置内容など"></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">費用（円）</label>
+          <input type="number" class="form-input" id="hosp-cost" placeholder="3000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">次回予定日</label>
+          <input type="date" class="form-input" id="hosp-next">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ</label>
+        <textarea class="form-textarea" id="hosp-memo" placeholder="その他メモ"></textarea>
+      </div>
+      <button class="btn btn-health" onclick="addRecord('hospital')">💾 記録を保存</button>
+    </div>
+    <div id="hospital-records"></div>
+  </div>
+
+  <!-- ワクチン -->
+  <div class="subtab-content" id="health-vaccine">
+    <div class="card">
+      <div class="card-title">💉 ワクチン記録を追加</div>
+      <div class="form-group">
+        <label class="form-label">接種日</label>
+        <input type="date" class="form-input" id="vac-date" oninput="autoSetNextDate('vac-date','vac-next','year',1)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ワクチン種類</label>
+        <select class="form-select" id="vac-type">
+          <option value="">選択してください</option>
+          <option>混合ワクチン（5種）</option>
+          <option>混合ワクチン（8種）</option>
+          <option>混合ワクチン（10種）</option>
+          <option>狂犬病ワクチン</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">次回接種予定日</label>
+        <input type="date" class="form-input" id="vac-next">
+      </div>
+      <div class="form-group">
+        <label class="form-label">病院名</label>
+        <input type="text" class="form-input" id="vac-hospital" placeholder="○○動物病院"
+               onfocus="renderChips('vac-hospital','savedHospitals','hospital')"
+               oninput="renderChips('vac-hospital','savedHospitals','hospital')">
+        <div class="suggestion-chips" id="chips-vac-hospital"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ</label>
+        <textarea class="form-textarea" id="vac-memo" placeholder="副反応など"></textarea>
+      </div>
+      <button class="btn btn-health" onclick="addRecord('vaccine')">💾 記録を保存</button>
+    </div>
+    <div id="vaccine-records"></div>
+  </div>
+
+  <!-- 投薬 -->
+  <div class="subtab-content" id="health-medicine">
+    <div class="card">
+      <div class="card-title">💊 投薬記録を追加</div>
+      <div class="form-group">
+        <label class="form-label">投薬日</label>
+        <input type="date" class="form-input" id="med-date" oninput="autoSetNextDate('med-date','med-next','month',1)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">薬の名前</label>
+        <input type="text" class="form-input" id="med-name" placeholder="フィラリア予防薬など">
+      </div>
+      <div class="form-group">
+        <label class="form-label">種類</label>
+        <select class="form-select" id="med-type">
+          <option value="">選択してください</option>
+          <option>フィラリア予防薬</option>
+          <option>ノミ・ダニ予防薬</option>
+          <option>消炎剤</option>
+          <option>抗生物質</option>
+          <option>ビタミン剤</option>
+          <option>その他</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">投与量</label>
+          <input type="text" class="form-input" id="med-dose" placeholder="1錠">
+        </div>
+        <div class="form-group">
+          <label class="form-label">次回投薬日</label>
+          <input type="date" class="form-input" id="med-next">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ</label>
+        <textarea class="form-textarea" id="med-memo" placeholder="服用状況など"></textarea>
+      </div>
+      <button class="btn btn-health" onclick="addRecord('medicine')">💾 記録を保存</button>
+    </div>
+    <div id="medicine-records"></div>
+  </div>
+
+  <!-- 体重 -->
+  <div class="subtab-content" id="health-weight">
+    <div class="card">
+      <div class="card-title">⚖️ 体重を記録</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">計測日</label>
+          <input type="date" class="form-input" id="wt-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">体重（kg）</label>
+          <input type="number" step="0.1" class="form-input" id="wt-value" placeholder="5.2">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ</label>
+        <input type="text" class="form-input" id="wt-memo" placeholder="太り気味、標準など">
+      </div>
+      <button class="btn btn-health" onclick="addRecord('weight')">💾 記録を保存</button>
+    </div>
+    <div class="weight-chart" id="weightChart"></div>
+    <div id="weight-records"></div>
+  </div>
+
+  <!-- 散歩 -->
+  <div class="subtab-content" id="health-walk">
+    <div class="card">
+      <div class="card-title">🦮 散歩を記録</div>
+      <div class="form-group">
+        <label class="form-label">日付</label>
+        <input type="date" class="form-input" id="walk-date">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">時間（分）</label>
+          <input type="number" class="form-input" id="walk-time" placeholder="30">
+        </div>
+        <div class="form-group">
+          <label class="form-label">距離（km）</label>
+          <input type="number" step="0.1" class="form-input" id="walk-dist" placeholder="1.5">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">コース</label>
+        <input type="text" class="form-input" id="walk-course" placeholder="公園周り、川沿いなど">
+      </div>
+      <div class="form-group">
+        <label class="form-label">天気</label>
+        <select class="form-select" id="walk-weather">
+          <option>☀️ 晴れ</option>
+          <option>⛅ 曇り</option>
+          <option>🌧 雨</option>
+          <option>❄️ 雪</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ</label>
+        <input type="text" class="form-input" id="walk-memo" placeholder="今日はよく走った！など">
+      </div>
+      <button class="btn btn-health" onclick="addRecord('walk')">💾 記録を保存</button>
+    </div>
+    <div id="walk-records"></div>
+  </div>
+</main>
+
+<!-- ========== 日常ケア ========== -->
+<main id="page-daily" class="page">
+  <div class="section-header">
+    <div class="section-title daily">🌿 日常ケア</div>
+  </div>
+
+  <div class="subtab-bar">
+    <button class="subtab-btn active-daily" onclick="showSubtab('daily','trim',this)">✂️ トリミング</button>
+    <button class="subtab-btn" onclick="showSubtab('daily','filter',this)">💧 給水フィルター</button>
+    <button class="subtab-btn" onclick="showSubtab('daily','other',this)">🧴 その他ケア</button>
+  </div>
+
+  <!-- トリミング -->
+  <div class="subtab-content active" id="daily-trim">
+    <div class="card">
+      <div class="card-title">✂️ トリミング記録を追加</div>
+      <div class="form-group">
+        <label class="form-label">日付</label>
+        <input type="date" class="form-input" id="trim-date" oninput="autoSetNextDate('trim-date','trim-next','month',1)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">サロン名</label>
+        <input type="text" class="form-input" id="trim-salon" placeholder="○○ペットサロン"
+               onfocus="renderChips('trim-salon','savedSalons','salon')"
+               oninput="renderChips('trim-salon','savedSalons','salon')">
+        <div class="suggestion-chips" id="chips-trim-salon"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">メニュー</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px" id="trim-menu-checks">
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
+            <input type="checkbox" value="シャンプー"> シャンプー
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
+            <input type="checkbox" value="カット"> カット
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
+            <input type="checkbox" value="爪切り"> 爪切り
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
+            <input type="checkbox" value="耳掃除"> 耳掃除
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
+            <input type="checkbox" value="歯磨き"> 歯磨き
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
+            <input type="checkbox" value="肛門腺絞り"> 肛門腺絞り
+          </label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">費用（円）</label>
+          <input type="number" class="form-input" id="trim-cost" placeholder="5000">
+        </div>
+        <div class="form-group">
+          <label class="form-label">次回予定日</label>
+          <input type="date" class="form-input" id="trim-next">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ・評価</label>
+        <textarea class="form-textarea" id="trim-memo" placeholder="仕上がりの感想など"></textarea>
+      </div>
+      <button class="btn btn-daily" onclick="addRecord('trim')">💾 記録を保存</button>
+    </div>
+    <div id="trim-records"></div>
+  </div>
+
+  <!-- 給水フィルター -->
+  <div class="subtab-content" id="daily-filter">
+    <div class="card">
+      <div class="card-title">💧 フィルター交換を記録</div>
+      <div class="form-group">
+        <label class="form-label">交換日</label>
+        <input type="date" class="form-input" id="filter-date" oninput="autoSetNextDate('filter-date','filter-next','month',1)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">給水機の種類</label>
+        <input type="text" class="form-input" id="filter-machine" placeholder="ピュアクリスタルなど">
+      </div>
+      <div class="form-group">
+        <label class="form-label">フィルターの種類</label>
+        <input type="text" class="form-input" id="filter-type" placeholder="軟水化フィルターなど">
+      </div>
+      <div class="form-group">
+        <label class="form-label">次回交換予定日</label>
+        <input type="date" class="form-input" id="filter-next">
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ</label>
+        <input type="text" class="form-input" id="filter-memo" placeholder="備考">
+      </div>
+      <button class="btn btn-daily" onclick="addRecord('filter')">💾 記録を保存</button>
+    </div>
+    <div id="filter-records"></div>
+  </div>
+
+  <!-- その他ケア -->
+  <div class="subtab-content" id="daily-other">
+    <div class="card">
+      <div class="card-title">🧴 その他のケアを記録</div>
+      <div class="form-group">
+        <label class="form-label">日付</label>
+        <input type="date" class="form-input" id="other-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ケアの種類</label>
+        <input type="text" class="form-input" id="other-type" placeholder="歯磨き、耳掃除、爪切りなど">
+      </div>
+      <div class="form-group">
+        <label class="form-label">メモ</label>
+        <textarea class="form-textarea" id="other-memo" placeholder="状態、気になる点など"></textarea>
+      </div>
+      <button class="btn btn-daily" onclick="addRecord('other')">💾 記録を保存</button>
+    </div>
+    <div id="other-records"></div>
+  </div>
+</main>
+
+<!-- ========== 旅行記録 ========== -->
+<main id="page-travel" class="page">
+  <div class="section-header">
+    <div class="section-title travel">✈️ 旅行の思い出</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🗺️ 新しい旅行を記録</div>
+    <div class="form-group">
+      <label class="form-label">旅行タイトル</label>
+      <input type="text" class="form-input" id="trip-title" placeholder="軽井沢の旅 🌲">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">出発日</label>
+        <input type="date" class="form-input" id="trip-start">
+      </div>
+      <div class="form-group">
+        <label class="form-label">帰宅日</label>
+        <input type="date" class="form-input" id="trip-end">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">行き先</label>
+      <input type="text" class="form-input" id="trip-dest" placeholder="軽井沢、箱根、沖縄など">
+    </div>
+    <div class="form-group">
+      <label class="form-label">🏨 宿泊施設名</label>
+      <input type="text" class="form-input" id="trip-hotel" placeholder="○○リゾートホテル">
+    </div>
+    <div class="form-group">
+      <label class="form-label">宿泊施設の評価</label>
+      <select class="form-select" id="trip-hotel-rating">
+        <option value="">選択</option>
+        <option>⭐⭐⭐⭐⭐ 最高！また行きたい</option>
+        <option>⭐⭐⭐⭐ とても良かった</option>
+        <option>⭐⭐⭐ 普通</option>
+        <option>⭐⭐ あまり良くなかった</option>
+        <option>⭐ 残念だった</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">思い出・コメント</label>
+      <textarea class="form-textarea" id="trip-memo" placeholder="わんこと一緒に楽しんだエピソードを記録しましょう！"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">📸 写真URL（iPhone/Macの写真共有リンク）</label>
+      <input type="url" class="form-input" id="trip-photo1" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">写真URL 2枚目（任意）</label>
+      <input type="url" class="form-input" id="trip-photo2" placeholder="https://...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">写真URL 3枚目（任意）</label>
+      <input type="url" class="form-input" id="trip-photo3" placeholder="https://...">
+    </div>
+    <button class="btn btn-travel" onclick="addRecord('trip')">💾 旅行を記録</button>
+  </div>
+
+  <div id="trip-records"></div>
+</main>
+
+<!-- ========== 設定モーダル ========== -->
+<div class="modal-overlay" id="settingsModal" onclick="closeSettings(event)">
+  <div class="modal-panel">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ 設定</div>
+
+    <!-- 犬の写真 -->
+    <div class="form-group" style="text-align:center;margin-bottom:20px">
+      <div id="settingsPhotoPreview" style="margin-bottom:10px">🐕</div>
+      <label style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--primary);color:white;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">
+        📷 写真を選ぶ
+        <input type="file" accept="image/*" id="dogPhotoInput" style="display:none" onchange="handlePhotoSelect(this)">
+      </label>
+      <div style="font-size:11px;color:var(--text-light);margin-top:8px">iPhoneはカメラロールから、Macはファイルから選べます</div>
+      <button id="removePhotoBtn" onclick="removeDogPhoto()" style="display:none;margin-top:8px;background:none;border:1px solid #ddd;border-radius:8px;padding:6px 14px;font-size:12px;color:var(--text-light);cursor:pointer">写真を削除</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">愛犬の名前</label>
+      <input type="text" class="form-input" id="set-name" placeholder="ポチ">
+    </div>
+    <div class="form-group">
+      <label class="form-label">犬種</label>
+      <input type="text" class="form-input" id="set-breed" placeholder="トイプードルなど">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">生年月日</label>
+        <input type="date" class="form-input" id="set-birth">
+      </div>
+      <div class="form-group">
+        <label class="form-label">性別</label>
+        <select class="form-select" id="set-gender">
+          <option>オス</option>
+          <option>メス</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">📊 Google スプレッドシートのURL</label>
+      <input type="url" class="form-input" id="set-gs-url" placeholder="https://docs.google.com/spreadsheets/...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">⚡ Apps Script Web アプリのURL（同期用）</label>
+      <input type="url" class="form-input" id="set-webapp-url" placeholder="https://script.google.com/macros/s/.../exec">
+    </div>
+    <div style="margin-bottom:16px">
+      <p style="font-size:11px;color:var(--text-light);line-height:1.5">
+        Web アプリのURLを登録すると、アプリへの入力が自動的にGoogle スプレッドシートに同期されます。<br>
+        Mac・iPhoneどちらから入力しても、同じデータがシートに蓄積されます。<br>
+        設定ガイド（ショートカット設定ガイド.md）を参照してURLを取得してください。
+      </p>
+    </div>
+    <button class="btn btn-primary" onclick="saveSettings()">💾 設定を保存</button>
+    <div style="height:10px"></div>
+    <button class="btn btn-secondary" onclick="closeSettings()">キャンセル</button>
+    <div style="height:16px"></div>
+    <button class="btn btn-danger btn-sm" style="width:100%" onclick="clearAllData()">🗑️ 全データをリセット</button>
+  </div>
+</div>
+
+<script>
+// ========== データ管理 ==========
+const DB = {
+  get: (key) => { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } },
+  set: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
+  getObj: (key) => { try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch { return {}; } },
+  setObj: (key, val) => localStorage.setItem(key, JSON.stringify(val))
+};
+
+// ========== ページ切替 ==========
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+  const fab = document.getElementById('fab');
+  if (name === 'home') { fab.classList.remove('visible'); }
+  else { fab.classList.add('visible'); fab.className = 'fab visible ' + name; }
+  renderPage(name);
+}
+
+function showSubtab(page, tab, btn) {
+  const parent = document.getElementById('page-' + page);
+  parent.querySelectorAll('.subtab-content').forEach(c => c.classList.remove('active'));
+  parent.querySelectorAll('.subtab-btn').forEach(b => {
+    b.classList.remove('active-health','active-daily','active-travel');
+  });
+  document.getElementById(page + '-' + tab).classList.add('active');
+  btn.classList.add('active-' + page);
+  renderSubtab(page, tab);
+  // タブ切替時に次回日付のデフォルトを再適用（未入力のものだけ）
+  setTodayDates();
+}
+
+function openFab() {
+  // 現在アクティブなサブタブのフォームにスクロール
+  const activePage = document.querySelector('.page.active');
+  if (activePage) {
+    const form = activePage.querySelector('.card');
+    if (form) form.scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+// ========== 今日の日付セット ==========
+function addMonths(date, months) {
+  const d = new Date(date);
+  d.setMonth(d.getMonth() + months);
+  return d.toISOString().split('T')[0];
+}
+function addYears(date, years) {
+  const d = new Date(date);
+  d.setFullYear(d.getFullYear() + years);
+  return d.toISOString().split('T')[0];
+}
+
+// 基準日から次回日付を計算してセットする
+function autoSetNextDate(sourceId, targetId, unit, amount) {
+  const src = document.getElementById(sourceId);
+  const tgt = document.getElementById(targetId);
+  if (!src || !tgt || !src.value) return;
+  tgt.value = unit === 'month' ? addMonths(src.value, amount) : addYears(src.value, amount);
+}
+
+function setTodayDates() {
+  const today = new Date().toISOString().split('T')[0];
+  // すべての日付入力に今日をセット（未入力のもののみ）
+  document.querySelectorAll('input[type="date"]').forEach(el => {
+    if (!el.value) el.value = today;
+  });
+  // 次回予定を基準日から計算してセット（未入力のもののみ）
+  const rules = [
+    { src: 'vac-date',    tgt: 'vac-next',    unit: 'year',  n: 1 },
+    { src: 'med-date',    tgt: 'med-next',    unit: 'month', n: 1 },
+    { src: 'trim-date',   tgt: 'trim-next',   unit: 'month', n: 1 },
+    { src: 'filter-date', tgt: 'filter-next', unit: 'month', n: 1 },
+  ];
+  rules.forEach(({ src, tgt, unit, n }) => {
+    const srcEl = document.getElementById(src);
+    const tgtEl = document.getElementById(tgt);
+    if (srcEl && tgtEl && srcEl.value && !tgtEl.value) {
+      tgtEl.value = unit === 'month' ? addMonths(srcEl.value, n) : addYears(srcEl.value, n);
+    }
+  });
+}
+
+// ========== レコード追加 ==========
+function addRecord(type) {
+  const d = new Date().toISOString().split('T')[0];
+  let record = { id: Date.now(), createdAt: d };
+  let key = '';
+
+  if (type === 'hospital') {
+    record.date = document.getElementById('hosp-date').value || d;
+    record.name = document.getElementById('hosp-name').value;
+    record.reason = document.getElementById('hosp-reason').value;
+    record.result = document.getElementById('hosp-result').value;
+    record.cost = document.getElementById('hosp-cost').value;
+    record.next = document.getElementById('hosp-next').value;
+    record.memo = document.getElementById('hosp-memo').value;
+    if (!record.reason && !record.name) { alert('病院名または受診内容を入力してください'); return; }
+    saveSuggestion('savedHospitals', record.name);
+    key = 'hospital';
+    clearForm(['hosp-name','hosp-reason','hosp-result','hosp-cost','hosp-next','hosp-memo']);
+  } else if (type === 'vaccine') {
+    record.date = document.getElementById('vac-date').value || d;
+    record.type = document.getElementById('vac-type').value;
+    record.next = document.getElementById('vac-next').value;
+    record.hospital = document.getElementById('vac-hospital').value;
+    record.memo = document.getElementById('vac-memo').value;
+    if (!record.type) { alert('ワクチンの種類を選択してください'); return; }
+    saveSuggestion('savedHospitals', record.hospital);
+    key = 'vaccine';
+    clearForm(['vac-hospital','vac-memo','vac-next']);
+    document.getElementById('vac-type').value = '';
+  } else if (type === 'medicine') {
+    record.date = document.getElementById('med-date').value || d;
+    record.name = document.getElementById('med-name').value;
+    record.type = document.getElementById('med-type').value;
+    record.dose = document.getElementById('med-dose').value;
+    record.next = document.getElementById('med-next').value;
+    record.memo = document.getElementById('med-memo').value;
+    if (!record.name) { alert('薬の名前を入力してください'); return; }
+    key = 'medicine';
+    clearForm(['med-name','med-dose','med-next','med-memo']);
+    document.getElementById('med-type').value = '';
+  } else if (type === 'weight') {
+    record.date = document.getElementById('wt-date').value || d;
+    record.value = parseFloat(document.getElementById('wt-value').value);
+    record.memo = document.getElementById('wt-memo').value;
+    if (!record.value) { alert('体重を入力してください'); return; }
+    key = 'weight';
+    clearForm(['wt-value','wt-memo']);
+  } else if (type === 'walk') {
+    record.date = document.getElementById('walk-date').value || d;
+    record.time = document.getElementById('walk-time').value;
+    record.dist = document.getElementById('walk-dist').value;
+    record.course = document.getElementById('walk-course').value;
+    record.weather = document.getElementById('walk-weather').value;
+    record.memo = document.getElementById('walk-memo').value;
+    if (!record.time && !record.dist) { alert('時間か距離を入力してください'); return; }
+    key = 'walk';
+    clearForm(['walk-time','walk-dist','walk-course','walk-memo']);
+  } else if (type === 'trim') {
+    record.date = document.getElementById('trim-date').value || d;
+    record.salon = document.getElementById('trim-salon').value;
+    const checks = [...document.querySelectorAll('#trim-menu-checks input:checked')].map(c => c.value);
+    record.menu = checks.join('、');
+    record.cost = document.getElementById('trim-cost').value;
+    record.next = document.getElementById('trim-next').value;
+    record.memo = document.getElementById('trim-memo').value;
+    saveSuggestion('savedSalons', record.salon);
+    key = 'trim';
+    clearForm(['trim-salon','trim-cost','trim-next','trim-memo']);
+    document.querySelectorAll('#trim-menu-checks input').forEach(c => c.checked = false);
+  } else if (type === 'filter') {
+    record.date = document.getElementById('filter-date').value || d;
+    record.machine = document.getElementById('filter-machine').value;
+    record.filterType = document.getElementById('filter-type').value;
+    record.next = document.getElementById('filter-next').value;
+    record.memo = document.getElementById('filter-memo').value;
+    key = 'filter';
+    clearForm(['filter-machine','filter-type','filter-next','filter-memo']);
+  } else if (type === 'other') {
+    record.date = document.getElementById('other-date').value || d;
+    record.type = document.getElementById('other-type').value;
+    record.memo = document.getElementById('other-memo').value;
+    if (!record.type) { alert('ケアの種類を入力してください'); return; }
+    key = 'other';
+    clearForm(['other-type','other-memo']);
+  } else if (type === 'trip') {
+    record.date = document.getElementById('trip-start').value || d;
+    record.title = document.getElementById('trip-title').value;
+    record.start = document.getElementById('trip-start').value;
+    record.end = document.getElementById('trip-end').value;
+    record.dest = document.getElementById('trip-dest').value;
+    record.hotel = document.getElementById('trip-hotel').value;
+    record.hotelRating = document.getElementById('trip-hotel-rating').value;
+    record.memo = document.getElementById('trip-memo').value;
+    record.photo1 = document.getElementById('trip-photo1').value;
+    record.photo2 = document.getElementById('trip-photo2').value;
+    record.photo3 = document.getElementById('trip-photo3').value;
+    if (!record.title && !record.dest) { alert('旅行タイトルまたは行き先を入力してください'); return; }
+    key = 'trip';
+    clearForm(['trip-title','trip-start','trip-end','trip-dest','trip-hotel','trip-memo','trip-photo1','trip-photo2','trip-photo3']);
+    document.getElementById('trip-hotel-rating').value = '';
+  }
+
+  const records = DB.get(key);
+  records.unshift(record);
+  DB.set(key, records);
+  renderRecords(key);
+  updateHomeStats();
+
+  // Google Sheetsに同期
+  syncToSheets(key, record, 'add');
+
+  // 保存アニメーション
+  const btn = document.querySelector(`#page-${getCurrentPage()} .btn:last-of-type`);
+  showSaveAnimation();
+}
+
+function getCurrentPage() {
+  const active = document.querySelector('.page.active');
+  return active ? active.id.replace('page-', '') : 'home';
+}
+
+function showSaveAnimation() {
+  const div = document.createElement('div');
+  div.textContent = '✅ 保存しました！';
+  div.style.cssText = `
+    position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-10px);
+    background:#333; color:white; padding:10px 20px; border-radius:20px; font-size:14px;
+    z-index:999; opacity:0; transition:all 0.3s; pointer-events:none;
+  `;
+  document.body.appendChild(div);
+  requestAnimationFrame(() => { div.style.opacity = '1'; div.style.transform = 'translateX(-50%) translateY(0)'; });
+  setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 1500);
+}
+
+function clearForm(ids) {
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+}
+
+function deleteRecord(key, id) {
+  if (!confirm('この記録を削除しますか？')) return;
+  const records = DB.get(key).filter(r => r.id !== id);
+  DB.set(key, records);
+  renderRecords(key);
+  updateHomeStats();
+  // Google Sheetsからも削除
+  syncToSheets(key, { id }, 'delete');
+}
+
+// ========== 日付フォーマット（グローバル共通） ==========
+// どんな形式の日付値でも yyyy/mm/dd に揃える
+function fmtDate(d) {
+  if (!d) return '';
+  const s = String(d);
+  // "2026-04-17" または "2026-04-17Txx:xx:xx..." 形式
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10).replace(/-/g, '/');
+  // Dateオブジェクトや他の文字列は new Date() でパース
+  const dt = new Date(d);
+  if (!isNaN(dt.getTime())) {
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, '0');
+    const day = String(dt.getDate()).padStart(2, '0');
+    return `${y}/${m}/${day}`;
+  }
+  return s.replace(/-/g, '/');
+}
+
+// ========== レンダリング ==========
+function renderRecords(key) {
+  const records = DB.get(key);
+  const container = document.getElementById(key + '-records');
+  if (!container) return;
+
+  if (records.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">まだ記録がありません</div></div>`;
+    return;
+  }
+
+  let html = '';
+  records.forEach(r => {
+    html += renderRecordItem(key, r);
+  });
+  container.innerHTML = html;
+
+  if (key === 'weight') renderWeightChart();
+}
+
+function renderRecordItem(key, r) {
+  const fmt = fmtDate;
+  let title = '', body = '', tags = '';
+
+  if (key === 'hospital') {
+    title = r.reason || r.name || '通院';
+    body = [r.name, r.result, r.memo].filter(Boolean).join(' / ');
+    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">🏥 ${fmt(r.date)}</span>`;
+    if (r.cost) tags += `<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;
+    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
+  } else if (key === 'vaccine') {
+    title = r.type || 'ワクチン';
+    body = [r.hospital, r.memo].filter(Boolean).join(' / ');
+    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">💉 ${fmt(r.date)}</span>`;
+    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
+  } else if (key === 'medicine') {
+    title = r.name || r.type || '投薬';
+    body = [r.type, r.dose ? r.dose + '投与' : '', r.memo].filter(Boolean).join(' / ');
+    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">💊 ${fmt(r.date)}</span>`;
+    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
+  } else if (key === 'weight') {
+    title = `${r.value} kg`;
+    body = r.memo || '';
+    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">⚖️ ${fmt(r.date)}</span>`;
+  } else if (key === 'walk') {
+    title = `${r.time ? r.time + '分' : ''} ${r.dist ? r.dist + 'km' : ''}`.trim() || '散歩';
+    body = [r.weather, r.course, r.memo].filter(Boolean).join(' / ');
+    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">🦮 ${fmt(r.date)}</span>`;
+  } else if (key === 'trim') {
+    title = r.salon || 'トリミング';
+    body = [r.menu, r.memo].filter(Boolean).join(' / ');
+    tags = `<span class="record-tag" style="background:#e8f8f0;color:var(--daily)">✂️ ${fmt(r.date)}</span>`;
+    if (r.cost) tags += `<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;
+    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
+  } else if (key === 'filter') {
+    title = `フィルター交換`;
+    body = [r.machine, r.filterType, r.memo].filter(Boolean).join(' / ');
+    tags = `<span class="record-tag" style="background:#e8f8f0;color:var(--daily)">💧 ${fmt(r.date)}</span>`;
+    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
+  } else if (key === 'other') {
+    title = r.type || 'ケア';
+    body = r.memo || '';
+    tags = `<span class="record-tag" style="background:#e8f8f0;color:var(--daily)">🧴 ${fmt(r.date)}</span>`;
+  } else if (key === 'trip') {
+    return renderTripCard(r);
+  }
+
+  return `
+    <div class="record-item">
+      <div class="record-item-header">
+        <div>
+          <div class="record-item-title">${title}</div>
+          <div>${tags}</div>
+          ${body ? `<div class="record-item-body">${body}</div>` : ''}
+        </div>
+        <button class="delete-btn" onclick="deleteRecord('${key}', ${r.id})">✕</button>
+      </div>
+    </div>`;
+}
+
+function renderTripCard(r) {
+  const fmt = fmtDate;
+  const photos = [r.photo1, r.photo2, r.photo3].filter(Boolean);
+  let photoHtml = '';
+  if (photos.length > 0) {
+    photoHtml = photos.map(p => `<img src="${p}" class="travel-photo" onerror="this.style.display='none'" alt="旅行の写真">`).join('');
+  }
+
+  return `
+    <div class="travel-card">
+      <div class="travel-card-header">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="travel-card-title">✈️ ${r.title || r.dest || '旅行'}</div>
+            <div class="travel-card-dates">${fmt(r.start)}${r.end ? ' 〜 ' + fmt(r.end) : ''}</div>
+          </div>
+          <button class="delete-btn" style="color:rgba(255,255,255,0.6)" onclick="deleteRecord('trip', ${r.id})">✕</button>
+        </div>
+      </div>
+      <div class="travel-card-body">
+        ${r.dest ? `<div class="travel-info-row"><span class="travel-info-icon">📍</span><span class="travel-info-text">${r.dest}</span></div>` : ''}
+        ${r.hotel ? `<div class="travel-info-row"><span class="travel-info-icon">🏨</span><span class="travel-info-text">${r.hotel}${r.hotelRating ? ' ' + r.hotelRating : ''}</span></div>` : ''}
+        ${r.memo ? `<div class="travel-info-row"><span class="travel-info-icon">📝</span><span class="travel-info-text">${r.memo}</span></div>` : ''}
+        ${photoHtml}
+      </div>
+    </div>`;
+}
+
+function renderWeightChart() {
+  const records = DB.get('weight').slice(0, 8).reverse();
+  const chart = document.getElementById('weightChart');
+  if (!chart) return;
+  if (records.length === 0) { chart.innerHTML = '<div style="width:100%;text-align:center;font-size:12px;color:var(--text-light);align-self:center">体重を記録するとグラフが表示されます</div>'; return; }
+  const max = Math.max(...records.map(r => r.value)) * 1.1;
+  chart.innerHTML = records.map(r => {
+    const h = Math.max(10, (r.value / max) * 90);
+    const label = r.date ? r.date.slice(5) : '';
+    return `<div class="weight-bar-wrap">
+      <div style="font-size:9px;color:var(--text-light);margin-bottom:2px">${r.value}</div>
+      <div class="weight-bar" style="height:${h}%"></div>
+      <div class="weight-bar-label">${label}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderPage(name) {
+  if (name === 'health') {
+    ['hospital','vaccine','medicine','weight','walk'].forEach(k => renderRecords(k));
+  } else if (name === 'daily') {
+    ['trim','filter','other'].forEach(k => renderRecords(k));
+  } else if (name === 'travel') {
+    renderRecords('trip');
+  } else if (name === 'home') {
+    updateHomeStats();
+    renderUpcoming();
+  }
+}
+
+function renderSubtab(page, tab) {
+  const map = {
+    health: { hospital:'hospital', vaccine:'vaccine', medicine:'medicine', weight:'weight', walk:'walk' },
+    daily: { trim:'trim', filter:'filter', other:'other' },
+    travel: { trip:'trip' }
+  };
+  if (map[page] && map[page][tab]) renderRecords(map[page][tab]);
+}
+
+// ========== ホーム統計 ==========
+function updateHomeStats() {
+  // 最新体重
+  const weights = DB.get('weight');
+  document.getElementById('statWeight').textContent = weights.length ? weights[0].value + 'kg' : '--';
+
+  // 今月の散歩回数
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const walks = DB.get('walk').filter(r => r.date && r.date.startsWith(ym));
+  document.getElementById('statWalks').textContent = walks.length + '回';
+
+  // 最終通院
+  const hospitals = DB.get('hospital');
+  if (hospitals.length) {
+    const d = hospitals[0].date;
+    document.getElementById('statHospital').textContent = d ? d.slice(5).replace('-','/') : '--';
+  } else {
+    document.getElementById('statHospital').textContent = '--';
+  }
+
+  // 直近の記録
+  const allRecords = [
+    ...DB.get('hospital').map(r => ({...r, category:'health', label:`🏥 ${r.reason || r.name || '通院'}`})),
+    ...DB.get('vaccine').map(r => ({...r, category:'health', label:`💉 ${r.type || 'ワクチン'}`})),
+    ...DB.get('medicine').map(r => ({...r, category:'health', label:`💊 ${r.name || '投薬'}`})),
+    ...DB.get('weight').map(r => ({...r, category:'health', label:`⚖️ 体重 ${r.value}kg`})),
+    ...DB.get('walk').map(r => ({...r, category:'health', label:`🦮 散歩 ${r.time || ''}分`})),
+    ...DB.get('trim').map(r => ({...r, category:'daily', label:`✂️ トリミング`})),
+    ...DB.get('filter').map(r => ({...r, category:'daily', label:`💧 フィルター交換`})),
+    ...DB.get('other').map(r => ({...r, category:'daily', label:`🧴 ${r.type}`})),
+    ...DB.get('trip').map(r => ({...r, category:'travel', label:`✈️ ${r.title || r.dest || '旅行'}`})),
+  ].sort((a, b) => {
+    // 日付を "yyyy-mm-dd" に正規化して比較（スラッシュ・スペース混在対策）
+    const toComp = (d) => (d || '').toString().slice(0, 10).replace(/\//g, '-');
+    const dateDiff = toComp(b.date).localeCompare(toComp(a.date));
+    if (dateDiff !== 0) return dateDiff;
+    // 同日ならID（登録時刻）の降順
+    return (Number(b.id) || 0) - (Number(a.id) || 0);
+  }).slice(0, 5);
+
+  const colorMap = { health: 'var(--health)', daily: 'var(--daily)', travel: 'var(--travel)' };
+  const recentList = document.getElementById('recentList');
+  if (allRecords.length === 0) {
+    recentList.innerHTML = '<li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>';
+  } else {
+    recentList.innerHTML = allRecords.map(r => `
+      <li class="recent-item">
+        <div class="recent-dot" style="background:${colorMap[r.category]}"></div>
+        <div class="recent-text">${r.label}</div>
+        <div class="recent-date">${fmtDate(r.date)}</div>
+      </li>`).join('');
+  }
+}
+
+// ========== 設定 ==========
+function openSettings() {
+  const s = DB.getObj('settings');
+  document.getElementById('set-name').value = s.name || '';
+  document.getElementById('set-breed').value = s.breed || '';
+  document.getElementById('set-birth').value = s.birth || '';
+  document.getElementById('set-gender').value = s.gender || 'オス';
+  document.getElementById('set-gs-url').value = s.gsUrl || '';
+  document.getElementById('set-webapp-url').value = s.webAppUrl || '';
+  // 写真プレビューを更新
+  applyDogPhoto(localStorage.getItem('dogPhoto'));
+  document.getElementById('settingsModal').classList.add('open');
+}
+
+function closeSettings(e) {
+  if (!e || e.target === document.getElementById('settingsModal')) {
+    document.getElementById('settingsModal').classList.remove('open');
+  }
+}
+
+function saveSettings() {
+  const s = {
+    name: document.getElementById('set-name').value || 'わんこ',
+    breed: document.getElementById('set-breed').value,
+    birth: document.getElementById('set-birth').value,
+    gender: document.getElementById('set-gender').value,
+    gsUrl: document.getElementById('set-gs-url').value,
+    webAppUrl: document.getElementById('set-webapp-url').value
+  };
+  DB.setObj('settings', s);
+  applySettings();
+  closeSettings();
+  showSaveAnimation();
+}
+
+function applySettings() {
+  const s = DB.getObj('settings');
+  const name = s.name || 'わんこ';
+  document.getElementById('headerDogName').textContent = name;
+  document.getElementById('homeDogName').textContent = name;
+  document.getElementById('homeBreed').textContent = s.breed ? `${s.breed} / ${s.gender || ''}` : (s.gender || '犬種未設定');
+
+  const gsUrl = s.gsUrl;
+  const gsCard = document.getElementById('gsCard');
+  if (gsUrl) {
+    gsCard.style.display = 'block';
+    document.getElementById('gsLink').href = gsUrl;
+  } else {
+    gsCard.style.display = 'none';
+  }
+
+  // WebアプリURL設定済みなら同期ボタンを明るくする
+  const syncBtn = document.getElementById('syncBtn');
+  if (s.webAppUrl) {
+    syncBtn.style.opacity = '1';
+    syncBtn.title = 'Google Sheetsと同期';
+  } else {
+    syncBtn.style.opacity = '0.5';
+    syncBtn.title = '設定でWebアプリURLを登録してください';
+  }
+}
+
+// ========== リマインダー ==========
+
+const REMIND_CHECKS = [
+  { key: 'hospital', nextField: 'next', icon: '🏥', labelFn: (r) => (r.name || '動物病院') + ' 通院予定' },
+  { key: 'vaccine',  nextField: 'next', icon: '💉', labelFn: (r) => (r.type || 'ワクチン') + ' 接種予定' },
+  { key: 'medicine', nextField: 'next', icon: '💊', labelFn: (r) => (r.name || '投薬') + ' 次回予定' },
+  { key: 'trim',     nextField: 'next', icon: '✂️', labelFn: (r) => (r.salon || 'トリミング') + ' 予定' },
+  { key: 'filter',   nextField: 'next', icon: '💧', labelFn: () => '給水フィルター交換予定' },
+];
+
+function getUpcomingReminders(daysAhead = 7) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const limit = new Date(today); limit.setDate(limit.getDate() + daysAhead);
+  const reminders = [];
+
+  REMIND_CHECKS.forEach(({ key, nextField, icon, labelFn }) => {
+    const records = DB.get(key);
+    // 各タイプで最新の「次回」が設定されているレコードをチェック
+    const seen = new Set();
+    records.forEach(r => {
+      const rawNext = r[nextField];
+      if (!rawNext) return;
+      const nextDate = new Date(rawNext); nextDate.setHours(0, 0, 0, 0);
+      if (isNaN(nextDate.getTime())) return;
+      // 過去のものはスキップ、7日以内のもの
+      if (nextDate < today || nextDate > limit) return;
+      const sig = key + '_' + rawNext; // 重複排除
+      if (seen.has(sig)) return;
+      seen.add(sig);
+      const daysLeft = Math.round((nextDate - today) / 86400000);
+      reminders.push({ icon, label: labelFn(r), date: fmtDate(rawNext), daysLeft });
+    });
+  });
+
+  // 日数が近い順に並べる
+  return reminders.sort((a, b) => a.daysLeft - b.daysLeft);
+}
+
+function renderUpcoming() {
+  const reminders = getUpcomingReminders(7);
+  const container = document.getElementById('upcomingList');
+  if (!container) return;
+
+  if (reminders.length === 0) {
+    container.innerHTML = '<p style="font-size:13px;color:var(--text-light);">1週間以内の予定はありません</p>';
+    return;
+  }
+
+  container.innerHTML = reminders.map(r => {
+    const cls = r.daysLeft === 0 ? 'urgent' : r.daysLeft <= 2 ? 'urgent' : r.daysLeft <= 4 ? 'soon' : 'normal';
+    const dayLabel = r.daysLeft === 0 ? '今日！' : r.daysLeft === 1 ? '明日！' : r.daysLeft + '日後';
+    return `<div class="remind-item ${cls}">
+      <div class="remind-days ${cls}">${dayLabel}</div>
+      <div>
+        <div class="remind-label">${r.icon} ${r.label}</div>
+        <div class="remind-date">${r.date}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- Web通知 ----
+async function requestNotifPermission() {
+  if (!('Notification' in window)) {
+    alert('このブラウザは通知に対応していません。\niPhoneではホーム画面に追加してから開いてください。');
+    return;
+  }
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    sendUpcomingNotifications();
+    document.getElementById('notifBtn').style.display = 'none';
+    showSaveAnimation();
+  } else {
+    alert('通知が許可されませんでした。\niPhoneの設定 → Safari → 通知 から許可してください。');
+  }
+}
+
+function sendUpcomingNotifications() {
+  if (Notification.permission !== 'granted') return;
+  const reminders = getUpcomingReminders(7);
+  if (reminders.length === 0) return;
+
+  reminders.forEach((r, i) => {
+    setTimeout(() => {
+      const dayLabel = r.daysLeft === 0 ? '今日' : r.daysLeft + '日後';
+      new Notification('🐾 わんケア リマインダー', {
+        body: `${r.icon} ${r.label}（${dayLabel}：${r.date}）`,
+        icon: '🐾',
+        tag: 'wancare-' + i,
+      });
+    }, i * 500); // 少しずらして表示
+  });
+}
+
+function initNotifButton() {
+  const btn = document.getElementById('notifBtn');
+  if (!btn) return;
+  if (!('Notification' in window)) { btn.style.display = 'none'; return; }
+  if (Notification.permission === 'granted') {
+    btn.style.display = 'none';
+  } else if (Notification.permission === 'denied') {
+    btn.style.display = 'none';
+  } else {
+    btn.style.display = 'inline-block';
+  }
+}
+
+// ========== 履歴チップ（病院名・サロン名） ==========
+
+function saveSuggestion(storageKey, value) {
+  if (!value || !value.trim()) return;
+  const list = DB.get(storageKey);
+  const trimmed = value.trim();
+  // 既にあれば先頭に移動、なければ先頭に追加（最大10件）
+  const filtered = list.filter(v => v !== trimmed);
+  filtered.unshift(trimmed);
+  DB.set(storageKey, filtered.slice(0, 10));
+}
+
+function removeSuggestion(storageKey, value, inputId, chipClass) {
+  const list = DB.get(storageKey).filter(v => v !== value);
+  DB.set(storageKey, list);
+  renderChips(inputId, storageKey, chipClass);
+}
+
+function renderChips(inputId, storageKey, chipClass) {
+  const container = document.getElementById('chips-' + inputId);
+  if (!container) return;
+  const inputVal = (document.getElementById(inputId)?.value || '').trim().toLowerCase();
+  const list = DB.get(storageKey);
+  // 入力中はフィルタリング
+  const filtered = inputVal
+    ? list.filter(v => v.toLowerCase().includes(inputVal))
+    : list;
+  if (filtered.length === 0) { container.innerHTML = ''; return; }
+  container.innerHTML = filtered.map(v => `
+    <span class="chip ${chipClass}" onclick="selectChip('${inputId}','${storageKey}','${chipClass}',${JSON.stringify(v)})">
+      ${v}
+      <span class="chip-del" onclick="event.stopPropagation();removeSuggestion('${storageKey}',${JSON.stringify(v)},'${inputId}','${chipClass}')">✕</span>
+    </span>`).join('');
+}
+
+function selectChip(inputId, storageKey, chipClass, value) {
+  const el = document.getElementById(inputId);
+  if (el) { el.value = value; }
+  // 選択したら先頭に昇格
+  saveSuggestion(storageKey, value);
+  renderChips(inputId, storageKey, chipClass);
+}
+
+// ========== 犬の写真管理 ==========
+
+function handlePhotoSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    // キャンバスでリサイズして容量を抑える
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const SIZE = 300; // 最大300px角に縮小
+      let w = img.width, h = img.height;
+      if (w > h) { h = Math.round(h * SIZE / w); w = SIZE; }
+      else       { w = Math.round(w * SIZE / h); h = SIZE; }
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+      localStorage.setItem('dogPhoto', dataUrl);
+      applyDogPhoto(dataUrl);
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyDogPhoto(dataUrl) {
+  // ホーム画面のアイコンを差し替え
+  const wrap = document.getElementById('homeDogIconWrap');
+  if (dataUrl) {
+    wrap.innerHTML = `<img src="${dataUrl}" class="home-dog-photo" alt="愛犬の写真">`;
+  } else {
+    wrap.innerHTML = '🐕';
+  }
+
+  // 設定プレビューも更新
+  const preview = document.getElementById('settingsPhotoPreview');
+  if (preview) {
+    if (dataUrl) {
+      preview.innerHTML = `<img src="${dataUrl}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--primary-light)">`;
+      document.getElementById('removePhotoBtn').style.display = 'inline-block';
+    } else {
+      preview.innerHTML = '<span style="font-size:50px">🐕</span>';
+      document.getElementById('removePhotoBtn').style.display = 'none';
+    }
+  }
+}
+
+function removeDogPhoto() {
+  localStorage.removeItem('dogPhoto');
+  applyDogPhoto(null);
+  document.getElementById('dogPhotoInput').value = '';
+}
+
+function clearAllData() {
+  if (!confirm('全データを削除しますか？この操作は元に戻せません。')) return;
+  ['hospital','vaccine','medicine','weight','walk','trim','filter','other','trip'].forEach(k => DB.set(k, []));
+  alert('全データを削除しました');
+  renderPage('home');
+}
+
+// ========== Google Sheets 同期 ==========
+
+function getWebAppUrl() {
+  return DB.getObj('settings').webAppUrl || '';
+}
+
+function showSyncBar(msg, state) {
+  const bar = document.getElementById('syncBar');
+  bar.textContent = msg;
+  bar.className = 'sync-bar ' + state;
+  if (state === 'success') {
+    setTimeout(() => { bar.className = 'sync-bar'; }, 2500);
+  }
+}
+
+// レコードをSheetsに送信（追加）
+async function syncToSheets(type, record, action) {
+  const url = getWebAppUrl();
+  if (!url) return; // URLが未設定なら何もしない
+
+  try {
+    const params = new URLSearchParams();
+    params.set('action', action);
+    params.set('type', type);
+    if (action === 'add') {
+      params.set('data', JSON.stringify(record));
+    } else if (action === 'delete') {
+      params.set('id', String(record.id));
+    }
+
+    await fetch(url, { method: 'POST', body: params });
+    // ※ Apps Scriptはno-corsでも書き込みは成功します
+  } catch (e) {
+    console.warn('Sheets同期エラー（オフライン可能性）:', e);
+  }
+}
+
+// Sheetsから全データを読み込んでlocalStorageに上書き
+async function loadFromSheets() {
+  const url = getWebAppUrl();
+  if (!url) return false;
+
+  const btn = document.getElementById('syncBtn');
+  btn.classList.add('spinning');
+  showSyncBar('🔄 Google Sheetsと同期中...', 'syncing');
+
+  try {
+    const res = await fetch(url + '?t=' + Date.now()); // キャッシュ回避
+    if (!res.ok) throw new Error('HTTPエラー: ' + res.status);
+    const json = await res.json();
+
+    if (json.status !== 'ok') throw new Error(json.message || '取得失敗');
+
+    const data = json.data;
+    // Sheetsのデータをlocalに保存（新しいIDで並び替え）
+    Object.keys(data).forEach(type => {
+      if (data[type] && data[type].length > 0) {
+        const sorted = data[type]
+          .map(r => ({ ...r, id: Number(r.id) || 0 }))
+          .sort((a, b) => b.id - a.id);
+        DB.set(type, sorted);
+      }
+    });
+
+    // 画面を更新
+    const activePage = document.querySelector('.page.active');
+    if (activePage) renderPage(activePage.id.replace('page-', ''));
+    updateHomeStats();
+
+    showSyncBar('✅ 同期完了！最新データを取得しました', 'success');
+    btn.classList.remove('spinning');
+    return true;
+  } catch (e) {
+    showSyncBar('⚠️ 同期失敗（オフラインか設定を確認）', 'error');
+    btn.classList.remove('spinning');
+    console.error('loadFromSheets error:', e);
+    return false;
+  }
+}
+
+// 手動同期ボタン
+async function manualSync() {
+  const url = getWebAppUrl();
+  if (!url) {
+    showSyncBar('⚙️ 設定でWebアプリURLを登録してください', 'error');
+    setTimeout(() => { document.getElementById('syncBar').className = 'sync-bar'; }, 3000);
+    return;
+  }
+  await loadFromSheets();
+}
+
+// ========== 初期化 ==========
+window.addEventListener('DOMContentLoaded', async () => {
+  setTodayDates();
+  applySettings();
+  applyDogPhoto(localStorage.getItem('dogPhoto'));
+  updateHomeStats();
+  renderUpcoming();
+  initNotifButton();
+  // 通知許可済みなら起動時にも通知
+  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+    sendUpcomingNotifications();
+  }
+  // 起動時にSheetsからデータを読み込む（URLが設定済みの場合）
+  if (getWebAppUrl()) {
+    await loadFromSheets();
+    renderUpcoming(); // Sheets読み込み後に再描画
+  }
+});
+</script>
+</body>
+</html>
