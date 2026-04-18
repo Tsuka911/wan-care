@@ -184,23 +184,43 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  .recent-list { list-style: none; }
+  .recent-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
   .recent-item {
     display: flex;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
+    padding: 10px 12px;
+    border-radius: 12px;
     gap: 10px;
+    transition: transform 0.15s;
   }
-  .recent-item:last-child { border-bottom: none; }
-  .recent-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+  .recent-item:active { transform: scale(0.98); }
+  .recent-item.cat-health { background: linear-gradient(135deg, #fff0eb, #ffe4d8); border-left: 3px solid var(--health); }
+  .recent-item.cat-daily  { background: linear-gradient(135deg, #edfaf3, #d6f5e5); border-left: 3px solid var(--daily); }
+  .recent-item.cat-travel { background: linear-gradient(135deg, #ebf3fd, #d5e9fb); border-left: 3px solid var(--travel); }
+  .recent-icon-wrap {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
     flex-shrink: 0;
   }
-  .recent-text { flex: 1; font-size: 13px; }
-  .recent-date { font-size: 11px; color: var(--text-light); }
+  .recent-icon-wrap.cat-health { background: rgba(224,123,84,0.15); }
+  .recent-icon-wrap.cat-daily  { background: rgba(106,184,154,0.15); }
+  .recent-icon-wrap.cat-travel { background: rgba(91,155,213,0.15); }
+  .recent-body { flex: 1; min-width: 0; }
+  .recent-text { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .recent-date {
+    display: inline-block;
+    margin-top: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    color: white;
+  }
+  .recent-date.cat-health { background: var(--health); }
+  .recent-date.cat-daily  { background: var(--daily); }
+  .recent-date.cat-travel { background: var(--travel); }
 
   /* フォーム */
   .form-group { margin-bottom: 12px; }
@@ -682,8 +702,8 @@
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-title">📅 直近の記録</div>
+  <div class="card" style="background: linear-gradient(160deg, #fffaf7 0%, #fff 100%); border: 1.5px solid var(--primary-light);">
+    <div class="card-title" style="font-size:15px; color:var(--primary-dark);">📋 直近の記録</div>
     <ul class="recent-list" id="recentList">
       <li class="empty-state">
         <div class="empty-icon">🐾</div>
@@ -1608,16 +1628,18 @@ function updateHomeStats() {
     return (Number(b.id) || 0) - (Number(a.id) || 0);
   }).slice(0, 5);
 
-  const colorMap = { health: 'var(--health)', daily: 'var(--daily)', travel: 'var(--travel)' };
+  const iconMap = { health: '❤️', daily: '🌿', travel: '✈️' };
   const recentList = document.getElementById('recentList');
   if (allRecords.length === 0) {
     recentList.innerHTML = '<li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>';
   } else {
     recentList.innerHTML = allRecords.map(r => `
-      <li class="recent-item">
-        <div class="recent-dot" style="background:${colorMap[r.category]}"></div>
-        <div class="recent-text">${r.label}</div>
-        <div class="recent-date">${fmtDate(r.date)}</div>
+      <li class="recent-item cat-${r.category}">
+        <div class="recent-icon-wrap cat-${r.category}">${iconMap[r.category] || '📝'}</div>
+        <div class="recent-body">
+          <div class="recent-text">${r.label}</div>
+          <div class="recent-date cat-${r.category}">${fmtDate(r.date)}</div>
+        </div>
       </li>`).join('');
   }
 }
@@ -1839,24 +1861,52 @@ function renderChips(inputId, storageKey, chipClass) {
   if (!container) return;
   const inputVal = (document.getElementById(inputId)?.value || '').trim().toLowerCase();
   const list = DB.get(storageKey);
-  // 入力中はフィルタリング
   const filtered = inputVal
     ? list.filter(v => v.toLowerCase().includes(inputVal))
     : list;
-  if (filtered.length === 0) { container.innerHTML = ''; return; }
-  container.innerHTML = filtered.map(v => `
-    <span class="chip ${chipClass}" onclick="selectChip('${inputId}','${storageKey}','${chipClass}',${JSON.stringify(v)})">
-      ${v}
-      <span class="chip-del" onclick="event.stopPropagation();removeSuggestion('${storageKey}',${JSON.stringify(v)},'${inputId}','${chipClass}')">✕</span>
-    </span>`).join('');
-}
 
-function selectChip(inputId, storageKey, chipClass, value) {
-  const el = document.getElementById(inputId);
-  if (el) { el.value = value; }
-  // 選択したら先頭に昇格
-  saveSuggestion(storageKey, value);
-  renderChips(inputId, storageKey, chipClass);
+  // チップのHTML生成（インラインonclickは使わない）
+  if (filtered.length === 0) {
+    container.innerHTML = '';
+    container._chipMeta = null;
+    return;
+  }
+  container.innerHTML = filtered.map((v, i) => {
+    const safeText = v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return `<span class="chip ${chipClass}" data-idx="${i}">${safeText}<span class="chip-del" data-del="${i}"> ✕</span></span>`;
+  }).join('');
+
+  // 値をコンテナに紐付けて保持（インデックスで参照）
+  container._chipMeta = { filtered, inputId, storageKey, chipClass };
+
+  // イベントリスナーを毎回付け替え（古いものを除去してから）
+  container.onclick = function(e) {
+    const meta = container._chipMeta;
+    if (!meta) return;
+
+    // ✕ ボタンのクリック
+    const delSpan = e.target.closest('[data-del]');
+    if (delSpan) {
+      e.stopPropagation();
+      const idx = parseInt(delSpan.dataset.del, 10);
+      const val = meta.filtered[idx];
+      removeSuggestion(meta.storageKey, val, meta.inputId, meta.chipClass);
+      return;
+    }
+
+    // チップ本体のクリック → 入力欄に反映
+    const chipSpan = e.target.closest('[data-idx]');
+    if (chipSpan) {
+      const idx = parseInt(chipSpan.dataset.idx, 10);
+      const val = meta.filtered[idx];
+      const inputEl = document.getElementById(meta.inputId);
+      if (inputEl) {
+        inputEl.value = val;
+      }
+      saveSuggestion(meta.storageKey, val);
+      renderChips(meta.inputId, meta.storageKey, meta.chipClass);
+    }
+  };
 }
 
 // ========== 犬の写真管理 ==========
