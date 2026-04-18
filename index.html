@@ -131,24 +131,34 @@
   .home-greeting {
     background: linear-gradient(135deg, #fff5f0, #ffeedd);
     border-radius: var(--radius);
-    padding: 20px;
+    padding: 16px 20px;
     margin-bottom: 16px;
-    text-align: center;
     border: 1px solid var(--primary-light);
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
-  .home-dog-icon { font-size: 60px; margin-bottom: 8px; }
+  .home-dog-icon {
+    font-size: 64px;
+    flex-shrink: 0;
+    line-height: 1;
+  }
   .home-dog-photo {
-    width: 100px; height: 100px;
+    width: 80px; height: 80px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid white;
+    border: 3px solid white;
     box-shadow: 0 4px 16px rgba(224,123,84,0.3);
-    margin-bottom: 8px;
+    flex-shrink: 0;
     display: block;
-    margin-left: auto; margin-right: auto;
   }
-  .home-dog-name { font-size: 22px; font-weight: 700; color: var(--primary); }
-  .home-breed { font-size: 13px; color: var(--text-light); margin-top: 2px; }
+  .home-dog-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .home-dog-name { font-size: 20px; font-weight: 700; color: var(--primary); line-height: 1.2; }
+  .home-breed { font-size: 12px; color: var(--text-light); margin-top: 3px; }
+  .home-birth { font-size: 12px; color: var(--text-light); margin-top: 3px; }
   .home-stats {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -647,8 +657,11 @@
 <main id="page-home" class="page active">
   <div class="home-greeting">
     <div class="home-dog-icon" id="homeDogIconWrap">🐕</div>
-    <div class="home-dog-name" id="homeDogName">わんこ</div>
-    <div class="home-breed" id="homeBreed">犬種未設定</div>
+    <div class="home-dog-info">
+      <div class="home-dog-name" id="homeDogName">わんこ</div>
+      <div class="home-breed" id="homeBreed">犬種未設定</div>
+      <div class="home-birth" id="homeBirth" style="display:none;"></div>
+    </div>
   </div>
 
   <div class="home-stats">
@@ -1647,6 +1660,23 @@ function applySettings() {
   document.getElementById('headerDogName').textContent = name;
   document.getElementById('homeDogName').textContent = name;
   document.getElementById('homeBreed').textContent = s.breed ? `${s.breed} / ${s.gender || ''}` : (s.gender || '犬種未設定');
+
+  // 生年月日・年齢表示
+  const birthEl = document.getElementById('homeBirth');
+  if (s.birth) {
+    const birth = new Date(s.birth);
+    const today = new Date();
+    let years = today.getFullYear() - birth.getFullYear();
+    let months = today.getMonth() - birth.getMonth();
+    if (today.getDate() < birth.getDate()) months--;
+    if (months < 0) { years--; months += 12; }
+    const birthStr = `${birth.getFullYear()}/${String(birth.getMonth()+1).padStart(2,'0')}/${String(birth.getDate()).padStart(2,'0')}`;
+    const ageStr = years > 0 ? `${years}歳${months > 0 ? months + 'ヶ月' : ''}` : `${months}ヶ月`;
+    birthEl.textContent = `🎂 ${birthStr}生まれ・${ageStr}`;
+    birthEl.style.display = 'block';
+  } else {
+    birthEl.style.display = 'none';
+  }
 
   const gsUrl = s.gsUrl;
   const gsCard = document.getElementById('gsCard');
