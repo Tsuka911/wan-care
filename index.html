@@ -1570,10 +1570,13 @@ function updateHomeStats() {
   const weights = DB.get('weight');
   document.getElementById('statWeight').textContent = weights.length ? weights[0].value + 'kg' : '--';
 
-  // 今月の散歩回数
+  // 今月の散歩回数（日付フォーマットを正規化して比較）
   const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-  const walks = DB.get('walk').filter(r => r.date && r.date.startsWith(ym));
+  const ym = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}`;
+  const walks = DB.get('walk').filter(r => {
+    const d = fmtDate(r.date);
+    return d && d.startsWith(ym);
+  });
   document.getElementById('statWalks').textContent = walks.length + '回';
 
   // 最終通院
@@ -1652,6 +1655,14 @@ function saveSettings() {
   applySettings();
   closeSettings();
   showSaveAnimation();
+
+  // プロフィールをGoogle Sheetsに同期
+  if (s.webAppUrl) {
+    const params = new URLSearchParams();
+    params.set('action', 'save_profile');
+    params.set('data', JSON.stringify({ name: s.name, breed: s.breed, birth: s.birth, gender: s.gender }));
+    fetch(s.webAppUrl, { method: 'POST', body: params, mode: 'no-cors' }).catch(() => {});
+  }
 }
 
 function applySettings() {
@@ -1969,6 +1980,7 @@ async function loadFromSheets() {
     const data = json.data;
     // Sheetsのデータをlocalに保存（新しいIDで並び替え）
     Object.keys(data).forEach(type => {
+      if (type === 'profile') return; // プロフィールは別処理
       if (data[type] && data[type].length > 0) {
         const sorted = data[type]
           .map(r => ({ ...r, id: Number(r.id) || 0 }))
@@ -1976,6 +1988,19 @@ async function loadFromSheets() {
         DB.set(type, sorted);
       }
     });
+
+    // プロフィール情報を復元（URLやパスワードはローカル優先）
+    if (data.profile) {
+      const current = DB.getObj('settings');
+      DB.setObj('settings', {
+        ...current,
+        name: data.profile.name || current.name,
+        breed: data.profile.breed || current.breed,
+        birth: data.profile.birth || current.birth,
+        gender: data.profile.gender || current.gender,
+      });
+      applySettings();
+    }
 
     // 画面を更新
     const activePage = document.querySelector('.page.active');
