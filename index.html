@@ -6,2095 +6,1784 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="わんケア">
+<link rel="apple-touch-icon" href="wancare-icon-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="wancare-icon-180.png">
 <title>🐾 わんケア</title>
 <style>
-  :root {
-    --primary: #e07b54;
-    --primary-light: #f5c4a8;
-    --primary-dark: #b85c35;
-    --secondary: #5b9bd5;
-    --accent: #f0c040;
-    --health: #e07b54;
-    --daily: #6ab89a;
-    --travel: #5b9bd5;
-    --bg: #fdf6f0;
-    --card: #ffffff;
-    --text: #3a2e28;
-    --text-light: #8a7a72;
-    --border: #e8ddd6;
-    --shadow: 0 2px 12px rgba(0,0,0,0.08);
-    --radius: 14px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, 'Hiragino Sans', 'Yu Gothic', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    padding-bottom: 90px;
-  }
+:root {
+  --primary:#e07b54; --primary-light:#f5c4a8; --primary-dark:#b85c35;
+  --health:#e07b54; --daily:#6ab89a; --travel:#5b9bd5; --violet:#9b8ed5;
+  --bg:#fdf6f0; --card:#ffffff; --text:#3a2e28; --text-light:#8a7a72;
+  --border:#e8ddd6; --shadow:0 2px 12px rgba(0,0,0,0.08); --radius:14px;
+  --tab-h:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:calc(var(--tab-h) + env(safe-area-inset-bottom));}
 
-  /* ヘッダー */
-  .header {
-    background: linear-gradient(135deg, var(--primary) 0%, #c86a3c 100%);
-    color: white;
-    padding: 18px 20px 14px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 10px rgba(224,123,84,0.3);
-  }
-  .header-left { display: flex; align-items: center; gap: 10px; }
-  .dog-name-display {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-  .header-sub { font-size: 12px; opacity: 0.85; }
-  .paw-icon { font-size: 28px; }
-  .settings-btn {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-  }
+/* ===== PAGES ===== */
+.page{display:none;min-height:100vh;}
+.page.active{display:block;}
 
-  /* タブバー */
-  .tab-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: white;
-    display: flex;
-    border-top: 1px solid var(--border);
-    z-index: 100;
-    padding-bottom: env(safe-area-inset-bottom);
-    box-shadow: 0 -2px 12px rgba(0,0,0,0.06);
-  }
-  .tab-btn {
-    flex: 1;
-    padding: 8px 4px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    font-size: 10px;
-    color: var(--text-light);
-    transition: all 0.2s;
-  }
-  .tab-btn .tab-icon { font-size: 22px; }
-  .tab-btn.active { color: var(--primary); }
-  .tab-btn.active.health { color: var(--health); }
-  .tab-btn.active.daily { color: var(--daily); }
-  .tab-btn.active.travel { color: var(--travel); }
+/* ===== TAB BAR ===== */
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,0.08);display:flex;align-items:center;height:calc(var(--tab-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);z-index:100;box-shadow:0 -2px 16px rgba(0,0,0,0.06);}
+.tab-btn{flex:1;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px 4px;font-family:inherit;color:var(--text-light);}
+.tab-btn svg{display:block;}
+.tab-label{font-size:9px;font-weight:500;color:var(--text-light);}
+.tab-btn.active .tab-label{font-weight:700;}
+.tab-btn[data-tab="home"]{color:#ccc;}
+.tab-btn[data-tab="home"].active{color:var(--primary);}
+.tab-btn[data-tab="home"].active .tab-label{color:var(--primary);}
+.tab-btn[data-tab="records"]{color:#ccc;}
+.tab-btn[data-tab="records"].active{color:var(--daily);}
+.tab-btn[data-tab="records"].active .tab-label{color:var(--daily);}
+.tab-btn[data-tab="calendar"]{color:#ccc;}
+.tab-btn[data-tab="calendar"].active{color:var(--travel);}
+.tab-btn[data-tab="calendar"].active .tab-label{color:var(--travel);}
+.tab-btn[data-tab="profile"] .tab-dog-svg{opacity:0.35;transition:opacity .2s;}
+.tab-btn[data-tab="profile"].active .tab-dog-svg{opacity:1;}
+.tab-btn[data-tab="profile"] .tab-label{color:var(--text-light);}
+.tab-btn[data-tab="profile"].active .tab-label{color:var(--violet);}
+.tab-add-wrap{flex:1;display:flex;align-items:center;justify-content:center;}
+.tab-add-btn{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#c86a3c);display:flex;align-items:center;justify-content:center;border:none;cursor:pointer;box-shadow:0 4px 16px rgba(224,123,84,0.45);margin-top:-20px;transition:transform .15s;}
+.tab-add-btn:active{transform:scale(0.92);}
 
-  /* コンテンツ */
-  .page { display: none; padding: 16px; }
-  .page.active { display: block; }
+/* ===== SYNC BAR ===== */
+.sync-bar{display:none;position:fixed;top:0;left:0;right:0;padding:8px 16px;font-size:12px;font-weight:600;text-align:center;z-index:150;padding-top:calc(env(safe-area-inset-top,0px) + 8px);}
+.sync-bar.syncing{display:block;background:#fff8e1;color:#b07d00;}
+.sync-bar.success{display:block;background:#e8f5e9;color:#2e7d32;}
+.sync-bar.error{display:block;background:#fdecea;color:#c62828;}
 
-  /* カード */
-  .card {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 16px;
-    margin-bottom: 14px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-  }
-  .card-title {
-    font-size: 14px;
-    font-weight: 700;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-  }
+/* ===== HOME ===== */
+.home-hero{background:linear-gradient(135deg,var(--primary) 0%,#c86a3c 100%);color:white;padding:calc(env(safe-area-inset-top,0px) + 56px) 16px 20px;}
+.home-hero-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.home-dog-row{display:flex;align-items:center;gap:12px;}
+.home-dog-avatar{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;overflow:hidden;border:2px solid rgba(255,255,255,0.5);}
+.home-dog-avatar img{width:100%;height:100%;object-fit:cover;}
+.home-dog-name{font-size:22px;font-weight:700;}
+.home-dog-breed{font-size:12px;opacity:.85;margin-top:2px;}
+.home-dog-birth{font-size:11px;opacity:.75;margin-top:2px;}
+.hero-btn{background:rgba(255,255,255,0.2);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.home-stats-row{display:flex;gap:8px;}
+.home-stat-pill{flex:1;background:rgba(255,255,255,0.18);border-radius:12px;padding:10px 6px;text-align:center;backdrop-filter:blur(8px);}
+.home-stat-icon{display:flex;align-items:center;justify-content:center;height:26px;}
+.home-stat-value{font-size:13px;font-weight:700;margin-top:2px;}
+.home-stat-label{font-size:9px;opacity:.8;}
+.home-content{padding:14px 14px 0;}
 
-  /* ホーム */
-  .home-greeting {
-    background: linear-gradient(135deg, #fff5f0, #ffeedd);
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    margin-bottom: 16px;
-    border: 1px solid var(--primary-light);
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .home-dog-icon {
-    font-size: 64px;
-    flex-shrink: 0;
-    line-height: 1;
-  }
-  .home-dog-photo {
-    width: 80px; height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid white;
-    box-shadow: 0 4px 16px rgba(224,123,84,0.3);
-    flex-shrink: 0;
-    display: block;
-  }
-  .home-dog-info {
-    flex: 1;
-    min-width: 0;
-  }
-  .home-dog-name { font-size: 20px; font-weight: 700; color: var(--primary); line-height: 1.2; }
-  .home-breed { font-size: 12px; color: var(--text-light); margin-top: 3px; }
-  .home-birth { font-size: 12px; color: var(--text-light); margin-top: 3px; }
-  .home-stats {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .stat-card {
-    background: white;
-    border-radius: var(--radius);
-    padding: 14px 8px;
-    text-align: center;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-  }
-  .stat-icon { font-size: 22px; margin-bottom: 4px; }
-  .stat-value { font-size: 14px; font-weight: 700; color: var(--text); }
-  .stat-label { font-size: 10px; color: var(--text-light); margin-top: 2px; }
-  .quick-section-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: var(--text-light);
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .recent-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-  .recent-item {
-    display: flex;
-    align-items: center;
-    padding: 10px 12px;
-    border-radius: 12px;
-    gap: 10px;
-    transition: transform 0.15s;
-  }
-  .recent-item:active { transform: scale(0.98); }
-  .recent-item.cat-health { background: linear-gradient(135deg, #fff0eb, #ffe4d8); border-left: 3px solid var(--health); }
-  .recent-item.cat-daily  { background: linear-gradient(135deg, #edfaf3, #d6f5e5); border-left: 3px solid var(--daily); }
-  .recent-item.cat-travel { background: linear-gradient(135deg, #ebf3fd, #d5e9fb); border-left: 3px solid var(--travel); }
-  .recent-icon-wrap {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 18px;
-    flex-shrink: 0;
-  }
-  .recent-icon-wrap.cat-health { background: rgba(224,123,84,0.15); }
-  .recent-icon-wrap.cat-daily  { background: rgba(106,184,154,0.15); }
-  .recent-icon-wrap.cat-travel { background: rgba(91,155,213,0.15); }
-  .recent-body { flex: 1; min-width: 0; }
-  .recent-text { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .recent-date {
-    display: inline-block;
-    margin-top: 3px;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 20px;
-    color: white;
-  }
-  .recent-date.cat-health { background: var(--health); }
-  .recent-date.cat-daily  { background: var(--daily); }
-  .recent-date.cat-travel { background: var(--travel); }
+/* ===== CARDS ===== */
+.card{background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.card-title{font-size:14px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.section-label{font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;}
 
-  /* フォーム */
-  .form-group { margin-bottom: 12px; }
-  .form-label {
-    display: block;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-light);
-    margin-bottom: 4px;
-  }
-  .form-input, .form-select, .form-textarea {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-size: 15px;
-    font-family: inherit;
-    background: white;
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-    -webkit-appearance: none;
-  }
-  .form-input:focus, .form-select:focus, .form-textarea:focus {
-    border-color: var(--primary);
-  }
-  .form-textarea { resize: vertical; min-height: 80px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* ===== REMINDERS ===== */
+.remind-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;margin-bottom:6px;font-size:13px;}
+.remind-item:last-child{margin-bottom:0;}
+.remind-item.urgent{background:#fff0eb;border:1.5px solid #f5b8a0;}
+.remind-item.soon{background:#fff9e6;border:1.5px solid #f5dfa0;}
+.remind-item.normal{background:#f0f9f4;border:1.5px solid #a0d8bc;}
+.remind-days{font-weight:700;font-size:15px;flex-shrink:0;min-width:36px;text-align:center;}
+.remind-days.urgent{color:#d94f00;} .remind-days.soon{color:#b07a00;} .remind-days.normal{color:#2a8a5a;}
+.remind-label{flex:1;font-weight:600;}
+.remind-date{font-size:11px;color:var(--text-light);margin-top:2px;}
 
-  /* ボタン */
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    padding: 12px 20px;
-    border-radius: 12px;
-    border: none;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-  }
-  .btn-primary {
-    background: var(--primary);
-    color: white;
-    width: 100%;
-  }
-  .btn-primary:active { transform: scale(0.98); background: var(--primary-dark); }
-  .btn-secondary {
-    background: var(--bg);
-    color: var(--text);
-    border: 1.5px solid var(--border);
-  }
-  .btn-health { background: var(--health); color: white; width: 100%; }
-  .btn-daily { background: var(--daily); color: white; width: 100%; }
-  .btn-travel { background: var(--travel); color: white; width: 100%; }
-  .btn-sm {
-    padding: 6px 12px;
-    font-size: 12px;
-    border-radius: 8px;
-  }
-  .btn-danger { background: #ff4d4d; color: white; }
+/* ===== RECENT (HOME) ===== */
+.recent-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;margin-bottom:6px;}
+.recent-item:last-child{margin-bottom:0;}
+.recent-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.recent-body{flex:1;min-width:0;}
+.recent-text{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.recent-date-badge{display:inline-block;margin-top:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;color:white;}
 
-  /* セクションタイトル */
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 12px;
-  }
-  .section-title {
-    font-size: 18px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .section-title.health { color: var(--health); }
-  .section-title.daily { color: var(--daily); }
-  .section-title.travel { color: var(--travel); }
+/* ===== RECORDS TIMELINE ===== */
+.page-sticky-header{background:var(--card);padding:calc(env(safe-area-inset-top,0px) + 56px) 14px 10px;border-bottom:1px solid rgba(0,0,0,0.06);position:sticky;top:0;z-index:10;}
+.page-title{font-size:22px;font-weight:900;margin-bottom:10px;}
+.filter-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.filter-chips::-webkit-scrollbar{display:none;}
+.filter-chip{padding:5px 12px;border-radius:20px;border:none;cursor:pointer;background:#f0e8e0;color:var(--text);font-size:12px;font-weight:600;white-space:nowrap;font-family:inherit;transition:all .15s;}
+.filter-chip.active{background:var(--primary);color:white;}
+.filter-chip.active.c-walk,.filter-chip.active.c-daily{background:var(--daily);}
+.filter-chip.active.c-travel{background:var(--travel);}
+.filter-chip.active.c-health{background:var(--health);}
+.timeline{padding:12px 14px 20px;}
+.timeline-item{display:flex;gap:10px;margin-bottom:12px;animation:slideUp .3s ease;}
+.tl-left{display:flex;flex-direction:column;align-items:center;}
+.tl-icon{width:38px;height:38px;border-radius:10px;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.tl-line{width:2px;flex:1;background:#e8ddd6;margin-top:4px;min-height:12px;}
+.tl-card{flex:1;background:var(--card);border-radius:12px;padding:10px 12px;box-shadow:0 1px 6px rgba(0,0,0,0.06);border:1px solid var(--border);}
+.tl-card-row{display:flex;justify-content:space-between;align-items:flex-start;}
+.tl-title{font-size:13px;font-weight:700;flex:1;min-width:0;}
+.tl-date{font-size:10px;color:var(--text-light);flex-shrink:0;margin-left:6px;}
+.tl-sub{font-size:12px;color:var(--text-light);margin-top:3px;}
+.tl-tag{display:inline-block;margin-top:5px;padding:1px 7px;border-radius:20px;font-size:10px;font-weight:700;}
+.tl-del{width:24px;height:24px;border:none;background:none;cursor:pointer;color:#ccc;font-size:14px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;margin-left:4px;}
+.tl-del:hover{color:#ff4d4d;background:#ffeaea;}
 
-  /* サブタブ */
-  .subtab-bar {
-    display: flex;
-    gap: 6px;
-    margin-bottom: 14px;
-    overflow-x: auto;
-    padding-bottom: 4px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .subtab-bar::-webkit-scrollbar { display: none; }
-  .subtab-btn {
-    padding: 6px 14px;
-    border-radius: 20px;
-    border: 1.5px solid var(--border);
-    background: white;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    color: var(--text-light);
-    transition: all 0.2s;
-    font-family: inherit;
-  }
-  .subtab-btn.active-health { background: var(--health); color: white; border-color: var(--health); }
-  .subtab-btn.active-daily { background: var(--daily); color: white; border-color: var(--daily); }
-  .subtab-btn.active-travel { background: var(--travel); color: white; border-color: var(--travel); }
-  .subtab-content { display: none; }
-  .subtab-content.active { display: block; }
+/* ===== CALENDAR ===== */
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.cal-title{font-size:20px;font-weight:900;}
+.cal-nav-btn{width:36px;height:36px;border:none;background:#f0e8e0;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;color:var(--text);font-family:inherit;}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;padding:8px 0 4px;}
+.cal-wd{font-size:10px;font-weight:700;color:var(--text-light);}
+.cal-wd:first-child{color:#e07b54;} .cal-wd:last-child{color:#5b9bd5;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:4px 14px 12px;}
+.cal-day{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:8px;cursor:pointer;position:relative;transition:background .15s;min-height:52px;}
+.cal-day:hover{background:#f0e8e0;}
+.cal-day.today .cal-num{background:var(--primary);color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;}
+.cal-day.selected{background:#fff0eb;}
+.cal-day.other-month .cal-num{color:#ccc;}
+.cal-num{font-size:13px;font-weight:600;line-height:1;width:28px;height:28px;display:flex;align-items:center;justify-content:center;}
+.cal-dots{display:flex;gap:3px;margin-top:5px;justify-content:center;flex-wrap:wrap;max-width:34px;}
+.cal-dot{width:7px;height:7px;border-radius:50%;display:block;flex-shrink:0;}
+.cal-day.has-record{background:rgba(224,123,84,0.08);}
+.cal-day.has-record .cal-num{font-weight:900;}
+.cal-month-count{font-size:11px;color:var(--text-light);margin-top:2px;text-align:center;}
+.cal-day-records{background:var(--card);border-radius:var(--radius);margin:0 14px 14px;padding:12px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.cal-day-records-title{font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;}
 
-  /* 記録リスト */
-  .record-item {
-    background: white;
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    border: 1px solid var(--border);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-    position: relative;
-  }
-  .record-item-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .record-item-title { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-  .record-item-date { font-size: 11px; color: var(--text-light); }
-  .record-item-body { font-size: 13px; color: var(--text-light); margin-top: 6px; }
-  .record-tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
-    margin-right: 4px;
-    margin-top: 4px;
-  }
-  .delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #ccc;
-    font-size: 16px;
-    padding: 2px;
-    flex-shrink: 0;
-  }
-  .delete-btn:hover { color: #ff4d4d; }
+/* ===== PROFILE ===== */
+.profile-hero{background:linear-gradient(135deg,var(--violet) 0%,#7a63c4 100%);color:white;padding:calc(env(safe-area-inset-top,0px) + 56px) 16px 24px;text-align:center;}
+.profile-avatar{width:88px;height:88px;border-radius:50%;background:rgba(255,255,255,0.25);margin:0 auto 12px;display:flex;align-items:center;justify-content:center;font-size:48px;overflow:hidden;border:3px solid rgba(255,255,255,0.5);}
+.profile-avatar img{width:100%;height:100%;object-fit:cover;}
+.profile-name{font-size:24px;font-weight:700;}
+.profile-breed{font-size:13px;opacity:.85;margin-top:4px;}
+.profile-birth-text{font-size:12px;opacity:.75;margin-top:3px;}
+.profile-content{padding:14px;}
+.profile-row{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:var(--shadow);border:1px solid var(--border);cursor:pointer;transition:transform .15s;border:none;width:100%;text-align:left;font-family:inherit;}
+.profile-row:active{transform:scale(0.98);}
+.profile-row-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.profile-row-body{flex:1;}
+.profile-row-title{font-size:14px;font-weight:700;color:var(--text);}
+.profile-row-sub{font-size:12px;color:var(--text-light);margin-top:2px;}
+.profile-row-arrow{color:var(--text-light);font-size:14px;}
+.gs-card{background:linear-gradient(135deg,#f0f9f4,#e8f5f0);border-radius:12px;padding:12px 14px;border:1.5px solid #a0d8bc;display:none;margin-bottom:10px;}
+.gs-card.visible{display:block;}
+.sync-btn-inline{background:rgba(255,255,255,0.2);border:none;color:white;width:36px;height:36px;border-radius:50%;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.sync-btn-inline.spinning{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-  /* 体重チャート */
-  .weight-chart {
-    height: 120px;
-    background: #fafafa;
-    border-radius: 10px;
-    padding: 10px;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: flex-end;
-    gap: 4px;
-    border: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .weight-bar-wrap {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100%;
-    justify-content: flex-end;
-    gap: 2px;
-  }
-  .weight-bar {
-    width: 100%;
-    background: linear-gradient(to top, var(--primary), var(--primary-light));
-    border-radius: 4px 4px 0 0;
-    transition: height 0.4s ease;
-  }
-  .weight-bar-label { font-size: 9px; color: var(--text-light); text-align: center; }
+/* ===== ADD SHEET ===== */
+.sheet-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:200;align-items:flex-end;}
+.sheet-overlay.open{display:flex;}
+.sheet-panel{background:var(--bg);border-radius:24px 24px 0 0;width:100%;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:env(safe-area-inset-bottom);animation:sheetUp .3s cubic-bezier(0.34,1.1,0.64,1);}
+@keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:12px auto 0;flex-shrink:0;}
+.sheet-topbar{display:flex;align-items:center;padding:10px 16px 6px;flex-shrink:0;gap:8px;}
+.sheet-back{width:34px;height:34px;border:none;background:#f0e8e0;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sheet-title{flex:1;font-size:18px;font-weight:900;text-align:center;}
+.sheet-close{width:34px;height:34px;border:none;background:#f0e8e0;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-light);}
+.add-step{display:none;flex-direction:column;overflow:hidden;flex:1;}
+.add-step.active{display:flex;}
 
-  /* 散歩カレンダー風 */
-  .walk-today {
-    background: linear-gradient(135deg, #fff8f0, #ffe8d6);
-    border-radius: 12px;
-    padding: 14px;
-    margin-bottom: 12px;
-    border: 1px solid var(--primary-light);
-    text-align: center;
-  }
-  .walk-today-num { font-size: 36px; font-weight: 700; color: var(--primary); }
-  .walk-today-unit { font-size: 13px; color: var(--text-light); }
+/* Category grid */
+.cat-scroll{overflow-y:auto;padding:8px 14px 20px;flex:1;}
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.cat-btn{background:var(--card);border:none;border-radius:16px;padding:16px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 1px 8px rgba(0,0,0,0.07);font-family:inherit;transition:transform .1s;}
+.cat-btn:active{transform:scale(0.95);}
+.cat-icon{width:50px;height:50px;border-radius:14px;font-size:24px;display:flex;align-items:center;justify-content:center;}
+.cat-label{font-size:12px;font-weight:700;color:var(--text);}
 
-  /* 旅行カード */
-  .travel-card {
-    background: white;
-    border-radius: var(--radius);
-    overflow: hidden;
-    margin-bottom: 12px;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-  }
-  .travel-card-header {
-    background: linear-gradient(135deg, var(--travel), #3a7ac4);
-    color: white;
-    padding: 14px 16px;
-  }
-  .travel-card-title { font-size: 16px; font-weight: 700; }
-  .travel-card-dates { font-size: 12px; opacity: 0.85; margin-top: 2px; }
-  .travel-card-body { padding: 12px 16px; }
-  .travel-photo {
-    width: 100%;
-    max-height: 200px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-top: 8px;
-  }
-  .travel-info-row {
-    display: flex;
-    gap: 6px;
-    align-items: flex-start;
-    margin-bottom: 6px;
-    font-size: 13px;
-  }
-  .travel-info-icon { flex-shrink: 0; }
-  .travel-info-text { color: var(--text-light); }
+/* Form step */
+.form-scroll{overflow-y:auto;padding:8px 14px 8px;flex:1;}
+.form-section{display:none;}
+.form-section.active{display:block;}
+.form-save-bar{padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));flex-shrink:0;background:var(--bg);border-top:1px solid var(--border);}
 
-  /* 次の予定 */
-  .upcoming-card {
-    background: linear-gradient(135deg, #fff8f0, #fff3e8);
-    border-radius: 12px;
-    padding: 12px 14px;
-    margin-bottom: 8px;
-    border-left: 4px solid var(--primary);
-  }
-  .upcoming-card.green { background: linear-gradient(135deg, #f0faf5, #e0f5ea); border-left-color: var(--daily); }
-  .upcoming-card.blue { background: linear-gradient(135deg, #f0f6ff, #e0ecff); border-left-color: var(--travel); }
-  .upcoming-title { font-size: 14px; font-weight: 700; }
-  .upcoming-date { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+/* Success step */
+.success-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px 48px;text-align:center;position:relative;overflow:hidden;min-height:320px;}
+.success-paw{width:80px;height:80px;display:flex;align-items:center;justify-content:center;font-size:80px;animation:pawStamp .5s cubic-bezier(0.34,1.56,0.64,1) forwards;opacity:0;}
+@keyframes pawStamp{0%{transform:scale(2.5);opacity:0;}60%{transform:scale(0.85);opacity:1;}80%{transform:scale(1.08);}100%{transform:scale(1);opacity:1;}}
+.success-title{font-size:22px;font-weight:900;margin-top:16px;opacity:0;animation:fadeUp .4s ease .3s forwards;}
+.success-sub{font-size:14px;color:var(--text-light);margin-top:6px;opacity:0;animation:fadeUp .4s ease .4s forwards;}
+.success-badge{margin-top:20px;padding:8px 20px;border-radius:999px;color:white;font-weight:700;font-size:14px;transform:rotate(-3deg);opacity:0;animation:badgePop .5s cubic-bezier(0.34,1.56,0.64,1) .5s forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes badgePop{from{transform:scale(0.5) rotate(-3deg);opacity:0;}to{transform:scale(1) rotate(-3deg);opacity:1;}}
+.mini-paw{position:absolute;animation:miniPop .5s ease forwards;opacity:0;}
+@keyframes miniPop{from{opacity:0;transform:scale(0.3);}to{opacity:.5;transform:scale(1);}}
 
-  /* 設定パネル */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 200;
-    align-items: flex-end;
-  }
-  .modal-overlay.open { display: flex; }
-  .modal-panel {
-    background: white;
-    border-radius: 20px 20px 0 0;
-    padding: 20px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-    padding-bottom: calc(20px + env(safe-area-inset-bottom));
-  }
-  .modal-handle {
-    width: 40px;
-    height: 4px;
-    background: #ddd;
-    border-radius: 2px;
-    margin: 0 auto 16px;
-  }
-  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+/* ===== SETTINGS MODAL ===== */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:300;align-items:flex-end;}
+.modal-overlay.open{display:flex;}
+.modal-panel{background:white;border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:85vh;overflow-y:auto;padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+.modal-handle{width:40px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;}
 
-  /* empty state */
-  .empty-state {
-    text-align: center;
-    padding: 30px 20px;
-    color: var(--text-light);
-  }
-  .empty-icon { font-size: 40px; margin-bottom: 8px; }
-  .empty-text { font-size: 14px; }
+/* ===== FORMS ===== */
+.form-group{margin-bottom:12px;}
+.form-label{display:block;font-size:12px;font-weight:600;color:var(--text-light);margin-bottom:4px;}
+.form-input,.form-select,.form-textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:15px;font-family:inherit;background:white;color:var(--text);outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--primary);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.form-card{background:white;border-radius:12px;padding:14px;margin-bottom:12px;}
 
-  /* アニメーション */
-  @keyframes slideUp {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
-  }
-  .record-item { animation: slideUp 0.3s ease; }
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 20px;border-radius:12px;border:none;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit;width:100%;}
+.btn-primary{background:var(--primary);color:white;}
+.btn-health{background:var(--health);color:white;}
+.btn-daily{background:var(--daily);color:white;}
+.btn-travel{background:var(--travel);color:white;}
+.btn-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border);}
+.btn-danger{background:#ff4d4d;color:white;}
+.btn-sm{padding:6px 12px;font-size:12px;border-radius:8px;}
+.btn:active{transform:scale(0.98);opacity:.9;}
 
-  /* リマインダーカード */
-  .remind-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 12px;
-    border-radius: 10px;
-    margin-bottom: 6px;
-    font-size: 13px;
-  }
-  .remind-item.urgent {
-    background: #fff0eb;
-    border: 1.5px solid #f5b8a0;
-  }
-  .remind-item.soon {
-    background: #fff9e6;
-    border: 1.5px solid #f5dfa0;
-  }
-  .remind-item.normal {
-    background: #f0f9f4;
-    border: 1.5px solid #a0d8bc;
-  }
-  .remind-days {
-    font-weight: 700;
-    font-size: 15px;
-    flex-shrink: 0;
-    min-width: 36px;
-    text-align: center;
-  }
-  .remind-days.urgent { color: #d94f00; }
-  .remind-days.soon   { color: #b07a00; }
-  .remind-days.normal { color: #2a8a5a; }
-  .remind-label { flex: 1; font-weight: 600; }
-  .remind-date  { font-size: 11px; color: var(--text-light); margin-top: 2px; }
+/* Chips */
+.suggestion-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:white;color:var(--text);transition:all .15s;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chip:active{transform:scale(0.95);}
+.chip.hospital{border-color:var(--health);color:var(--health);background:#fff5f2;}
+.chip.salon{border-color:var(--daily);color:var(--daily);background:#f0faf5;}
+.chip-del{font-size:11px;opacity:.5;flex-shrink:0;padding:0 2px;}
+.chip-del:hover{opacity:1;color:#ff4d4d;}
 
-  /* 履歴チップ */
-  .suggestion-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 6px;
-    min-height: 0;
-  }
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1.5px solid var(--border);
-    background: white;
-    color: var(--text);
-    transition: all 0.15s;
-    max-width: 180px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .chip:active { transform: scale(0.95); }
-  .chip.hospital { border-color: var(--health); color: var(--health); background: #fff5f2; }
-  .chip.salon    { border-color: var(--daily); color: var(--daily);  background: #f0faf5; }
-  .chip-del {
-    font-size: 11px;
-    opacity: 0.5;
-    flex-shrink: 0;
-    padding: 0 2px;
-  }
-  .chip-del:hover { opacity: 1; color: #ff4d4d; }
+/* Weight chart */
+.weight-chart{height:100px;background:#fafafa;border-radius:10px;padding:8px;margin-bottom:12px;display:flex;align-items:flex-end;gap:4px;border:1px solid var(--border);overflow:hidden;}
+.weight-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end;gap:2px;}
+.weight-bar{width:100%;background:linear-gradient(to top,var(--primary),var(--primary-light));border-radius:4px 4px 0 0;transition:height .4s ease;}
+.weight-bar-label{font-size:9px;color:var(--text-light);text-align:center;}
 
-  /* 同期ステータスバー */
-  .sync-bar {
-    display: none;
-    position: fixed;
-    top: 64px; left: 0; right: 0;
-    padding: 7px 16px;
-    font-size: 12px;
-    font-weight: 600;
-    text-align: center;
-    z-index: 99;
-    transition: all 0.3s;
-  }
-  .sync-bar.syncing { display: block; background: #fff8e1; color: #b07d00; }
-  .sync-bar.success { display: block; background: #e8f5e9; color: #2e7d32; }
-  .sync-bar.error   { display: block; background: #fdecea; color: #c62828; }
+/* Travel card */
+.travel-card{background:white;border-radius:var(--radius);overflow:hidden;margin-bottom:12px;box-shadow:var(--shadow);border:1px solid var(--border);}
+.travel-card-header{background:linear-gradient(135deg,var(--travel),#3a7ac4);color:white;padding:12px 14px;}
+.travel-card-title{font-size:15px;font-weight:700;}
+.travel-card-dates{font-size:11px;opacity:.85;margin-top:2px;}
+.travel-card-body{padding:10px 14px;}
+.travel-photo{width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-top:8px;}
+.travel-info-row{display:flex;gap:6px;align-items:flex-start;margin-bottom:4px;font-size:12px;}
+.travel-info-text{color:var(--text-light);}
 
-  /* 同期ボタン */
-  .sync-btn {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    font-size: 15px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    margin-left: 4px;
-  }
-  .sync-btn.spinning { animation: spin 1s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* フローティングボタン */
-  .fab {
-    position: fixed;
-    bottom: 80px;
-    right: 20px;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--primary);
-    color: white;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 16px rgba(224,123,84,0.4);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 99;
-    transition: transform 0.2s;
-  }
-  .fab:active { transform: scale(0.9); }
-  .fab.visible { display: flex; }
-  .fab.health { background: var(--health); box-shadow: 0 4px 16px rgba(224,123,84,0.4); }
-  .fab.daily { background: var(--daily); box-shadow: 0 4px 16px rgba(106,184,154,0.4); }
-  .fab.travel { background: var(--travel); box-shadow: 0 4px 16px rgba(91,155,213,0.4); }
+/* Misc */
+.empty-state{text-align:center;padding:30px 20px;color:var(--text-light);}
+.empty-icon{font-size:40px;margin-bottom:8px;}
+.empty-text{font-size:14px;}
+.record-item{background:white;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+.record-item-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.record-item-title{font-size:14px;font-weight:700;margin-bottom:2px;}
+.record-item-body{font-size:13px;color:var(--text-light);margin-top:6px;}
+.record-tag{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;margin-right:4px;margin-top:4px;}
+.delete-btn{background:none;border:none;cursor:pointer;color:#ccc;font-size:16px;padding:2px;flex-shrink:0;}
+.delete-btn:hover{color:#ff4d4d;}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
 </style>
 </head>
 <body>
 
-<!-- ヘッダー -->
-<header class="header">
-  <div class="header-left">
-    <span class="paw-icon">🐾</span>
-    <div>
-      <div class="dog-name-display" id="headerDogName">わんこ</div>
-      <div class="header-sub">愛犬お世話管理アプリ</div>
-    </div>
-  </div>
-  <div style="display:flex;gap:4px;align-items:center">
-    <button class="sync-btn" id="syncBtn" onclick="manualSync()" title="Google Sheetsと同期">🔄</button>
-    <button class="settings-btn" onclick="openSettings()">⚙️</button>
-  </div>
-</header>
 <div class="sync-bar" id="syncBar"></div>
 
-<!-- タブバー -->
-<nav class="tab-bar">
-  <button class="tab-btn active" onclick="showPage('home', this)">
-    <span class="tab-icon">🏠</span>ホーム
-  </button>
-  <button class="tab-btn health" onclick="showPage('health', this)">
-    <span class="tab-icon">❤️</span>健康管理
-  </button>
-  <button class="tab-btn daily" onclick="showPage('daily', this)">
-    <span class="tab-icon">🌿</span>日常ケア
-  </button>
-  <button class="tab-btn travel" onclick="showPage('travel', this)">
-    <span class="tab-icon">✈️</span>旅行記録
-  </button>
-</nav>
-
-<!-- FAB -->
-<button class="fab" id="fab" onclick="openFab()">＋</button>
-
-<!-- ========== ホーム ========== -->
+<!-- ===== ホーム ===== -->
 <main id="page-home" class="page active">
-  <div class="home-greeting">
-    <div class="home-dog-icon" id="homeDogIconWrap">🐕</div>
-    <div class="home-dog-info">
-      <div class="home-dog-name" id="homeDogName">わんこ</div>
-      <div class="home-breed" id="homeBreed">犬種未設定</div>
-      <div class="home-birth" id="homeBirth" style="display:none;"></div>
+  <div class="home-hero">
+    <div class="home-hero-top">
+      <div class="home-dog-row">
+        <div class="home-dog-avatar" id="homeDogIconWrap">🐕</div>
+        <div>
+          <div class="home-dog-name" id="homeDogName">わんこ</div>
+          <div class="home-dog-breed" id="homeBreed">犬種未設定</div>
+          <div class="home-dog-birth" id="homeBirth" style="display:none"></div>
+        </div>
+      </div>
+      <button class="hero-btn sync-btn-inline" id="syncBtn" onclick="manualSync()" title="Google Sheetsと同期">🔄</button>
+    </div>
+    <div class="home-stats-row">
+      <div class="home-stat-pill">
+        <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect x="4" y="18" width="24" height="9" rx="4.5" fill="#E07B54"/><path d="M10 18c0-6 12-6 12 0" stroke="#E07B54" stroke-width="2.5" fill="none"/><circle cx="16" cy="18" r="1.5" fill="white"/><line x1="8" y1="22" x2="8" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="20" x2="16" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="21" x2="20" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="24" y1="22" x2="24" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="18" x2="21" y2="14" stroke="#C86A3C" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="home-stat-value" id="statWeight">--</div>
+        <div class="home-stat-label">最新体重</div>
+      </div>
+      <div class="home-stat-pill">
+        <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="6.5" cy="25.5" r="1" fill="white" opacity="0.55"/><circle cx="8" cy="26.5" r="1" fill="white" opacity="0.55"/><circle cx="9.5" cy="25.5" r="1" fill="white" opacity="0.55"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg></div>
+        <div class="home-stat-value" id="statWalks">--</div>
+        <div class="home-stat-label">今月散歩</div>
+      </div>
+      <div class="home-stat-pill">
+        <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/><rect x="13" y="3" width="6" height="8" rx="3" fill="#E07B54"/><rect x="14.5" y="4.5" width="3" height="5" rx="1.5" fill="white" opacity="0.5"/><rect x="14" y="13" width="4" height="10" rx="2" fill="white"/><rect x="11" y="16" width="10" height="4" rx="2" fill="white"/></svg></div>
+        <div class="home-stat-value" id="statHospital">--</div>
+        <div class="home-stat-label">前回通院</div>
+      </div>
     </div>
   </div>
-
-  <div class="home-stats">
-    <div class="stat-card">
-      <div class="stat-icon">⚖️</div>
-      <div class="stat-value" id="statWeight">--</div>
-      <div class="stat-label">最新体重(kg)</div>
+  <div class="home-content">
+    <div class="card" id="upcomingCard">
+      <div class="card-title" style="justify-content:space-between">
+        <span>🔔 もうすぐの予定</span>
+        <button id="notifBtn" onclick="requestNotifPermission()" style="display:none;font-size:11px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--primary);background:white;color:var(--primary);cursor:pointer;font-weight:600">通知ON</button>
+      </div>
+      <div id="upcomingList"><p style="font-size:13px;color:var(--text-light);">予定を登録するとここに表示されます</p></div>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon">🦮</div>
-      <div class="stat-value" id="statWalks">--</div>
-      <div class="stat-label">今月の散歩回数</div>
+    <div class="card" style="background:linear-gradient(160deg,#fffaf7,#fff);border:1.5px solid var(--primary-light);">
+      <div class="card-title" style="color:var(--primary-dark);">📋 直近の記録</div>
+      <ul class="recent-list" id="recentList" style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+        <li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>
+      </ul>
     </div>
-    <div class="stat-card">
-      <div class="stat-icon">🏥</div>
-      <div class="stat-value" id="statHospital">--</div>
-      <div class="stat-label">最終通院</div>
+    <div class="gs-card" id="gsCard">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px;">📊 Google スプレッドシート</div>
+      <a id="gsLink" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display:inline-flex;gap:6px;align-items:center;text-decoration:none;width:auto;">📋 シートを開く</a>
     </div>
-  </div>
-
-  <div class="card" style="background: linear-gradient(160deg, #fffaf7 0%, #fff 100%); border: 1.5px solid var(--primary-light);">
-    <div class="card-title" style="font-size:15px; color:var(--primary-dark);">📋 直近の記録</div>
-    <ul class="recent-list" id="recentList">
-      <li class="empty-state">
-        <div class="empty-icon">🐾</div>
-        <div class="empty-text">記録を追加してみましょう！</div>
-      </li>
-    </ul>
-  </div>
-
-  <div class="card" id="upcomingCard">
-    <div class="card-title" style="justify-content:space-between">
-      <span>🔔 もうすぐの予定</span>
-      <button id="notifBtn" onclick="requestNotifPermission()" style="display:none;font-size:11px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--primary);background:white;color:var(--primary);cursor:pointer;font-weight:600">通知をONにする</button>
-    </div>
-    <div id="upcomingList">
-      <p style="font-size:13px;color:var(--text-light);">予定を登録すると1週間以内のものがここに表示されます</p>
-    </div>
-  </div>
-
-  <div class="card" id="gsCard" style="display:none">
-    <div class="card-title">📊 Google スプレッドシート</div>
-    <a id="gsLink" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display:inline-flex;gap:6px;align-items:center;text-decoration:none;">
-      📋 スプレッドシートを開く
-    </a>
-    <p style="font-size:11px;color:var(--text-light);margin-top:8px;">設定からURLを登録してください</p>
   </div>
 </main>
 
-<!-- ========== 健康管理 ========== -->
-<main id="page-health" class="page">
-  <div class="section-header">
-    <div class="section-title health">❤️ 健康管理</div>
-  </div>
-
-  <div class="subtab-bar">
-    <button class="subtab-btn active-health" onclick="showSubtab('health','hospital',this)">🏥 通院</button>
-    <button class="subtab-btn" onclick="showSubtab('health','vaccine',this)">💉 ワクチン</button>
-    <button class="subtab-btn" onclick="showSubtab('health','medicine',this)">💊 投薬</button>
-    <button class="subtab-btn" onclick="showSubtab('health','weight',this)">⚖️ 体重</button>
-    <button class="subtab-btn" onclick="showSubtab('health','walk',this)">🦮 散歩</button>
-  </div>
-
-  <!-- 通院 -->
-  <div class="subtab-content active" id="health-hospital">
-    <div class="card">
-      <div class="card-title">🏥 通院記録を追加</div>
-      <div class="form-group">
-        <label class="form-label">日付</label>
-        <input type="date" class="form-input" id="hosp-date">
-      </div>
-      <div class="form-group">
-        <label class="form-label">病院名</label>
-        <input type="text" class="form-input" id="hosp-name" placeholder="○○動物病院"
-               onfocus="renderChips('hosp-name','savedHospitals','hospital')"
-               oninput="renderChips('hosp-name','savedHospitals','hospital')">
-        <div class="suggestion-chips" id="chips-hosp-name"></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">受診内容</label>
-        <input type="text" class="form-input" id="hosp-reason" placeholder="定期健診、歯の検査など">
-      </div>
-      <div class="form-group">
-        <label class="form-label">診断・処置</label>
-        <textarea class="form-textarea" id="hosp-result" placeholder="診断内容、処置内容など"></textarea>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">費用（円）</label>
-          <input type="number" class="form-input" id="hosp-cost" placeholder="3000">
-        </div>
-        <div class="form-group">
-          <label class="form-label">次回予定日</label>
-          <input type="date" class="form-input" id="hosp-next">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">メモ</label>
-        <textarea class="form-textarea" id="hosp-memo" placeholder="その他メモ"></textarea>
-      </div>
-      <button class="btn btn-health" onclick="addRecord('hospital')">💾 記録を保存</button>
+<!-- ===== 記録タイムライン ===== -->
+<main id="page-records" class="page">
+  <div class="page-sticky-header">
+    <div class="page-title" style="display:flex;align-items:center;gap:8px"><svg width="24" height="24" viewBox="0 0 26 26" fill="none"><rect x="4" y="3" width="18" height="20" rx="3" stroke="#e07b54" stroke-width="1.8"/><line x1="8" y1="9" x2="18" y2="9" stroke="#e07b54" stroke-width="1.6" stroke-linecap="round"/><line x1="8" y1="13" x2="18" y2="13" stroke="#e07b54" stroke-width="1.6" stroke-linecap="round"/><line x1="8" y1="17" x2="14" y2="17" stroke="#e07b54" stroke-width="1.6" stroke-linecap="round"/></svg>記録</div>
+    <div class="filter-chips" id="filterChips">
+      <button class="filter-chip active" data-filter="all" onclick="setFilter('all',this)">すべて</button>
+      <button class="filter-chip c-walk" data-filter="walk" onclick="setFilter('walk',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg>散歩</button>
+      <button class="filter-chip c-health" data-filter="health" onclick="setFilter('health',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/><rect x="14" y="13" width="4" height="10" rx="2" fill="white"/><rect x="11" y="16" width="10" height="4" rx="2" fill="white"/></svg>健康</button>
+      <button class="filter-chip c-daily" data-filter="daily" onclick="setFilter('daily',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><circle cx="9" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/><circle cx="23" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/><line x1="12" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><line x1="16" y1="16" x2="16" y2="8" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/></svg>ケア</button>
+      <button class="filter-chip c-travel" data-filter="travel" onclick="setFilter('travel',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/></svg>旅行</button>
     </div>
-    <div id="hospital-records"></div>
   </div>
+  <div class="timeline" id="timeline"></div>
+</main>
 
-  <!-- ワクチン -->
-  <div class="subtab-content" id="health-vaccine">
-    <div class="card">
-      <div class="card-title">💉 ワクチン記録を追加</div>
-      <div class="form-group">
-        <label class="form-label">接種日</label>
-        <input type="date" class="form-input" id="vac-date" oninput="autoSetNextDate('vac-date','vac-next','year',1)">
+<!-- ===== カレンダー ===== -->
+<main id="page-calendar" class="page">
+  <div class="page-sticky-header">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+      <div>
+        <div class="cal-title" id="calTitle">2026年4月</div>
+        <div class="cal-month-count" id="calMonthCount"></div>
       </div>
-      <div class="form-group">
-        <label class="form-label">ワクチン種類</label>
-        <select class="form-select" id="vac-type">
-          <option value="">選択してください</option>
-          <option>混合ワクチン（5種）</option>
-          <option>混合ワクチン（8種）</option>
-          <option>混合ワクチン（10種）</option>
-          <option>狂犬病ワクチン</option>
-          <option>その他</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">次回接種予定日</label>
-        <input type="date" class="form-input" id="vac-next">
-      </div>
-      <div class="form-group">
-        <label class="form-label">病院名</label>
-        <input type="text" class="form-input" id="vac-hospital" placeholder="○○動物病院"
-               onfocus="renderChips('vac-hospital','savedHospitals','hospital')"
-               oninput="renderChips('vac-hospital','savedHospitals','hospital')">
-        <div class="suggestion-chips" id="chips-vac-hospital"></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">メモ</label>
-        <textarea class="form-textarea" id="vac-memo" placeholder="副反応など"></textarea>
-      </div>
-      <button class="btn btn-health" onclick="addRecord('vaccine')">💾 記録を保存</button>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
     </div>
-    <div id="vaccine-records"></div>
+    <div class="cal-weekdays">
+      <div class="cal-wd">日</div><div class="cal-wd">月</div><div class="cal-wd">火</div>
+      <div class="cal-wd">水</div><div class="cal-wd">木</div><div class="cal-wd">金</div>
+      <div class="cal-wd">土</div>
+    </div>
   </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div id="calDayRecords"></div>
+</main>
 
-  <!-- 投薬 -->
-  <div class="subtab-content" id="health-medicine">
-    <div class="card">
-      <div class="card-title">💊 投薬記録を追加</div>
-      <div class="form-group">
-        <label class="form-label">投薬日</label>
-        <input type="date" class="form-input" id="med-date" oninput="autoSetNextDate('med-date','med-next','month',1)">
-      </div>
-      <div class="form-group">
-        <label class="form-label">薬の名前</label>
-        <input type="text" class="form-input" id="med-name" placeholder="フィラリア予防薬など">
-      </div>
-      <div class="form-group">
-        <label class="form-label">種類</label>
-        <select class="form-select" id="med-type">
-          <option value="">選択してください</option>
-          <option>フィラリア予防薬</option>
-          <option>ノミ・ダニ予防薬</option>
-          <option>消炎剤</option>
-          <option>抗生物質</option>
-          <option>ビタミン剤</option>
-          <option>その他</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">投与量</label>
-          <input type="text" class="form-input" id="med-dose" placeholder="1錠">
-        </div>
-        <div class="form-group">
-          <label class="form-label">次回投薬日</label>
-          <input type="date" class="form-input" id="med-next">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">メモ</label>
-        <textarea class="form-textarea" id="med-memo" placeholder="服用状況など"></textarea>
-      </div>
-      <button class="btn btn-health" onclick="addRecord('medicine')">💾 記録を保存</button>
-    </div>
-    <div id="medicine-records"></div>
+<!-- ===== わんこ（プロフィール） ===== -->
+<main id="page-profile" class="page">
+  <div class="profile-hero">
+    <div class="profile-avatar" id="profileAvatarWrap">🐕</div>
+    <div class="profile-name" id="profileName">わんこ</div>
+    <div class="profile-breed" id="profileBreed">犬種未設定</div>
+    <div class="profile-birth-text" id="profileBirth" style="display:none"></div>
   </div>
-
-  <!-- 体重 -->
-  <div class="subtab-content" id="health-weight">
-    <div class="card">
-      <div class="card-title">⚖️ 体重を記録</div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">計測日</label>
-          <input type="date" class="form-input" id="wt-date">
-        </div>
-        <div class="form-group">
-          <label class="form-label">体重（kg）</label>
-          <input type="number" step="0.1" class="form-input" id="wt-value" placeholder="5.2">
-        </div>
+  <div class="profile-content">
+    <button class="profile-row" onclick="openSettings()">
+      <div class="profile-row-icon" style="background:#fff0eb;">⚙️</div>
+      <div class="profile-row-body">
+        <div class="profile-row-title">プロフィール・基本設定</div>
+        <div class="profile-row-sub">名前・犬種・生年月日を編集</div>
       </div>
-      <div class="form-group">
-        <label class="form-label">メモ</label>
-        <input type="text" class="form-input" id="wt-memo" placeholder="太り気味、標準など">
+      <span class="profile-row-arrow">›</span>
+    </button>
+    <div class="gs-card" id="gsCard2">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <div style="font-size:13px;font-weight:700;">📊 Google スプレッドシート</div>
+        <button class="sync-btn-inline" id="syncBtn2" onclick="manualSync()" style="background:var(--daily);" title="同期">🔄</button>
       </div>
-      <button class="btn btn-health" onclick="addRecord('weight')">💾 記録を保存</button>
+      <a id="gsLink2" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display:inline-flex;gap:6px;align-items:center;text-decoration:none;width:auto;">📋 シートを開く</a>
     </div>
-    <div class="weight-chart" id="weightChart"></div>
-    <div id="weight-records"></div>
-  </div>
-
-  <!-- 散歩 -->
-  <div class="subtab-content" id="health-walk">
-    <div class="card">
-      <div class="card-title">🦮 散歩を記録</div>
-      <div class="form-group">
-        <label class="form-label">日付</label>
-        <input type="date" class="form-input" id="walk-date">
+    <button class="profile-row" onclick="requestNotifPermission()">
+      <div class="profile-row-icon" style="background:#fff9e6;">🔔</div>
+      <div class="profile-row-body">
+        <div class="profile-row-title">通知設定</div>
+        <div class="profile-row-sub">リマインダーの通知を許可する</div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">時間（分）</label>
-          <input type="number" class="form-input" id="walk-time" placeholder="30">
-        </div>
-        <div class="form-group">
-          <label class="form-label">距離（km）</label>
-          <input type="number" step="0.1" class="form-input" id="walk-dist" placeholder="1.5">
-        </div>
+      <span class="profile-row-arrow">›</span>
+    </button>
+    <button class="profile-row" onclick="clearAllData()" style="margin-top:8px;">
+      <div class="profile-row-icon" style="background:#ffeaea;">🗑️</div>
+      <div class="profile-row-body">
+        <div class="profile-row-title" style="color:#ff4d4d;">全データをリセット</div>
+        <div class="profile-row-sub">記録をすべて削除します</div>
       </div>
-      <div class="form-group">
-        <label class="form-label">コース</label>
-        <input type="text" class="form-input" id="walk-course" placeholder="公園周り、川沿いなど">
-      </div>
-      <div class="form-group">
-        <label class="form-label">天気</label>
-        <select class="form-select" id="walk-weather">
-          <option>☀️ 晴れ</option>
-          <option>⛅ 曇り</option>
-          <option>🌧 雨</option>
-          <option>❄️ 雪</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">メモ</label>
-        <input type="text" class="form-input" id="walk-memo" placeholder="今日はよく走った！など">
-      </div>
-      <button class="btn btn-health" onclick="addRecord('walk')">💾 記録を保存</button>
-    </div>
-    <div id="walk-records"></div>
+      <span class="profile-row-arrow" style="color:#ff4d4d;">›</span>
+    </button>
   </div>
 </main>
 
-<!-- ========== 日常ケア ========== -->
-<main id="page-daily" class="page">
-  <div class="section-header">
-    <div class="section-title daily">🌿 日常ケア</div>
-  </div>
+<!-- ===== 追加シート ===== -->
+<div class="sheet-overlay" id="addSheet" onclick="closeSheetOverlay(event)">
+  <div class="sheet-panel">
 
-  <div class="subtab-bar">
-    <button class="subtab-btn active-daily" onclick="showSubtab('daily','trim',this)">✂️ トリミング</button>
-    <button class="subtab-btn" onclick="showSubtab('daily','filter',this)">💧 給水フィルター</button>
-    <button class="subtab-btn" onclick="showSubtab('daily','other',this)">🧴 その他ケア</button>
-  </div>
+    <!-- Step1: カテゴリ選択 -->
+    <div class="add-step active" id="addStepCats">
+      <div class="sheet-handle"></div>
+      <div class="sheet-topbar">
+        <div style="width:34px"></div>
+        <div class="sheet-title">何を記録する？</div>
+        <button class="sheet-close" onclick="closeAddSheet()">✕</button>
+      </div>
+      <div class="cat-scroll">
+        <div class="cat-grid">
 
-  <!-- トリミング -->
-  <div class="subtab-content active" id="daily-trim">
-    <div class="card">
-      <div class="card-title">✂️ トリミング記録を追加</div>
-      <div class="form-group">
-        <label class="form-label">日付</label>
-        <input type="date" class="form-input" id="trim-date" oninput="autoSetNextDate('trim-date','trim-next','month',1)">
-      </div>
-      <div class="form-group">
-        <label class="form-label">サロン名</label>
-        <input type="text" class="form-input" id="trim-salon" placeholder="○○ペットサロン"
-               onfocus="renderChips('trim-salon','savedSalons','salon')"
-               oninput="renderChips('trim-salon','savedSalons','salon')">
-        <div class="suggestion-chips" id="chips-trim-salon"></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">メニュー</label>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px" id="trim-menu-checks">
-          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
-            <input type="checkbox" value="シャンプー"> シャンプー
-          </label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
-            <input type="checkbox" value="カット"> カット
-          </label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
-            <input type="checkbox" value="爪切り"> 爪切り
-          </label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
-            <input type="checkbox" value="耳掃除"> 耳掃除
-          </label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
-            <input type="checkbox" value="歯磨き"> 歯磨き
-          </label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer">
-            <input type="checkbox" value="肛門腺絞り"> 肛門腺絞り
-          </label>
+          <!-- 通院 -->
+          <button class="cat-btn" onclick="selectCat('hospital')">
+            <div class="cat-icon" style="background:#fff0eb;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/>
+                <rect x="13" y="3" width="6" height="8" rx="3" fill="#E07B54"/>
+                <rect x="14.5" y="4.5" width="3" height="5" rx="1.5" fill="white" opacity="0.5"/>
+                <rect x="14" y="13" width="4" height="10" rx="2" fill="white"/>
+                <rect x="11" y="16" width="10" height="4" rx="2" fill="white"/>
+              </svg>
+            </div>
+            <div class="cat-label">通院</div>
+          </button>
+
+          <!-- ワクチン -->
+          <button class="cat-btn" onclick="selectCat('vaccine')">
+            <div class="cat-icon" style="background:#fff0eb;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="8" y="13" width="16" height="7" rx="3.5" fill="#E07B54"/>
+                <rect x="22" y="14.5" width="5" height="4" rx="1" fill="#C86A3C"/>
+                <rect x="3" y="15.5" width="7" height="2" rx="1" fill="#B85C35"/>
+                <rect x="9" y="14.5" width="8" height="4" rx="2" fill="white" opacity="0.4"/>
+                <line x1="14" y1="13" x2="14" y2="20" stroke="white" stroke-width="1" opacity="0.5"/>
+                <line x1="17" y1="13" x2="17" y2="20" stroke="white" stroke-width="1" opacity="0.5"/>
+              </svg>
+            </div>
+            <div class="cat-label">ワクチン</div>
+          </button>
+
+          <!-- 投薬 -->
+          <button class="cat-btn" onclick="selectCat('medicine')">
+            <div class="cat-icon" style="background:#fff0eb;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="6" y="12" width="20" height="9" rx="4.5" fill="#E07B54"/>
+                <path d="M16 12v9" stroke="white" stroke-width="1.5"/>
+                <rect x="6" y="12" width="10" height="9" rx="4.5" fill="#E07B54" opacity="0.6"/>
+                <rect x="20" y="6" width="7" height="4" rx="2" fill="#F0A080"/>
+                <rect x="5" y="24" width="7" height="4" rx="2" fill="#F0A080"/>
+              </svg>
+            </div>
+            <div class="cat-label">投薬</div>
+          </button>
+
+          <!-- 体重 -->
+          <button class="cat-btn" onclick="selectCat('weight')">
+            <div class="cat-icon" style="background:#fff0eb;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="4" y="18" width="24" height="9" rx="4.5" fill="#E07B54"/>
+                <path d="M10 18c0-6 12-6 12 0" stroke="#E07B54" stroke-width="2.5" fill="none"/>
+                <circle cx="16" cy="18" r="1.5" fill="white"/>
+                <line x1="8" y1="22" x2="8" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="12" y1="21" x2="12" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="16" y1="20" x2="16" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="20" y1="21" x2="20" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="24" y1="22" x2="24" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="16" y1="18" x2="21" y2="14" stroke="#C86A3C" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="cat-label">体重</div>
+          </button>
+
+          <!-- 散歩 -->
+          <button class="cat-btn" onclick="selectCat('walk')">
+            <div class="cat-icon" style="background:#edfaf3;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/>
+                <circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/>
+                <circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/>
+                <circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/>
+                <circle cx="6.5" cy="25.5" r="1" fill="white" opacity="0.55"/>
+                <circle cx="8" cy="26.5" r="1" fill="white" opacity="0.55"/>
+                <circle cx="9.5" cy="25.5" r="1" fill="white" opacity="0.55"/>
+                <ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/>
+                <circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/>
+                <circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/>
+                <circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/>
+                <ellipse cx="9" cy="7" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.38"/>
+                <circle cx="6.5" cy="3.5" r="1.6" fill="#6AB89A" opacity="0.38"/>
+                <circle cx="9" cy="2.5" r="1.6" fill="#6AB89A" opacity="0.38"/>
+                <circle cx="11.5" cy="3.5" r="1.6" fill="#6AB89A" opacity="0.38"/>
+              </svg>
+            </div>
+            <div class="cat-label">散歩</div>
+          </button>
+
+          <!-- トリミング -->
+          <button class="cat-btn" onclick="selectCat('trim')">
+            <div class="cat-icon" style="background:#edfaf3;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <circle cx="9" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/>
+                <circle cx="23" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/>
+                <line x1="12" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="20" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/>
+                <line x1="16" y1="16" x2="16" y2="8" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="22" cy="8" r="1.5" fill="#6AB89A"/>
+                <line x1="22" y1="5" x2="22" y2="6" stroke="#6AB89A" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="22" y1="10" x2="22" y2="11" stroke="#6AB89A" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="19" y1="8" x2="20" y2="8" stroke="#6AB89A" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="24" y1="8" x2="25" y2="8" stroke="#6AB89A" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="cat-label">トリミング</div>
+          </button>
+
+          <!-- 給水フィルター -->
+          <button class="cat-btn" onclick="selectCat('filter')">
+            <div class="cat-icon" style="background:#ebf3fd;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M16 5 C16 5 7 15 7 20 a9 9 0 0 0 18 0 C25 15 16 5 16 5Z" fill="#5B9BD5"/>
+                <ellipse cx="12" cy="18" rx="2" ry="3.5" fill="white" opacity="0.35" transform="rotate(-15 12 18)"/>
+                <circle cx="22" cy="8" r="1.5" fill="#5B9BD5" opacity="0.5"/>
+                <circle cx="24" cy="13" r="1" fill="#5B9BD5" opacity="0.4"/>
+              </svg>
+            </div>
+            <div class="cat-label">給水ﾌｨﾙﾀｰ</div>
+          </button>
+
+          <!-- その他ケア -->
+          <button class="cat-btn" onclick="selectCat('other')">
+            <div class="cat-icon" style="background:#f5f0fb;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M16 25 C16 25 6 18 6 12 a5 5 0 0 1 10-1.5 a5 5 0 0 1 10 1.5 C26 18 16 25 16 25Z" fill="#9B8ED5"/>
+                <path d="M10 11 Q12 9 14 11" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+                <circle cx="24" cy="8" r="1.5" fill="#9B8ED5"/>
+                <line x1="24" y1="5.5" x2="24" y2="6.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="24" y1="9.5" x2="24" y2="10.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="21.5" y1="8" x2="22.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="25.5" y1="8" x2="26.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div class="cat-label">その他ケア</div>
+          </button>
+
+          <!-- 旅行 -->
+          <button class="cat-btn" onclick="selectCat('trip')">
+            <div class="cat-icon" style="background:#ebf3fd;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/>
+                <circle cx="16" cy="12" r="3.5" fill="white"/>
+                <circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/>
+                <circle cx="13.5" cy="10" r="1" fill="#5B9BD5"/>
+                <circle cx="16" cy="9.5" r="1" fill="#5B9BD5"/>
+                <circle cx="18.5" cy="10" r="1" fill="#5B9BD5"/>
+              </svg>
+            </div>
+            <div class="cat-label">旅行</div>
+          </button>
+
         </div>
       </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">費用（円）</label>
-          <input type="number" class="form-input" id="trim-cost" placeholder="5000">
+    </div>
+
+    <!-- Step2: フォーム -->
+    <div class="add-step" id="addStepForm">
+      <div class="sheet-handle"></div>
+      <div class="sheet-topbar">
+        <button class="sheet-back" onclick="backToCats()">←</button>
+        <div class="sheet-title" id="formStepTitle">記録</div>
+        <button class="sheet-close" onclick="closeAddSheet()">✕</button>
+      </div>
+      <div class="form-scroll">
+
+        <!-- 通院 -->
+        <div id="form-hospital" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="hosp-date"></div>
+            <div class="form-group"><label class="form-label">病院名</label><input type="text" class="form-input" id="hosp-name" placeholder="○○動物病院" onfocus="renderChips('hosp-name','savedHospitals','hospital')" oninput="renderChips('hosp-name','savedHospitals','hospital')"><div class="suggestion-chips" id="chips-hosp-name"></div></div>
+            <div class="form-group"><label class="form-label">受診内容</label><input type="text" class="form-input" id="hosp-reason" placeholder="定期健診など"></div>
+            <div class="form-group"><label class="form-label">診断・処置</label><textarea class="form-textarea" id="hosp-result" placeholder="診断内容など"></textarea></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">費用（円）</label><input type="number" class="form-input" id="hosp-cost" placeholder="3000"></div>
+              <div class="form-group"><label class="form-label">次回予定日</label><input type="date" class="form-input" id="hosp-next"></div>
+            </div>
+            <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="hosp-memo" placeholder="その他メモ"></textarea></div>
+          </div>
+          <div id="hospital-records"></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">次回予定日</label>
-          <input type="date" class="form-input" id="trim-next">
+
+        <!-- ワクチン -->
+        <div id="form-vaccine" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">接種日</label><input type="date" class="form-input" id="vac-date" oninput="autoSetNextDate('vac-date','vac-next','year',1)"></div>
+            <div class="form-group"><label class="form-label">ワクチン種類</label>
+              <select class="form-select" id="vac-type">
+                <option value="">選択してください</option>
+                <option>混合ワクチン（5種）</option><option>混合ワクチン（8種）</option><option>混合ワクチン（10種）</option><option>狂犬病ワクチン</option><option>その他</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">次回接種予定日</label><input type="date" class="form-input" id="vac-next"></div>
+            <div class="form-group"><label class="form-label">病院名</label><input type="text" class="form-input" id="vac-hospital" placeholder="○○動物病院" onfocus="renderChips('vac-hospital','savedHospitals','hospital')" oninput="renderChips('vac-hospital','savedHospitals','hospital')"><div class="suggestion-chips" id="chips-vac-hospital"></div></div>
+            <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="vac-memo" placeholder="副反応など"></textarea></div>
+          </div>
+          <div id="vaccine-records"></div>
         </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">メモ・評価</label>
-        <textarea class="form-textarea" id="trim-memo" placeholder="仕上がりの感想など"></textarea>
-      </div>
-      <button class="btn btn-daily" onclick="addRecord('trim')">💾 記録を保存</button>
-    </div>
-    <div id="trim-records"></div>
-  </div>
 
-  <!-- 給水フィルター -->
-  <div class="subtab-content" id="daily-filter">
-    <div class="card">
-      <div class="card-title">💧 フィルター交換を記録</div>
-      <div class="form-group">
-        <label class="form-label">交換日</label>
-        <input type="date" class="form-input" id="filter-date" oninput="autoSetNextDate('filter-date','filter-next','month',1)">
-      </div>
-      <div class="form-group">
-        <label class="form-label">給水機の種類</label>
-        <input type="text" class="form-input" id="filter-machine" placeholder="ピュアクリスタルなど">
-      </div>
-      <div class="form-group">
-        <label class="form-label">フィルターの種類</label>
-        <input type="text" class="form-input" id="filter-type" placeholder="軟水化フィルターなど">
-      </div>
-      <div class="form-group">
-        <label class="form-label">次回交換予定日</label>
-        <input type="date" class="form-input" id="filter-next">
-      </div>
-      <div class="form-group">
-        <label class="form-label">メモ</label>
-        <input type="text" class="form-input" id="filter-memo" placeholder="備考">
-      </div>
-      <button class="btn btn-daily" onclick="addRecord('filter')">💾 記録を保存</button>
-    </div>
-    <div id="filter-records"></div>
-  </div>
+        <!-- 投薬 -->
+        <div id="form-medicine" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">投薬日</label><input type="date" class="form-input" id="med-date" oninput="autoSetNextDate('med-date','med-next','month',1)"></div>
+            <div class="form-group"><label class="form-label">薬の名前</label><input type="text" class="form-input" id="med-name" placeholder="フィラリア予防薬など"></div>
+            <div class="form-group"><label class="form-label">種類</label>
+              <select class="form-select" id="med-type">
+                <option value="">選択してください</option>
+                <option>フィラリア予防薬</option><option>ノミ・ダニ予防薬</option><option>消炎剤</option><option>抗生物質</option><option>ビタミン剤</option><option>その他</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">投与量</label><input type="text" class="form-input" id="med-dose" placeholder="1錠"></div>
+              <div class="form-group"><label class="form-label">次回投薬日</label><input type="date" class="form-input" id="med-next"></div>
+            </div>
+            <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="med-memo" placeholder="服用状況など"></textarea></div>
+          </div>
+          <div id="medicine-records"></div>
+        </div>
 
-  <!-- その他ケア -->
-  <div class="subtab-content" id="daily-other">
-    <div class="card">
-      <div class="card-title">🧴 その他のケアを記録</div>
-      <div class="form-group">
-        <label class="form-label">日付</label>
-        <input type="date" class="form-input" id="other-date">
-      </div>
-      <div class="form-group">
-        <label class="form-label">ケアの種類</label>
-        <input type="text" class="form-input" id="other-type" placeholder="歯磨き、耳掃除、爪切りなど">
-      </div>
-      <div class="form-group">
-        <label class="form-label">メモ</label>
-        <textarea class="form-textarea" id="other-memo" placeholder="状態、気になる点など"></textarea>
-      </div>
-      <button class="btn btn-daily" onclick="addRecord('other')">💾 記録を保存</button>
-    </div>
-    <div id="other-records"></div>
-  </div>
-</main>
+        <!-- 体重 -->
+        <div id="form-weight" class="form-section">
+          <div class="form-card">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">計測日</label><input type="date" class="form-input" id="wt-date"></div>
+              <div class="form-group"><label class="form-label">体重（kg）</label><input type="number" step="0.1" class="form-input" id="wt-value" placeholder="5.2"></div>
+            </div>
+            <div class="form-group"><label class="form-label">メモ</label><input type="text" class="form-input" id="wt-memo" placeholder="太り気味、標準など"></div>
+          </div>
+          <div class="weight-chart" id="weightChart"></div>
+          <div id="weight-records"></div>
+        </div>
 
-<!-- ========== 旅行記録 ========== -->
-<main id="page-travel" class="page">
-  <div class="section-header">
-    <div class="section-title travel">✈️ 旅行の思い出</div>
-  </div>
+        <!-- 散歩 -->
+        <div id="form-walk" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="walk-date"></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">時間（分）</label><input type="number" class="form-input" id="walk-time" placeholder="30"></div>
+              <div class="form-group"><label class="form-label">距離（km）</label><input type="number" step="0.1" class="form-input" id="walk-dist" placeholder="1.5"></div>
+            </div>
+            <div class="form-group"><label class="form-label">コース</label><input type="text" class="form-input" id="walk-course" placeholder="公園周りなど"></div>
+            <div class="form-group"><label class="form-label">天気</label>
+              <select class="form-select" id="walk-weather">
+                <option>☀️ 晴れ</option><option>⛅ 曇り</option><option>🌧 雨</option><option>❄️ 雪</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">メモ</label><input type="text" class="form-input" id="walk-memo" placeholder="今日はよく走った！など"></div>
+          </div>
+          <div id="walk-records"></div>
+        </div>
 
-  <div class="card">
-    <div class="card-title">🗺️ 新しい旅行を記録</div>
-    <div class="form-group">
-      <label class="form-label">旅行タイトル</label>
-      <input type="text" class="form-input" id="trip-title" placeholder="軽井沢の旅 🌲">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">出発日</label>
-        <input type="date" class="form-input" id="trip-start">
+        <!-- トリミング -->
+        <div id="form-trim" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="trim-date" oninput="autoSetNextDate('trim-date','trim-next','month',1)"></div>
+            <div class="form-group"><label class="form-label">サロン名</label><input type="text" class="form-input" id="trim-salon" placeholder="○○ペットサロン" onfocus="renderChips('trim-salon','savedSalons','salon')" oninput="renderChips('trim-salon','savedSalons','salon')"><div class="suggestion-chips" id="chips-trim-salon"></div></div>
+            <div class="form-group"><label class="form-label">メニュー</label>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px" id="trim-menu-checks">
+                <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer"><input type="checkbox" value="シャンプー"> シャンプー</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer"><input type="checkbox" value="カット"> カット</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer"><input type="checkbox" value="爪切り"> 爪切り</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer"><input type="checkbox" value="耳掃除"> 耳掃除</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer"><input type="checkbox" value="歯磨き"> 歯磨き</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:13px;cursor:pointer"><input type="checkbox" value="肛門腺絞り"> 肛門腺絞り</label>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">費用（円）</label><input type="number" class="form-input" id="trim-cost" placeholder="5000"></div>
+              <div class="form-group"><label class="form-label">次回予定日</label><input type="date" class="form-input" id="trim-next"></div>
+            </div>
+            <div class="form-group"><label class="form-label">メモ・評価</label><textarea class="form-textarea" id="trim-memo" placeholder="仕上がりの感想など"></textarea></div>
+          </div>
+          <div id="trim-records"></div>
+        </div>
+
+        <!-- 給水フィルター -->
+        <div id="form-filter" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">交換日</label><input type="date" class="form-input" id="filter-date" oninput="autoSetNextDate('filter-date','filter-next','month',1)"></div>
+            <div class="form-group"><label class="form-label">給水機の種類</label><input type="text" class="form-input" id="filter-machine" placeholder="ピュアクリスタルなど"></div>
+            <div class="form-group"><label class="form-label">フィルターの種類</label><input type="text" class="form-input" id="filter-type" placeholder="軟水化フィルターなど"></div>
+            <div class="form-group"><label class="form-label">次回交換予定日</label><input type="date" class="form-input" id="filter-next"></div>
+            <div class="form-group"><label class="form-label">メモ</label><input type="text" class="form-input" id="filter-memo" placeholder="備考"></div>
+          </div>
+          <div id="filter-records"></div>
+        </div>
+
+        <!-- その他ケア -->
+        <div id="form-other" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="other-date"></div>
+            <div class="form-group"><label class="form-label">ケアの種類</label><input type="text" class="form-input" id="other-type" placeholder="歯磨き、耳掃除など"></div>
+            <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="other-memo" placeholder="状態、気になる点など"></textarea></div>
+          </div>
+          <div id="other-records"></div>
+        </div>
+
+        <!-- 旅行 -->
+        <div id="form-trip" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">旅行タイトル</label><input type="text" class="form-input" id="trip-title" placeholder="軽井沢の旅 🌲"></div>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">出発日</label><input type="date" class="form-input" id="trip-start"></div>
+              <div class="form-group"><label class="form-label">帰宅日</label><input type="date" class="form-input" id="trip-end"></div>
+            </div>
+            <div class="form-group"><label class="form-label">行き先</label><input type="text" class="form-input" id="trip-dest" placeholder="軽井沢、箱根など"></div>
+            <div class="form-group"><label class="form-label">🏨 宿泊施設名</label><input type="text" class="form-input" id="trip-hotel" placeholder="○○リゾートホテル"></div>
+            <div class="form-group"><label class="form-label">宿泊施設の評価</label>
+              <select class="form-select" id="trip-hotel-rating">
+                <option value="">選択</option>
+                <option>⭐⭐⭐⭐⭐ 最高！また行きたい</option><option>⭐⭐⭐⭐ とても良かった</option><option>⭐⭐⭐ 普通</option><option>⭐⭐ あまり良くなかった</option><option>⭐ 残念だった</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">思い出・コメント</label><textarea class="form-textarea" id="trip-memo" placeholder="エピソードを記録しましょう！"></textarea></div>
+            <div class="form-group"><label class="form-label">📸 写真URL 1枚目</label><input type="url" class="form-input" id="trip-photo1" placeholder="https://..."></div>
+            <div class="form-group"><label class="form-label">写真URL 2枚目（任意）</label><input type="url" class="form-input" id="trip-photo2" placeholder="https://..."></div>
+            <div class="form-group"><label class="form-label">写真URL 3枚目（任意）</label><input type="url" class="form-input" id="trip-photo3" placeholder="https://..."></div>
+          </div>
+          <div id="trip-records"></div>
+        </div>
+
+      </div><!-- /form-scroll -->
+      <div class="form-save-bar">
+        <button class="btn btn-primary" id="formSaveBtn" onclick="saveCurrentForm()">💾 記録を保存</button>
       </div>
-      <div class="form-group">
-        <label class="form-label">帰宅日</label>
-        <input type="date" class="form-input" id="trip-end">
+    </div><!-- /addStepForm -->
+
+    <!-- Step3: 成功アニメーション -->
+    <div class="add-step" id="addStepSuccess">
+      <div class="success-wrap" id="successWrap">
+        <div class="success-paw" id="successPaw">🐾</div>
+        <div class="success-title" id="successTitle">記録しました！</div>
+        <div class="success-sub" id="successSub">お世話、ありがとう 🐩</div>
+        <div class="success-badge" id="successBadge">保存 ✓</div>
       </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">行き先</label>
-      <input type="text" class="form-input" id="trip-dest" placeholder="軽井沢、箱根、沖縄など">
-    </div>
-    <div class="form-group">
-      <label class="form-label">🏨 宿泊施設名</label>
-      <input type="text" class="form-input" id="trip-hotel" placeholder="○○リゾートホテル">
-    </div>
-    <div class="form-group">
-      <label class="form-label">宿泊施設の評価</label>
-      <select class="form-select" id="trip-hotel-rating">
-        <option value="">選択</option>
-        <option>⭐⭐⭐⭐⭐ 最高！また行きたい</option>
-        <option>⭐⭐⭐⭐ とても良かった</option>
-        <option>⭐⭐⭐ 普通</option>
-        <option>⭐⭐ あまり良くなかった</option>
-        <option>⭐ 残念だった</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">思い出・コメント</label>
-      <textarea class="form-textarea" id="trip-memo" placeholder="わんこと一緒に楽しんだエピソードを記録しましょう！"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">📸 写真URL（iPhone/Macの写真共有リンク）</label>
-      <input type="url" class="form-input" id="trip-photo1" placeholder="https://...">
-    </div>
-    <div class="form-group">
-      <label class="form-label">写真URL 2枚目（任意）</label>
-      <input type="url" class="form-input" id="trip-photo2" placeholder="https://...">
-    </div>
-    <div class="form-group">
-      <label class="form-label">写真URL 3枚目（任意）</label>
-      <input type="url" class="form-input" id="trip-photo3" placeholder="https://...">
-    </div>
-    <button class="btn btn-travel" onclick="addRecord('trip')">💾 旅行を記録</button>
-  </div>
 
-  <div id="trip-records"></div>
-</main>
+  </div><!-- /sheet-panel -->
+</div><!-- /addSheet -->
 
-<!-- ========== 設定モーダル ========== -->
+<!-- ===== 設定モーダル ===== -->
 <div class="modal-overlay" id="settingsModal" onclick="closeSettings(event)">
   <div class="modal-panel">
     <div class="modal-handle"></div>
-    <div class="modal-title">⚙️ 設定</div>
-
-    <!-- 犬の写真 -->
+    <div class="modal-title">⚙️ プロフィール・設定</div>
     <div class="form-group" style="text-align:center;margin-bottom:20px">
       <div id="settingsPhotoPreview" style="margin-bottom:10px">🐕</div>
       <label style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:var(--primary);color:white;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">
         📷 写真を選ぶ
         <input type="file" accept="image/*" id="dogPhotoInput" style="display:none" onchange="handlePhotoSelect(this)">
       </label>
-      <div style="font-size:11px;color:var(--text-light);margin-top:8px">iPhoneはカメラロールから、Macはファイルから選べます</div>
-      <button id="removePhotoBtn" onclick="removeDogPhoto()" style="display:none;margin-top:8px;background:none;border:1px solid #ddd;border-radius:8px;padding:6px 14px;font-size:12px;color:var(--text-light);cursor:pointer">写真を削除</button>
+      <button id="removePhotoBtn" onclick="removeDogPhoto()" style="display:none;margin-top:8px;margin-left:8px;background:none;border:1px solid #ddd;border-radius:8px;padding:6px 14px;font-size:12px;color:var(--text-light);cursor:pointer">写真を削除</button>
     </div>
-
-    <div class="form-group">
-      <label class="form-label">愛犬の名前</label>
-      <input type="text" class="form-input" id="set-name" placeholder="ポチ">
-    </div>
-    <div class="form-group">
-      <label class="form-label">犬種</label>
-      <input type="text" class="form-input" id="set-breed" placeholder="トイプードルなど">
-    </div>
+    <div class="form-group"><label class="form-label">愛犬の名前</label><input type="text" class="form-input" id="set-name" placeholder="ポチ"></div>
+    <div class="form-group"><label class="form-label">犬種</label><input type="text" class="form-input" id="set-breed" placeholder="トイプードルなど"></div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">生年月日</label>
-        <input type="date" class="form-input" id="set-birth">
-      </div>
-      <div class="form-group">
-        <label class="form-label">性別</label>
-        <select class="form-select" id="set-gender">
-          <option>オス</option>
-          <option>メス</option>
-        </select>
-      </div>
+      <div class="form-group"><label class="form-label">生年月日</label><input type="date" class="form-input" id="set-birth"></div>
+      <div class="form-group"><label class="form-label">性別</label><select class="form-select" id="set-gender"><option>オス</option><option>メス</option></select></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">📊 Google スプレッドシートのURL</label>
-      <input type="url" class="form-input" id="set-gs-url" placeholder="https://docs.google.com/spreadsheets/...">
-    </div>
-    <div class="form-group">
-      <label class="form-label">⚡ Apps Script Web アプリのURL（同期用）</label>
-      <input type="url" class="form-input" id="set-webapp-url" placeholder="https://script.google.com/macros/s/.../exec">
-    </div>
-    <div style="margin-bottom:16px">
-      <p style="font-size:11px;color:var(--text-light);line-height:1.5">
-        Web アプリのURLを登録すると、アプリへの入力が自動的にGoogle スプレッドシートに同期されます。<br>
-        Mac・iPhoneどちらから入力しても、同じデータがシートに蓄積されます。<br>
-        設定ガイド（ショートカット設定ガイド.md）を参照してURLを取得してください。
-      </p>
-    </div>
+    <div class="form-group"><label class="form-label">📊 Google スプレッドシートのURL</label><input type="url" class="form-input" id="set-gs-url" placeholder="https://docs.google.com/spreadsheets/..."></div>
+    <div class="form-group"><label class="form-label">⚡ Apps Script Web アプリのURL（同期用）</label><input type="url" class="form-input" id="set-webapp-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
+    <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:16px">Web アプリのURLを登録すると、入力が自動的にGoogle スプレッドシートに同期されます。</p>
     <button class="btn btn-primary" onclick="saveSettings()">💾 設定を保存</button>
     <div style="height:10px"></div>
     <button class="btn btn-secondary" onclick="closeSettings()">キャンセル</button>
-    <div style="height:16px"></div>
-    <button class="btn btn-danger btn-sm" style="width:100%" onclick="clearAllData()">🗑️ 全データをリセット</button>
   </div>
 </div>
+
+<!-- ===== TAB BAR ===== -->
+<nav class="tab-bar">
+  <button class="tab-btn active" data-tab="home" onclick="showPage('home',this)">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <path d="M3 12L13 3l10 9v10a1 1 0 01-1 1H16v-6h-6v6H4a1 1 0 01-1-1V12z" fill="currentColor" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+    </svg>
+    <span class="tab-label">ホーム</span>
+  </button>
+  <button class="tab-btn" data-tab="records" onclick="showPage('records',this)">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <rect x="4" y="3" width="18" height="20" rx="3" stroke="currentColor" stroke-width="1.8"/>
+      <line x1="8" y1="9" x2="18" y2="9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="8" y1="13" x2="18" y2="13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <line x1="8" y1="17" x2="14" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+    <span class="tab-label">記録</span>
+  </button>
+  <div class="tab-add-wrap">
+    <button class="tab-add-btn" onclick="openAddSheet()">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <line x1="11" y1="4" x2="11" y2="18" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="4" y1="11" x2="18" y2="11" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+  <button class="tab-btn" data-tab="calendar" onclick="showPage('calendar',this)">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <rect x="3" y="5" width="20" height="18" rx="3" stroke="currentColor" stroke-width="1.8"/>
+      <line x1="8" y1="3" x2="8" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="18" y1="3" x2="18" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      <line x1="3" y1="11" x2="23" y2="11" stroke="currentColor" stroke-width="1.6"/>
+      <rect x="8" y="14" width="4" height="4" rx="1" fill="currentColor"/>
+    </svg>
+    <span class="tab-label">カレンダー</span>
+  </button>
+  <button class="tab-btn" data-tab="profile" onclick="showPage('profile',this)">
+    <svg class="tab-dog-svg" width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <ellipse cx="7.5" cy="10" rx="3.5" ry="5" fill="#C8A880"/>
+      <ellipse cx="18.5" cy="10" rx="3.5" ry="5" fill="#C8A880"/>
+      <circle cx="13" cy="13" r="8" fill="#D4956A"/>
+      <ellipse cx="13" cy="16.5" rx="4" ry="3" fill="#E8B880"/>
+      <ellipse cx="13" cy="15" rx="2" ry="1.4" fill="#3A2010"/>
+      <circle cx="10" cy="12" r="1.8" fill="#1A0A04"/>
+      <circle cx="16" cy="12" r="1.8" fill="#1A0A04"/>
+      <circle cx="9.4" cy="11.4" r="0.6" fill="white"/>
+      <circle cx="15.4" cy="11.4" r="0.6" fill="white"/>
+    </svg>
+    <span class="tab-label">わんこ</span>
+  </button>
+</nav>
 
 <script>
 // ========== データ管理 ==========
 const DB = {
-  get: (key) => { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; } },
-  set: (key, val) => localStorage.setItem(key, JSON.stringify(val)),
-  getObj: (key) => { try { return JSON.parse(localStorage.getItem(key) || '{}'); } catch { return {}; } },
-  setObj: (key, val) => localStorage.setItem(key, JSON.stringify(val))
+  get:(k)=>{try{return JSON.parse(localStorage.getItem(k)||'[]');}catch{return[];}},
+  set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)),
+  getObj:(k)=>{try{return JSON.parse(localStorage.getItem(k)||'{}');}catch{return{};}},
+  setObj:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
 };
+
+// カテゴリ設定
+const CAT_CFG = {
+  hospital:{label:'通院',      color:'#e07b54',cat:'health'},
+  vaccine: {label:'ワクチン',  color:'#e07b54',cat:'health'},
+  medicine:{label:'投薬',      color:'#e07b54',cat:'health'},
+  weight:  {label:'体重',      color:'#e07b54',cat:'health'},
+  walk:    {label:'散歩',      color:'#6ab89a',cat:'walk'},
+  trim:    {label:'トリミング',color:'#6ab89a',cat:'daily'},
+  filter:  {label:'給水フィルター',color:'#5b9bd5',cat:'daily'},
+  other:   {label:'その他ケア',color:'#6ab89a',cat:'daily'},
+  trip:    {label:'旅行',      color:'#5b9bd5',cat:'travel'},
+};
+
+// SVGアイコン定義（各所で共通利用）
+const CAT_SVG={
+  hospital:s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/><rect x="13" y="3" width="6" height="8" rx="3" fill="#E07B54"/><rect x="14.5" y="4.5" width="3" height="5" rx="1.5" fill="white" opacity="0.5"/><rect x="14" y="13" width="4" height="10" rx="2" fill="white"/><rect x="11" y="16" width="10" height="4" rx="2" fill="white"/></svg>`,
+  vaccine: s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="8" y="13" width="16" height="7" rx="3.5" fill="#E07B54"/><rect x="22" y="14.5" width="5" height="4" rx="1" fill="#C86A3C"/><rect x="3" y="15.5" width="7" height="2" rx="1" fill="#B85C35"/><rect x="9" y="14.5" width="8" height="4" rx="2" fill="white" opacity="0.4"/><line x1="14" y1="13" x2="14" y2="20" stroke="white" stroke-width="1" opacity="0.5"/><line x1="17" y1="13" x2="17" y2="20" stroke="white" stroke-width="1" opacity="0.5"/></svg>`,
+  medicine:s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="6" y="12" width="20" height="9" rx="4.5" fill="#E07B54"/><path d="M16 12v9" stroke="white" stroke-width="1.5"/><rect x="6" y="12" width="10" height="9" rx="4.5" fill="#E07B54" opacity="0.6"/><rect x="20" y="6" width="7" height="4" rx="2" fill="#F0A080"/><rect x="5" y="24" width="7" height="4" rx="2" fill="#F0A080"/></svg>`,
+  weight:  s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="4" y="18" width="24" height="9" rx="4.5" fill="#E07B54"/><path d="M10 18c0-6 12-6 12 0" stroke="#E07B54" stroke-width="2.5" fill="none"/><circle cx="16" cy="18" r="1.5" fill="white"/><line x1="8" y1="22" x2="8" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="12" y1="21" x2="12" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="20" x2="16" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="20" y1="21" x2="20" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="24" y1="22" x2="24" y2="24" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="18" x2="21" y2="14" stroke="#C86A3C" stroke-width="2" stroke-linecap="round"/></svg>`,
+  walk:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="6.5" cy="25.5" r="1" fill="white" opacity="0.55"/><circle cx="8" cy="26.5" r="1" fill="white" opacity="0.55"/><circle cx="9.5" cy="25.5" r="1" fill="white" opacity="0.55"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg>`,
+  trim:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><circle cx="9" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/><circle cx="23" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/><line x1="12" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><line x1="16" y1="16" x2="16" y2="8" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><circle cx="22" cy="8" r="1.5" fill="#6AB89A"/></svg>`,
+  filter:  s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 5 C16 5 7 15 7 20 a9 9 0 0 0 18 0 C25 15 16 5 16 5Z" fill="#5B9BD5"/><ellipse cx="12" cy="18" rx="2" ry="3.5" fill="white" opacity="0.35" transform="rotate(-15 12 18)"/><circle cx="22" cy="8" r="1.5" fill="#5B9BD5" opacity="0.5"/><circle cx="24" cy="13" r="1" fill="#5B9BD5" opacity="0.4"/></svg>`,
+  other:   s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 25 C16 25 6 18 6 12 a5 5 0 0 1 10-1.5 a5 5 0 0 1 10 1.5 C26 18 16 25 16 25Z" fill="#9B8ED5"/><path d="M10 11 Q12 9 14 11" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/><circle cx="24" cy="8" r="1.5" fill="#9B8ED5"/><line x1="24" y1="5.5" x2="24" y2="6.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="24" y1="9.5" x2="24" y2="10.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="21.5" y1="8" x2="22.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="25.5" y1="8" x2="26.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+  trip:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/><circle cx="13.5" cy="10" r="1" fill="#5B9BD5"/><circle cx="16" cy="9.5" r="1" fill="#5B9BD5"/><circle cx="18.5" cy="10" r="1" fill="#5B9BD5"/></svg>`,
+};
+// 短縮ヘルパー: cs('hospital',20) → SVG文字列
+function cs(type,size=16){return CAT_SVG[type]?CAT_SVG[type](size):'';}
+// アイコンラップ用: 背景色付きの丸いSVGアイコンdiv
+function csWrap(type,size=20,bg=''){const b=bg||{hospital:'rgba(224,123,84,0.15)',vaccine:'rgba(224,123,84,0.15)',medicine:'rgba(224,123,84,0.15)',weight:'rgba(224,123,84,0.15)',walk:'rgba(106,184,154,0.15)',trim:'rgba(106,184,154,0.15)',filter:'rgba(91,155,213,0.15)',other:'rgba(155,142,213,0.15)',trip:'rgba(91,155,213,0.15)'}[type]||'rgba(224,123,84,0.12)';return`<div style="width:36px;height:36px;border-radius:10px;background:${b};display:flex;align-items:center;justify-content:center;flex-shrink:0">${cs(type,size)}</div>`;}
 
 // ========== ページ切替 ==========
 function showPage(name, btn) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  btn.classList.add('active');
-  const fab = document.getElementById('fab');
-  if (name === 'home') { fab.classList.remove('visible'); }
-  else { fab.classList.add('visible'); fab.className = 'fab visible ' + name; }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
   renderPage(name);
 }
 
-function showSubtab(page, tab, btn) {
-  const parent = document.getElementById('page-' + page);
-  parent.querySelectorAll('.subtab-content').forEach(c => c.classList.remove('active'));
-  parent.querySelectorAll('.subtab-btn').forEach(b => {
-    b.classList.remove('active-health','active-daily','active-travel');
-  });
-  document.getElementById(page + '-' + tab).classList.add('active');
-  btn.classList.add('active-' + page);
-  renderSubtab(page, tab);
-  // タブ切替時に次回日付のデフォルトを再適用（未入力のものだけ）
+function renderPage(name) {
+  if(name==='home'){updateHomeStats();renderUpcoming();}
+  else if(name==='records'){renderTimeline();}
+  else if(name==='calendar'){
+    // 未選択の場合、最新記録日か今日を自動選択
+    if(!calSelectedDay){
+      const allDates=[];
+      Object.keys(CAT_CFG).forEach(type=>{
+        DB.get(type).forEach(r=>{
+          const raw=(r.date||r.start||r.createdAt||'').toString();
+          const ds=raw.slice(0,10).replace(/\//g,'-');
+          if(/^\d{4}-\d{2}-\d{2}$/.test(ds)) allDates.push(ds);
+        });
+      });
+      allDates.sort((a,b)=>b.localeCompare(a));
+      calSelectedDay=allDates[0]||null;
+      // 最新記録が別月なら表示月も移動
+      if(calSelectedDay){
+        const parts=calSelectedDay.split('-');
+        const yr=parseInt(parts[0]),mo=parseInt(parts[1]);
+        if(!isNaN(yr)&&!isNaN(mo)){calYear=yr;calMonth=mo-1;}
+      }
+    }
+    renderCalendar();
+  }
+}
+
+// ========== 追加シート ==========
+let currentCat = null;
+
+function openAddSheet() {
+  currentCat = null;
+  document.getElementById('addStepCats').classList.add('active');
+  document.getElementById('addStepForm').classList.remove('active');
+  document.getElementById('addStepSuccess').classList.remove('active');
+  document.getElementById('addSheet').classList.add('open');
   setTodayDates();
 }
 
-function openFab() {
-  // 現在アクティブなサブタブのフォームにスクロール
-  const activePage = document.querySelector('.page.active');
-  if (activePage) {
-    const form = activePage.querySelector('.card');
-    if (form) form.scrollIntoView({ behavior: 'smooth' });
+function closeAddSheet() {
+  document.getElementById('addSheet').classList.remove('open');
+}
+
+function closeSheetOverlay(e) {
+  if(e.target===document.getElementById('addSheet')) closeAddSheet();
+}
+
+function selectCat(catId) {
+  currentCat = catId;
+  document.querySelectorAll('.form-section').forEach(el=>el.classList.remove('active'));
+  document.getElementById('form-'+catId).classList.add('active');
+  const cfg = CAT_CFG[catId];
+  const titleEl=document.getElementById('formStepTitle');
+  titleEl.innerHTML='';
+  const iconSpan=document.createElement('span');
+  iconSpan.style.cssText='display:inline-flex;align-items:center;vertical-align:middle;margin-right:4px';
+  iconSpan.innerHTML=cs(catId,16);
+  titleEl.appendChild(iconSpan);
+  titleEl.appendChild(document.createTextNode(cfg.label+'を記録'));
+  // 保存ボタンの色
+  const btn = document.getElementById('formSaveBtn');
+  const colorMap={health:'btn-health',walk:'btn-daily',daily:'btn-daily',travel:'btn-travel'};
+  btn.className='btn '+(colorMap[cfg.cat]||'btn-primary');
+  document.getElementById('addStepCats').classList.remove('active');
+  document.getElementById('addStepForm').classList.add('active');
+  setTodayDates();
+  // カテゴリの記録を表示
+  renderRecords(catId);
+  if(catId==='weight') renderWeightChart();
+}
+
+function backToCats() {
+  document.getElementById('addStepForm').classList.remove('active');
+  document.getElementById('addStepCats').classList.add('active');
+}
+
+function saveCurrentForm() {
+  if(currentCat) addRecord(currentCat);
+}
+
+function showAddSuccess(catId) {
+  const cfg = CAT_CFG[catId]||{label:'記録',color:'#e07b54'};
+  const pawEl=document.getElementById('successPaw');
+  pawEl.innerHTML=cs(catId,80)||'🐾';
+  pawEl.style.animation = 'none';
+  document.getElementById('successTitle').textContent = '記録しました！';
+  const s = DB.getObj('settings');
+  document.getElementById('successSub').textContent = (s.name||'わんこ')+'のお世話、ありがとう 🐩';
+  const badge = document.getElementById('successBadge');
+  badge.textContent = cfg.label+'を記録 ✓';
+  badge.style.background = cfg.color;
+  badge.style.animation = 'none';
+  document.getElementById('addStepForm').classList.remove('active');
+  document.getElementById('addStepSuccess').classList.add('active');
+  // アニメーション再起動
+  setTimeout(()=>{
+    document.getElementById('successPaw').style.animation = '';
+    badge.style.animation = '';
+  }, 20);
+  // ミニ肉球コンフェッティ
+  const wrap = document.getElementById('successWrap');
+  // 既存のミニ肉球を削除
+  wrap.querySelectorAll('.mini-paw').forEach(el=>el.remove());
+  for(let i=0;i<10;i++){
+    const el=document.createElement('div');
+    el.className='mini-paw';
+    el.textContent='🐾';
+    el.style.cssText=`left:${15+Math.random()*70}%;top:${10+Math.random()*80}%;font-size:${12+Math.random()*16}px;transform:rotate(${Math.random()*360}deg);animation-delay:${Math.random()*0.4}s;`;
+    wrap.appendChild(el);
   }
+  setTimeout(()=>{ closeAddSheet(); updateHomeStats(); renderTimeline(); renderCalendar(); }, 2600);
 }
 
-// ========== 今日の日付セット ==========
-function addMonths(date, months) {
-  const d = new Date(date);
-  d.setMonth(d.getMonth() + months);
-  return d.toISOString().split('T')[0];
-}
-function addYears(date, years) {
-  const d = new Date(date);
-  d.setFullYear(d.getFullYear() + years);
-  return d.toISOString().split('T')[0];
-}
-
-// 基準日から次回日付を計算してセットする
-function autoSetNextDate(sourceId, targetId, unit, amount) {
-  const src = document.getElementById(sourceId);
-  const tgt = document.getElementById(targetId);
-  if (!src || !tgt || !src.value) return;
-  tgt.value = unit === 'month' ? addMonths(src.value, amount) : addYears(src.value, amount);
+// ========== 日付ユーティリティ ==========
+function addMonths(date,months){const d=new Date(date);d.setMonth(d.getMonth()+months);return localDateStr(d);}
+function addYears(date,years){const d=new Date(date);d.setFullYear(d.getFullYear()+years);return localDateStr(d);}
+function autoSetNextDate(srcId,tgtId,unit,n){const src=document.getElementById(srcId);const tgt=document.getElementById(tgtId);if(!src||!tgt||!src.value)return;tgt.value=unit==='month'?addMonths(src.value,n):addYears(src.value,n);}
+function localDateStr(d){const t=d||new Date();return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
+function setTodayDates(){
+  const today=localDateStr();
+  document.querySelectorAll('input[type="date"]').forEach(el=>{if(!el.value)el.value=today;});
+  [{src:'vac-date',tgt:'vac-next',unit:'year',n:1},{src:'med-date',tgt:'med-next',unit:'month',n:1},{src:'trim-date',tgt:'trim-next',unit:'month',n:1},{src:'filter-date',tgt:'filter-next',unit:'month',n:1}]
+    .forEach(({src,tgt,unit,n})=>{const se=document.getElementById(src);const te=document.getElementById(tgt);if(se&&te&&se.value&&!te.value)te.value=unit==='month'?addMonths(se.value,n):addYears(se.value,n);});
 }
 
-function setTodayDates() {
-  const today = new Date().toISOString().split('T')[0];
-  // すべての日付入力に今日をセット（未入力のもののみ）
-  document.querySelectorAll('input[type="date"]').forEach(el => {
-    if (!el.value) el.value = today;
-  });
-  // 次回予定を基準日から計算してセット（未入力のもののみ）
-  const rules = [
-    { src: 'vac-date',    tgt: 'vac-next',    unit: 'year',  n: 1 },
-    { src: 'med-date',    tgt: 'med-next',    unit: 'month', n: 1 },
-    { src: 'trim-date',   tgt: 'trim-next',   unit: 'month', n: 1 },
-    { src: 'filter-date', tgt: 'filter-next', unit: 'month', n: 1 },
-  ];
-  rules.forEach(({ src, tgt, unit, n }) => {
-    const srcEl = document.getElementById(src);
-    const tgtEl = document.getElementById(tgt);
-    if (srcEl && tgtEl && srcEl.value && !tgtEl.value) {
-      tgtEl.value = unit === 'month' ? addMonths(srcEl.value, n) : addYears(srcEl.value, n);
-    }
-  });
+// ========== 日付フォーマット ==========
+function fmtDate(d){
+  if(!d)return'';
+  const s=String(d);
+  if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10).replace(/-/g,'/');
+  const dt=new Date(d);
+  if(!isNaN(dt.getTime())){const y=dt.getFullYear();const m=String(dt.getMonth()+1).padStart(2,'0');const dy=String(dt.getDate()).padStart(2,'0');return`${y}/${m}/${dy}`;}
+  return s.replace(/-/g,'/');
 }
 
 // ========== レコード追加 ==========
-function addRecord(type) {
-  const d = new Date().toISOString().split('T')[0];
-  let record = { id: Date.now(), createdAt: d };
-  let key = '';
+function addRecord(type){
+  const d=localDateStr();
+  let record={id:Date.now(),createdAt:d};
+  let key='';
 
-  if (type === 'hospital') {
-    record.date = document.getElementById('hosp-date').value || d;
-    record.name = document.getElementById('hosp-name').value;
-    record.reason = document.getElementById('hosp-reason').value;
-    record.result = document.getElementById('hosp-result').value;
-    record.cost = document.getElementById('hosp-cost').value;
-    record.next = document.getElementById('hosp-next').value;
-    record.memo = document.getElementById('hosp-memo').value;
-    if (!record.reason && !record.name) { alert('病院名または受診内容を入力してください'); return; }
-    saveSuggestion('savedHospitals', record.name);
-    key = 'hospital';
+  if(type==='hospital'){
+    record.date=document.getElementById('hosp-date').value||d;
+    record.name=document.getElementById('hosp-name').value;
+    record.reason=document.getElementById('hosp-reason').value;
+    record.result=document.getElementById('hosp-result').value;
+    record.cost=document.getElementById('hosp-cost').value;
+    record.next=document.getElementById('hosp-next').value;
+    record.memo=document.getElementById('hosp-memo').value;
+    if(!record.reason&&!record.name){alert('病院名または受診内容を入力してください');return;}
+    saveSuggestion('savedHospitals',record.name);
+    key='hospital';
     clearForm(['hosp-name','hosp-reason','hosp-result','hosp-cost','hosp-next','hosp-memo']);
-  } else if (type === 'vaccine') {
-    record.date = document.getElementById('vac-date').value || d;
-    record.type = document.getElementById('vac-type').value;
-    record.next = document.getElementById('vac-next').value;
-    record.hospital = document.getElementById('vac-hospital').value;
-    record.memo = document.getElementById('vac-memo').value;
-    if (!record.type) { alert('ワクチンの種類を選択してください'); return; }
-    saveSuggestion('savedHospitals', record.hospital);
-    key = 'vaccine';
+  } else if(type==='vaccine'){
+    record.date=document.getElementById('vac-date').value||d;
+    record.type=document.getElementById('vac-type').value;
+    record.next=document.getElementById('vac-next').value;
+    record.hospital=document.getElementById('vac-hospital').value;
+    record.memo=document.getElementById('vac-memo').value;
+    if(!record.type){alert('ワクチンの種類を選択してください');return;}
+    saveSuggestion('savedHospitals',record.hospital);
+    key='vaccine';
     clearForm(['vac-hospital','vac-memo','vac-next']);
-    document.getElementById('vac-type').value = '';
-  } else if (type === 'medicine') {
-    record.date = document.getElementById('med-date').value || d;
-    record.name = document.getElementById('med-name').value;
-    record.type = document.getElementById('med-type').value;
-    record.dose = document.getElementById('med-dose').value;
-    record.next = document.getElementById('med-next').value;
-    record.memo = document.getElementById('med-memo').value;
-    if (!record.name) { alert('薬の名前を入力してください'); return; }
-    key = 'medicine';
+    document.getElementById('vac-type').value='';
+  } else if(type==='medicine'){
+    record.date=document.getElementById('med-date').value||d;
+    record.name=document.getElementById('med-name').value;
+    record.type=document.getElementById('med-type').value;
+    record.dose=document.getElementById('med-dose').value;
+    record.next=document.getElementById('med-next').value;
+    record.memo=document.getElementById('med-memo').value;
+    if(!record.name){alert('薬の名前を入力してください');return;}
+    key='medicine';
     clearForm(['med-name','med-dose','med-next','med-memo']);
-    document.getElementById('med-type').value = '';
-  } else if (type === 'weight') {
-    record.date = document.getElementById('wt-date').value || d;
-    record.value = parseFloat(document.getElementById('wt-value').value);
-    record.memo = document.getElementById('wt-memo').value;
-    if (!record.value) { alert('体重を入力してください'); return; }
-    key = 'weight';
+    document.getElementById('med-type').value='';
+  } else if(type==='weight'){
+    record.date=document.getElementById('wt-date').value||d;
+    record.value=parseFloat(document.getElementById('wt-value').value);
+    record.memo=document.getElementById('wt-memo').value;
+    if(!record.value){alert('体重を入力してください');return;}
+    key='weight';
     clearForm(['wt-value','wt-memo']);
-  } else if (type === 'walk') {
-    record.date = document.getElementById('walk-date').value || d;
-    record.time = document.getElementById('walk-time').value;
-    record.dist = document.getElementById('walk-dist').value;
-    record.course = document.getElementById('walk-course').value;
-    record.weather = document.getElementById('walk-weather').value;
-    record.memo = document.getElementById('walk-memo').value;
-    if (!record.time && !record.dist) { alert('時間か距離を入力してください'); return; }
-    key = 'walk';
+  } else if(type==='walk'){
+    record.date=document.getElementById('walk-date').value||d;
+    record.time=document.getElementById('walk-time').value;
+    record.dist=document.getElementById('walk-dist').value;
+    record.course=document.getElementById('walk-course').value;
+    record.weather=document.getElementById('walk-weather').value;
+    record.memo=document.getElementById('walk-memo').value;
+    if(!record.time&&!record.dist){alert('時間か距離を入力してください');return;}
+    key='walk';
     clearForm(['walk-time','walk-dist','walk-course','walk-memo']);
-  } else if (type === 'trim') {
-    record.date = document.getElementById('trim-date').value || d;
-    record.salon = document.getElementById('trim-salon').value;
-    const checks = [...document.querySelectorAll('#trim-menu-checks input:checked')].map(c => c.value);
-    record.menu = checks.join('、');
-    record.cost = document.getElementById('trim-cost').value;
-    record.next = document.getElementById('trim-next').value;
-    record.memo = document.getElementById('trim-memo').value;
-    saveSuggestion('savedSalons', record.salon);
-    key = 'trim';
+  } else if(type==='trim'){
+    record.date=document.getElementById('trim-date').value||d;
+    record.salon=document.getElementById('trim-salon').value;
+    const checks=[...document.querySelectorAll('#trim-menu-checks input:checked')].map(c=>c.value);
+    record.menu=checks.join('、');
+    record.cost=document.getElementById('trim-cost').value;
+    record.next=document.getElementById('trim-next').value;
+    record.memo=document.getElementById('trim-memo').value;
+    saveSuggestion('savedSalons',record.salon);
+    key='trim';
     clearForm(['trim-salon','trim-cost','trim-next','trim-memo']);
-    document.querySelectorAll('#trim-menu-checks input').forEach(c => c.checked = false);
-  } else if (type === 'filter') {
-    record.date = document.getElementById('filter-date').value || d;
-    record.machine = document.getElementById('filter-machine').value;
-    record.filterType = document.getElementById('filter-type').value;
-    record.next = document.getElementById('filter-next').value;
-    record.memo = document.getElementById('filter-memo').value;
-    key = 'filter';
+    document.querySelectorAll('#trim-menu-checks input').forEach(c=>c.checked=false);
+  } else if(type==='filter'){
+    record.date=document.getElementById('filter-date').value||d;
+    record.machine=document.getElementById('filter-machine').value;
+    record.filterType=document.getElementById('filter-type').value;
+    record.next=document.getElementById('filter-next').value;
+    record.memo=document.getElementById('filter-memo').value;
+    key='filter';
     clearForm(['filter-machine','filter-type','filter-next','filter-memo']);
-  } else if (type === 'other') {
-    record.date = document.getElementById('other-date').value || d;
-    record.type = document.getElementById('other-type').value;
-    record.memo = document.getElementById('other-memo').value;
-    if (!record.type) { alert('ケアの種類を入力してください'); return; }
-    key = 'other';
+  } else if(type==='other'){
+    record.date=document.getElementById('other-date').value||d;
+    record.type=document.getElementById('other-type').value;
+    record.memo=document.getElementById('other-memo').value;
+    if(!record.type){alert('ケアの種類を入力してください');return;}
+    key='other';
     clearForm(['other-type','other-memo']);
-  } else if (type === 'trip') {
-    record.date = document.getElementById('trip-start').value || d;
-    record.title = document.getElementById('trip-title').value;
-    record.start = document.getElementById('trip-start').value;
-    record.end = document.getElementById('trip-end').value;
-    record.dest = document.getElementById('trip-dest').value;
-    record.hotel = document.getElementById('trip-hotel').value;
-    record.hotelRating = document.getElementById('trip-hotel-rating').value;
-    record.memo = document.getElementById('trip-memo').value;
-    record.photo1 = document.getElementById('trip-photo1').value;
-    record.photo2 = document.getElementById('trip-photo2').value;
-    record.photo3 = document.getElementById('trip-photo3').value;
-    if (!record.title && !record.dest) { alert('旅行タイトルまたは行き先を入力してください'); return; }
-    key = 'trip';
+  } else if(type==='trip'){
+    record.date=document.getElementById('trip-start').value||d;
+    record.title=document.getElementById('trip-title').value;
+    record.start=document.getElementById('trip-start').value;
+    record.end=document.getElementById('trip-end').value;
+    record.dest=document.getElementById('trip-dest').value;
+    record.hotel=document.getElementById('trip-hotel').value;
+    record.hotelRating=document.getElementById('trip-hotel-rating').value;
+    record.memo=document.getElementById('trip-memo').value;
+    record.photo1=document.getElementById('trip-photo1').value;
+    record.photo2=document.getElementById('trip-photo2').value;
+    record.photo3=document.getElementById('trip-photo3').value;
+    if(!record.title&&!record.dest){alert('旅行タイトルまたは行き先を入力してください');return;}
+    key='trip';
     clearForm(['trip-title','trip-start','trip-end','trip-dest','trip-hotel','trip-memo','trip-photo1','trip-photo2','trip-photo3']);
-    document.getElementById('trip-hotel-rating').value = '';
+    document.getElementById('trip-hotel-rating').value='';
   }
 
-  const records = DB.get(key);
+  const records=DB.get(key);
   records.unshift(record);
-  DB.set(key, records);
+  DB.set(key,records);
+  renderRecords(key);
+
+  // Google Sheets同期
+  if(getWebAppUrl()){
+    showSyncBar('📤 Google Sheetsに送信中...','syncing');
+    syncToSheets(key,record,'add').then(()=>showSyncBar('✅ Sheetsに保存しました','success'));
+  }
+
+  showAddSuccess(key);
+}
+
+function clearForm(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+
+function deleteRecord(key,id){
+  if(!confirm('この記録を削除しますか？'))return;
+  const records=DB.get(key).filter(r=>r.id!==id);
+  DB.set(key,records);
   renderRecords(key);
   updateHomeStats();
-
-  // Google Sheetsに同期（バックグラウンド送信）
-  if (getWebAppUrl()) {
-    showSyncBar('📤 Google Sheetsに送信中...', 'syncing');
-    syncToSheets(key, record, 'add').then(() => {
-      showSyncBar('✅ Sheetsに保存しました', 'success');
-    });
-  }
-
-  // 保存アニメーション
-  const btn = document.querySelector(`#page-${getCurrentPage()} .btn:last-of-type`);
-  showSaveAnimation();
+  renderTimeline();
+  renderCalendar();
+  syncToSheets(key,{id},'delete');
 }
 
-function getCurrentPage() {
-  const active = document.querySelector('.page.active');
-  return active ? active.id.replace('page-', '') : 'home';
+// ========== タイムライン ==========
+let currentFilter = 'all';
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderTimeline();
 }
 
-function showSaveAnimation() {
-  const div = document.createElement('div');
-  div.textContent = '✅ 保存しました！';
-  div.style.cssText = `
-    position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-10px);
-    background:#333; color:white; padding:10px 20px; border-radius:20px; font-size:14px;
-    z-index:999; opacity:0; transition:all 0.3s; pointer-events:none;
-  `;
-  document.body.appendChild(div);
-  requestAnimationFrame(() => { div.style.opacity = '1'; div.style.transform = 'translateX(-50%) translateY(0)'; });
-  setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 1500);
+function getRecordLabel(type, r) {
+  if(type==='hospital') return r.reason||r.name||'通院';
+  if(type==='vaccine') return r.type||'ワクチン';
+  if(type==='medicine') return r.name||r.type||'投薬';
+  if(type==='weight') return r.value+'kg';
+  if(type==='walk') return [(r.time?r.time+'分':''), (r.dist?r.dist+'km':'')].filter(Boolean).join(' ')||'散歩';
+  if(type==='trim') return r.salon||'トリミング';
+  if(type==='filter') return 'フィルター交換';
+  if(type==='other') return r.type||'ケア';
+  if(type==='trip') return r.title||r.dest||'旅行';
+  return '記録';
 }
 
-function clearForm(ids) {
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
+function getRecordSub(type, r) {
+  if(type==='hospital') return [r.name, r.result, r.memo].filter(Boolean).join(' / ');
+  if(type==='vaccine') return [r.hospital, r.memo].filter(Boolean).join(' / ');
+  if(type==='medicine') return [r.type, r.dose?r.dose+'投与':'', r.memo].filter(Boolean).join(' / ');
+  if(type==='weight') return r.memo||'';
+  if(type==='walk') return [r.weather, r.course, r.memo].filter(Boolean).join(' / ');
+  if(type==='trim') return [r.menu, r.memo].filter(Boolean).join(' / ');
+  if(type==='filter') return [r.machine, r.filterType].filter(Boolean).join(' / ');
+  if(type==='other') return r.memo||'';
+  if(type==='trip') return [r.dest, r.hotel].filter(Boolean).join(' · ');
+  return '';
+}
+
+function getAllRecords() {
+  const all=[];
+  Object.entries(CAT_CFG).forEach(([type,cfg])=>{
+    DB.get(type).forEach(r=>all.push({...r,_type:type,_cfg:cfg}));
+  });
+  return all.sort((a,b)=>{
+    const tc=d=>(d||'').toString().slice(0,10).replace(/\//g,'-');
+    const dd=tc(b.date).localeCompare(tc(a.date));
+    return dd!==0?dd:(Number(b.id)||0)-(Number(a.id)||0);
   });
 }
 
-function deleteRecord(key, id) {
-  if (!confirm('この記録を削除しますか？')) return;
-  const records = DB.get(key).filter(r => r.id !== id);
-  DB.set(key, records);
-  renderRecords(key);
-  updateHomeStats();
-  // Google Sheetsからも削除
-  syncToSheets(key, { id }, 'delete');
-}
+function renderTimeline() {
+  const container = document.getElementById('timeline');
+  if(!container) return;
+  let records = getAllRecords();
+  if(currentFilter==='walk') records=records.filter(r=>r._type==='walk');
+  else if(currentFilter==='health') records=records.filter(r=>r._cfg.cat==='health');
+  else if(currentFilter==='daily') records=records.filter(r=>r._cfg.cat==='daily');
+  else if(currentFilter==='travel') records=records.filter(r=>r._type==='trip');
 
-// ========== 日付フォーマット（グローバル共通） ==========
-// どんな形式の日付値でも yyyy/mm/dd に揃える
-function fmtDate(d) {
-  if (!d) return '';
-  const s = String(d);
-  // "2026-04-17" または "2026-04-17Txx:xx:xx..." 形式
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10).replace(/-/g, '/');
-  // Dateオブジェクトや他の文字列は new Date() でパース
-  const dt = new Date(d);
-  if (!isNaN(dt.getTime())) {
-    const y = dt.getFullYear();
-    const m = String(dt.getMonth() + 1).padStart(2, '0');
-    const day = String(dt.getDate()).padStart(2, '0');
-    return `${y}/${m}/${day}`;
-  }
-  return s.replace(/-/g, '/');
-}
-
-// ========== レンダリング ==========
-function renderRecords(key) {
-  const records = DB.get(key);
-  const container = document.getElementById(key + '-records');
-  if (!container) return;
-
-  if (records.length === 0) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">まだ記録がありません</div></div>`;
+  if(records.length===0){
+    container.innerHTML=`<div class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録がありません</div></div>`;
     return;
   }
 
-  let html = '';
-  records.forEach(r => {
-    html += renderRecordItem(key, r);
-  });
-  container.innerHTML = html;
-
-  if (key === 'weight') renderWeightChart();
-}
-
-function renderRecordItem(key, r) {
-  const fmt = fmtDate;
-  let title = '', body = '', tags = '';
-
-  if (key === 'hospital') {
-    title = r.reason || r.name || '通院';
-    body = [r.name, r.result, r.memo].filter(Boolean).join(' / ');
-    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">🏥 ${fmt(r.date)}</span>`;
-    if (r.cost) tags += `<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;
-    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
-  } else if (key === 'vaccine') {
-    title = r.type || 'ワクチン';
-    body = [r.hospital, r.memo].filter(Boolean).join(' / ');
-    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">💉 ${fmt(r.date)}</span>`;
-    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
-  } else if (key === 'medicine') {
-    title = r.name || r.type || '投薬';
-    body = [r.type, r.dose ? r.dose + '投与' : '', r.memo].filter(Boolean).join(' / ');
-    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">💊 ${fmt(r.date)}</span>`;
-    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
-  } else if (key === 'weight') {
-    title = `${r.value} kg`;
-    body = r.memo || '';
-    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">⚖️ ${fmt(r.date)}</span>`;
-  } else if (key === 'walk') {
-    title = `${r.time ? r.time + '分' : ''} ${r.dist ? r.dist + 'km' : ''}`.trim() || '散歩';
-    body = [r.weather, r.course, r.memo].filter(Boolean).join(' / ');
-    tags = `<span class="record-tag" style="background:#fff0eb;color:var(--health)">🦮 ${fmt(r.date)}</span>`;
-  } else if (key === 'trim') {
-    title = r.salon || 'トリミング';
-    body = [r.menu, r.memo].filter(Boolean).join(' / ');
-    tags = `<span class="record-tag" style="background:#e8f8f0;color:var(--daily)">✂️ ${fmt(r.date)}</span>`;
-    if (r.cost) tags += `<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;
-    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
-  } else if (key === 'filter') {
-    title = `フィルター交換`;
-    body = [r.machine, r.filterType, r.memo].filter(Boolean).join(' / ');
-    tags = `<span class="record-tag" style="background:#e8f8f0;color:var(--daily)">💧 ${fmt(r.date)}</span>`;
-    if (r.next) tags += `<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
-  } else if (key === 'other') {
-    title = r.type || 'ケア';
-    body = r.memo || '';
-    tags = `<span class="record-tag" style="background:#e8f8f0;color:var(--daily)">🧴 ${fmt(r.date)}</span>`;
-  } else if (key === 'trip') {
-    return renderTripCard(r);
-  }
-
-  return `
-    <div class="record-item">
-      <div class="record-item-header">
-        <div>
-          <div class="record-item-title">${title}</div>
-          <div>${tags}</div>
-          ${body ? `<div class="record-item-body">${body}</div>` : ''}
-        </div>
-        <button class="delete-btn" onclick="deleteRecord('${key}', ${r.id})">✕</button>
+  container.innerHTML = records.map((r,i)=>{
+    const cfg=r._cfg;
+    const type=r._type;
+    const title=getRecordLabel(type,r);
+    const sub=getRecordSub(type,r);
+    const dateStr=fmtDate(r.date);
+    const nextStr=r.next?`<span class="tl-tag" style="background:#fff5cc;color:#a07000">次回: ${fmtDate(r.next)}</span>`:'';
+    const costStr=r.cost?`<span class="tl-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`:'';
+    return `<div class="timeline-item">
+      <div class="tl-left">
+        <div class="tl-icon" style="background:${cfg.color}22">${cs(type,20)}</div>
+        ${i<records.length-1?'<div class="tl-line"></div>':''}
       </div>
-    </div>`;
-}
-
-function renderTripCard(r) {
-  const fmt = fmtDate;
-  const photos = [r.photo1, r.photo2, r.photo3].filter(Boolean);
-  let photoHtml = '';
-  if (photos.length > 0) {
-    photoHtml = photos.map(p => `<img src="${p}" class="travel-photo" onerror="this.style.display='none'" alt="旅行の写真">`).join('');
-  }
-
-  return `
-    <div class="travel-card">
-      <div class="travel-card-header">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div class="tl-card">
+        <div class="tl-card-row">
           <div>
-            <div class="travel-card-title">✈️ ${r.title || r.dest || '旅行'}</div>
-            <div class="travel-card-dates">${fmt(r.start)}${r.end ? ' 〜 ' + fmt(r.end) : ''}</div>
+            <div class="tl-title">${title}</div>
+            ${sub?`<div class="tl-sub">${sub}</div>`:''}
+            <div style="margin-top:5px;display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+              <span class="tl-tag" style="background:${cfg.color}18;color:${cfg.color};display:inline-flex;align-items:center;gap:3px">${cs(type,12)} ${cfg.label}</span>
+              ${nextStr}${costStr}
+            </div>
           </div>
-          <button class="delete-btn" style="color:rgba(255,255,255,0.6)" onclick="deleteRecord('trip', ${r.id})">✕</button>
+          <div style="display:flex;align-items:flex-start;gap:4px;flex-shrink:0;margin-left:6px">
+            <div class="tl-date">${dateStr}</div>
+            <button class="tl-del" onclick="deleteRecord('${type}',${r.id})">✕</button>
+          </div>
         </div>
       </div>
-      <div class="travel-card-body">
-        ${r.dest ? `<div class="travel-info-row"><span class="travel-info-icon">📍</span><span class="travel-info-text">${r.dest}</span></div>` : ''}
-        ${r.hotel ? `<div class="travel-info-row"><span class="travel-info-icon">🏨</span><span class="travel-info-text">${r.hotel}${r.hotelRating ? ' ' + r.hotelRating : ''}</span></div>` : ''}
-        ${r.memo ? `<div class="travel-info-row"><span class="travel-info-icon">📝</span><span class="travel-info-text">${r.memo}</span></div>` : ''}
-        ${photoHtml}
-      </div>
-    </div>`;
-}
-
-function renderWeightChart() {
-  const records = DB.get('weight').slice(0, 8).reverse();
-  const chart = document.getElementById('weightChart');
-  if (!chart) return;
-  if (records.length === 0) { chart.innerHTML = '<div style="width:100%;text-align:center;font-size:12px;color:var(--text-light);align-self:center">体重を記録するとグラフが表示されます</div>'; return; }
-  const max = Math.max(...records.map(r => r.value)) * 1.1;
-  chart.innerHTML = records.map(r => {
-    const h = Math.max(10, (r.value / max) * 90);
-    const label = r.date ? r.date.slice(5) : '';
-    return `<div class="weight-bar-wrap">
-      <div style="font-size:9px;color:var(--text-light);margin-bottom:2px">${r.value}</div>
-      <div class="weight-bar" style="height:${h}%"></div>
-      <div class="weight-bar-label">${label}</div>
     </div>`;
   }).join('');
 }
 
-function renderPage(name) {
-  if (name === 'health') {
-    ['hospital','vaccine','medicine','weight','walk'].forEach(k => renderRecords(k));
-  } else if (name === 'daily') {
-    ['trim','filter','other'].forEach(k => renderRecords(k));
-  } else if (name === 'travel') {
-    renderRecords('trip');
-  } else if (name === 'home') {
-    updateHomeStats();
-    renderUpcoming();
-  }
+// ========== 個別レコード表示（シート内履歴） ==========
+function renderRecords(key) {
+  const records=DB.get(key);
+  const container=document.getElementById(key+'-records');
+  if(!container)return;
+  if(records.length===0){container.innerHTML='';return;}
+  let html='';
+  records.slice(0,5).forEach(r=>{
+    if(key==='trip'){html+=renderTripCard(r);return;}
+    html+=renderRecordItem(key,r);
+  });
+  container.innerHTML=html;
+  if(key==='weight')renderWeightChart();
 }
 
-function renderSubtab(page, tab) {
-  const map = {
-    health: { hospital:'hospital', vaccine:'vaccine', medicine:'medicine', weight:'weight', walk:'walk' },
-    daily: { trim:'trim', filter:'filter', other:'other' },
-    travel: { trip:'trip' }
-  };
-  if (map[page] && map[page][tab]) renderRecords(map[page][tab]);
+function renderRecordItem(key,r){
+  const fmt=fmtDate;
+  const ico=(type,bg,sz=13)=>`<span style="display:inline-flex;align-items:center;vertical-align:middle;margin-right:2px">${cs(type,sz)}</span>`;
+  let title='',body='',tags='';
+  if(key==='hospital'){title=r.reason||r.name||'通院';body=[r.name,r.result,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#fff0eb;color:var(--health)">${ico('hospital')}${fmt(r.date)}</span>`;if(r.cost)tags+=`<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
+  else if(key==='vaccine'){title=r.type||'ワクチン';body=[r.hospital,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#fff0eb;color:var(--health)">${ico('vaccine')}${fmt(r.date)}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
+  else if(key==='medicine'){title=r.name||r.type||'投薬';body=[r.type,r.dose?r.dose+'投与':'',r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#fff0eb;color:var(--health)">${ico('medicine')}${fmt(r.date)}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
+  else if(key==='weight'){title=`${r.value} kg`;body=r.memo||'';tags=`<span class="record-tag" style="background:#fff0eb;color:var(--health)">${ico('weight')}${fmt(r.date)}</span>`;}
+  else if(key==='walk'){title=`${r.time?r.time+'分':''} ${r.dist?r.dist+'km':''}`.trim()||'散歩';body=[r.weather,r.course,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#edfaf3;color:var(--daily)">${ico('walk')}${fmt(r.date)}</span>`;}
+  else if(key==='trim'){title=r.salon||'トリミング';body=[r.menu,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#edfaf3;color:var(--daily)">${ico('trim')}${fmt(r.date)}</span>`;if(r.cost)tags+=`<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
+  else if(key==='filter'){title='フィルター交換';body=[r.machine,r.filterType,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#ebf3fd;color:var(--travel)">${ico('filter')}${fmt(r.date)}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
+  else if(key==='other'){title=r.type||'ケア';body=r.memo||'';tags=`<span class="record-tag" style="background:#f5f0fb;color:#7c6ec9">${ico('other')}${fmt(r.date)}</span>`;}
+  return`<div class="record-item"><div class="record-item-header"><div><div class="record-item-title">${title}</div><div>${tags}</div>${body?`<div class="record-item-body">${body}</div>`:''}</div><button class="delete-btn" onclick="deleteRecord('${key}',${r.id})">✕</button></div></div>`;
+}
+
+function renderTripCard(r){
+  const fmt=fmtDate;
+  const photos=[r.photo1,r.photo2,r.photo3].filter(Boolean);
+  const photoHtml=photos.map(p=>`<img src="${p}" class="travel-photo" onerror="this.style.display='none'" alt="旅行の写真">`).join('');
+  return`<div class="travel-card"><div class="travel-card-header"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="travel-card-title" style="display:flex;align-items:center;gap:6px">${cs('trip',18)} ${r.title||r.dest||'旅行'}</div><div class="travel-card-dates">${fmt(r.start)}${r.end?' 〜 '+fmt(r.end):''}</div></div><button class="delete-btn" style="color:rgba(255,255,255,0.6)" onclick="deleteRecord('trip',${r.id})">✕</button></div></div><div class="travel-card-body">${r.dest?`<div class="travel-info-row"><span>📍</span><span class="travel-info-text">${r.dest}</span></div>`:''} ${r.hotel?`<div class="travel-info-row"><span>🏨</span><span class="travel-info-text">${r.hotel}${r.hotelRating?' '+r.hotelRating:''}</span></div>`:''} ${r.memo?`<div class="travel-info-row"><span>📝</span><span class="travel-info-text">${r.memo}</span></div>`:''} ${photoHtml}</div></div>`;
+}
+
+function renderWeightChart(){
+  const records=DB.get('weight').slice(0,8).reverse();
+  const chart=document.getElementById('weightChart');
+  if(!chart)return;
+  if(records.length===0){chart.innerHTML='<div style="width:100%;text-align:center;font-size:12px;color:var(--text-light);align-self:center">体重を記録するとグラフが表示されます</div>';return;}
+  const max=Math.max(...records.map(r=>r.value))*1.1;
+  chart.innerHTML=records.map(r=>{
+    const h=Math.max(10,(r.value/max)*90);
+    return`<div class="weight-bar-wrap"><div style="font-size:9px;color:var(--text-light);margin-bottom:2px">${r.value}</div><div class="weight-bar" style="height:${h}%"></div><div class="weight-bar-label">${(r.date||'').slice(5)}</div></div>`;
+  }).join('');
 }
 
 // ========== ホーム統計 ==========
-function updateHomeStats() {
-  // 最新体重
-  const weights = DB.get('weight');
-  document.getElementById('statWeight').textContent = weights.length ? weights[0].value + 'kg' : '--';
-
-  // 今月の散歩回数（日付フォーマットを正規化して比較）
-  const now = new Date();
-  const ym = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}`;
-  const walks = DB.get('walk').filter(r => {
-    const d = fmtDate(r.date);
-    return d && d.startsWith(ym);
-  });
-  document.getElementById('statWalks').textContent = walks.length + '回';
-
-  // 最終通院
-  const hospitals = DB.get('hospital');
-  if (hospitals.length) {
-    const d = fmtDate(hospitals[0].date);
-    document.getElementById('statHospital').textContent = d ? d.slice(5) : '--';
-  } else {
-    document.getElementById('statHospital').textContent = '--';
-  }
+function updateHomeStats(){
+  const weights=DB.get('weight');
+  document.getElementById('statWeight').textContent=weights.length?weights[0].value+'kg':'--';
+  const now=new Date();
+  const ym=`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}`;
+  const walks=DB.get('walk').filter(r=>{const d=fmtDate(r.date);return d&&d.startsWith(ym);});
+  document.getElementById('statWalks').textContent=walks.length+'回';
+  const hospitals=DB.get('hospital');
+  document.getElementById('statHospital').textContent=hospitals.length?fmtDate(hospitals[0].date).slice(5)||'--':'--';
 
   // 直近の記録
-  const allRecords = [
-    ...DB.get('hospital').map(r => ({...r, category:'health', label:`🏥 ${r.reason || r.name || '通院'}`})),
-    ...DB.get('vaccine').map(r => ({...r, category:'health', label:`💉 ${r.type || 'ワクチン'}`})),
-    ...DB.get('medicine').map(r => ({...r, category:'health', label:`💊 ${r.name || '投薬'}`})),
-    ...DB.get('weight').map(r => ({...r, category:'health', label:`⚖️ 体重 ${r.value}kg`})),
-    ...DB.get('walk').map(r => ({...r, category:'health', label:`🦮 散歩 ${r.time || ''}分`})),
-    ...DB.get('trim').map(r => ({...r, category:'daily', label:`✂️ トリミング`})),
-    ...DB.get('filter').map(r => ({...r, category:'daily', label:`💧 フィルター交換`})),
-    ...DB.get('other').map(r => ({...r, category:'daily', label:`🧴 ${r.type}`})),
-    ...DB.get('trip').map(r => ({...r, category:'travel', label:`✈️ ${r.title || r.dest || '旅行'}`})),
-  ].sort((a, b) => {
-    // 日付を "yyyy-mm-dd" に正規化して比較（スラッシュ・スペース混在対策）
-    const toComp = (d) => (d || '').toString().slice(0, 10).replace(/\//g, '-');
-    const dateDiff = toComp(b.date).localeCompare(toComp(a.date));
-    if (dateDiff !== 0) return dateDiff;
-    // 同日ならID（登録時刻）の降順
-    return (Number(b.id) || 0) - (Number(a.id) || 0);
-  }).slice(0, 5);
+  const all=[
+    ...DB.get('hospital').map(r=>({...r,_cat:'health',_type:'hospital',_text:`通院: ${r.reason||r.name||'通院'}`})),
+    ...DB.get('vaccine').map(r=>({...r,_cat:'health',_type:'vaccine',_text:`ワクチン: ${r.type||'ワクチン'}`})),
+    ...DB.get('medicine').map(r=>({...r,_cat:'health',_type:'medicine',_text:`投薬: ${r.name||'投薬'}`})),
+    ...DB.get('weight').map(r=>({...r,_cat:'health',_type:'weight',_text:`体重 ${r.value}kg`})),
+    ...DB.get('walk').map(r=>({...r,_cat:'walk',_type:'walk',_text:`散歩 ${r.time?r.time+'分':''}`})),
+    ...DB.get('trim').map(r=>({...r,_cat:'daily',_type:'trim',_text:'トリミング'})),
+    ...DB.get('filter').map(r=>({...r,_cat:'daily',_type:'filter',_text:'フィルター交換'})),
+    ...DB.get('other').map(r=>({...r,_cat:'daily',_type:'other',_text:r.type||'その他ケア'})),
+    ...DB.get('trip').map(r=>({...r,_cat:'travel',_type:'trip',_text:r.title||r.dest||'旅行'})),
+  ].sort((a,b)=>{
+    const tc=d=>(d||'').toString().slice(0,10).replace(/\//g,'-');
+    const dd=tc(b.date).localeCompare(tc(a.date));
+    return dd!==0?dd:(Number(b.id)||0)-(Number(a.id)||0);
+  }).slice(0,5);
 
-  const iconMap = { health: '❤️', daily: '🌿', travel: '✈️' };
-  const recentList = document.getElementById('recentList');
-  if (allRecords.length === 0) {
-    recentList.innerHTML = '<li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>';
+  const colorMap={health:'var(--health)',walk:'var(--daily)',daily:'var(--daily)',travel:'var(--travel)'};
+  const bgMap={health:'rgba(224,123,84,0.12)',walk:'rgba(106,184,154,0.12)',daily:'rgba(106,184,154,0.12)',travel:'rgba(91,155,213,0.12)'};
+  const recentList=document.getElementById('recentList');
+  if(all.length===0){
+    recentList.innerHTML='<li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>';
   } else {
-    recentList.innerHTML = allRecords.map(r => `
-      <li class="recent-item cat-${r.category}">
-        <div class="recent-icon-wrap cat-${r.category}">${iconMap[r.category] || '📝'}</div>
+    recentList.innerHTML=all.map(r=>`
+      <li class="recent-item" style="background:${bgMap[r._cat]||'#f5f0eb'};border-left:3px solid ${colorMap[r._cat]||'#e07b54'}">
+        ${csWrap(r._type,18,bgMap[r._cat])}
         <div class="recent-body">
-          <div class="recent-text">${r.label}</div>
-          <div class="recent-date cat-${r.category}">${fmtDate(r.date)}</div>
+          <div class="recent-text">${r._text}</div>
+          <span class="recent-date-badge" style="background:${colorMap[r._cat]||'var(--primary)'}">${fmtDate(r.date)}</span>
         </div>
       </li>`).join('');
   }
 }
 
+// ========== リマインダー ==========
+const REMIND_CHECKS=[
+  {key:'hospital',nextField:'next',iconType:'hospital',labelFn:(r)=>(r.name||'動物病院')+' 通院予定'},
+  {key:'vaccine', nextField:'next',iconType:'vaccine', labelFn:(r)=>(r.type||'ワクチン')+' 接種予定'},
+  {key:'medicine',nextField:'next',iconType:'medicine',labelFn:(r)=>(r.name||'投薬')+' 次回予定'},
+  {key:'trim',    nextField:'next',iconType:'trim',    labelFn:(r)=>(r.salon||'トリミング')+' 予定'},
+  {key:'filter',  nextField:'next',iconType:'filter',  labelFn:()=>'給水フィルター交換予定'},
+];
+
+function getUpcomingReminders(daysAhead=30){
+  const today=new Date();today.setHours(0,0,0,0);
+  const limit=new Date(today);limit.setDate(limit.getDate()+daysAhead);
+  const reminders=[];
+  REMIND_CHECKS.forEach(({key,nextField,iconType,labelFn})=>{
+    const seen=new Set();
+    DB.get(key).forEach(r=>{
+      const rawNext=r[nextField];
+      if(!rawNext)return;
+      const nextDate=new Date(rawNext);nextDate.setHours(0,0,0,0);
+      if(isNaN(nextDate.getTime()))return;
+      if(nextDate<today||nextDate>limit)return;
+      const sig=key+'_'+rawNext;
+      if(seen.has(sig))return;
+      seen.add(sig);
+      const daysLeft=Math.round((nextDate-today)/86400000);
+      reminders.push({iconType,label:labelFn(r),date:fmtDate(rawNext),daysLeft});
+    });
+  });
+  return reminders.sort((a,b)=>a.daysLeft-b.daysLeft);
+}
+
+function renderUpcoming(){
+  const reminders=getUpcomingReminders(30);
+  const container=document.getElementById('upcomingList');
+  if(!container)return;
+  if(reminders.length===0){container.innerHTML='<p style="font-size:13px;color:var(--text-light);">30日以内の予定はありません</p>';return;}
+  container.innerHTML=reminders.map(r=>{
+    const cls=r.daysLeft<=2?'urgent':r.daysLeft<=7?'soon':'normal';
+    const dayLabel=r.daysLeft===0?'今日！':r.daysLeft===1?'明日！':r.daysLeft+'日後';
+    return`<div class="remind-item ${cls}"><div class="remind-days ${cls}">${dayLabel}</div><div style="display:flex;align-items:center;gap:8px">${csWrap(r.iconType,16)}<div><div class="remind-label">${r.label}</div><div class="remind-date">${r.date}</div></div></div></div>`;
+  }).join('');
+}
+
+// ========== カレンダー ==========
+let calYear=new Date().getFullYear();
+let calMonth=new Date().getMonth();
+let calSelectedDay=null;
+
+function changeMonth(delta){
+  calMonth+=delta;
+  if(calMonth>11){calMonth=0;calYear++;}
+  if(calMonth<0){calMonth=11;calYear--;}
+  calSelectedDay=null;
+  renderCalendar();
+}
+
+function renderCalendar(){
+  const grid=document.getElementById('calGrid');
+  if(!grid)return; // ページが非表示の場合はスキップしない（DOMはある）
+  document.getElementById('calTitle').textContent=`${calYear}年${calMonth+1}月`;
+  const today=new Date();
+  // toISOStringはUTC変換でズレるためローカルタイム基準で生成
+  const todayStr=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // 全記録の日付セット（色付きドット用）
+  const recordDays={};
+  Object.entries(CAT_CFG).forEach(([type,cfg])=>{
+    DB.get(type).forEach(r=>{
+      // dateフィールドまたはstartフィールド（旅行）を参照
+      const rawDate=(r.date||r.start||r.createdAt||'').toString();
+      const ds=rawDate.slice(0,10).replace(/\//g,'-');
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(ds))return;
+      if(!recordDays[ds])recordDays[ds]=new Set();
+      recordDays[ds].add(cfg.color);
+    });
+  });
+
+  // カレンダーグリッド
+  const firstDay=new Date(calYear,calMonth,1).getDay();
+  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  const daysInPrev=new Date(calYear,calMonth,0).getDate();
+
+  let cells=[];
+  for(let i=0;i<firstDay;i++) cells.push({day:daysInPrev-firstDay+1+i,current:false});
+  for(let d=1;d<=daysInMonth;d++) cells.push({day:d,current:true});
+  while(cells.length<42) cells.push({day:cells.length-firstDay-daysInMonth+1,current:false});
+
+  // 月間合計件数
+  const monthPrefix=`${calYear}-${String(calMonth+1).padStart(2,'0')}-`;
+  let monthTotal=0;
+  Object.entries(CAT_CFG).forEach(([type])=>{
+    monthTotal+=DB.get(type).filter(r=>{
+      const rawDate=r.date||r.start||r.createdAt||'';
+      const ds=rawDate.toString().slice(0,10).replace(/\//g,'-');
+      return ds.startsWith(monthPrefix);
+    }).length;
+  });
+  const countEl=document.getElementById('calMonthCount');
+  if(countEl){
+    if(monthTotal>0){
+      // 記録のある日付を小さく表示（例：4/5・4/16・4/19）
+      const recDaysInMonth=Object.keys(recordDays)
+        .filter(ds=>ds.startsWith(monthPrefix))
+        .sort()
+        .map(ds=>{const[,m,d]=ds.split('-');return`${parseInt(m)}/${parseInt(d)}`;});
+      countEl.textContent=`今月 ${monthTotal}件（${recDaysInMonth.join('・')}）`;
+    } else {
+      countEl.textContent='';
+    }
+  }
+
+  grid.innerHTML=cells.map(cell=>{
+    if(!cell.current) return`<div class="cal-day other-month"><div class="cal-num">${cell.day}</div></div>`;
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(cell.day).padStart(2,'0')}`;
+    const colors=recordDays[ds]?[...recordDays[ds]]:[];
+    const isToday=ds===todayStr;
+    const isSelected=ds===calSelectedDay;
+    const hasRec=colors.length>0;
+    const dotsHtml=colors.slice(0,4).map(c=>`<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${c};flex-shrink:0"></span>`).join('');
+    return`<div class="cal-day${isToday?' today':''}${isSelected?' selected':''}${hasRec?' has-record':''}" onclick="selectCalDay('${ds}')">
+      <div class="cal-num">${cell.day}</div>
+      ${hasRec?`<div style="display:flex;gap:3px;margin-top:5px;justify-content:center;flex-wrap:wrap">${dotsHtml}</div>`:''}
+    </div>`;
+  }).join('');
+
+  renderCalDayRecords();
+}
+
+function selectCalDay(ds){
+  calSelectedDay=calSelectedDay===ds?null:ds;
+  renderCalendar();
+}
+
+function renderCalDayRecords(){
+  const container=document.getElementById('calDayRecords');
+  if(!calSelectedDay){container.innerHTML='';return;}
+  const ds=calSelectedDay;
+  const dayRecords=[];
+  Object.entries(CAT_CFG).forEach(([type,cfg])=>{
+    DB.get(type).forEach(r=>{
+      const rawDate=(r.date||r.start||r.createdAt||'').toString();
+      const rds=rawDate.slice(0,10).replace(/\//g,'-');
+      if(rds===ds) dayRecords.push({...r,_type:type,_cfg:cfg});
+    });
+  });
+
+  const [y,m,d]=ds.split('-');
+  const title=`${parseInt(m)}月${parseInt(d)}日の記録`;
+  if(dayRecords.length===0){
+    container.innerHTML=`<div class="cal-day-records"><div class="cal-day-records-title">${title}</div><p style="font-size:13px;color:var(--text-light)">この日の記録はありません</p></div>`;
+    return;
+  }
+  const items=dayRecords.map(r=>{
+    const label=getRecordLabel(r._type,r);
+    const sub=getRecordSub(r._type,r);
+    return`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+      <div style="width:32px;height:32px;border-radius:8px;background:${r._cfg.color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0">${cs(r._type,18)}</div>
+      <div><div style="font-size:13px;font-weight:700">${label}</div>${sub?`<div style="font-size:11px;color:var(--text-light)">${sub}</div>`:''}</div>
+    </div>`;
+  }).join('');
+  container.innerHTML=`<div class="cal-day-records"><div class="cal-day-records-title">${title}</div>${items}</div>`;
+}
+
 // ========== 設定 ==========
-function openSettings() {
-  const s = DB.getObj('settings');
-  document.getElementById('set-name').value = s.name || '';
-  document.getElementById('set-breed').value = s.breed || '';
-  document.getElementById('set-birth').value = s.birth || '';
-  document.getElementById('set-gender').value = s.gender || 'オス';
-  document.getElementById('set-gs-url').value = s.gsUrl || '';
-  document.getElementById('set-webapp-url').value = s.webAppUrl || '';
-  // 写真プレビューを更新
+function openSettings(){
+  const s=DB.getObj('settings');
+  document.getElementById('set-name').value=s.name||'';
+  document.getElementById('set-breed').value=s.breed||'';
+  document.getElementById('set-birth').value=s.birth||'';
+  document.getElementById('set-gender').value=s.gender||'オス';
+  document.getElementById('set-gs-url').value=s.gsUrl||'';
+  document.getElementById('set-webapp-url').value=s.webAppUrl||'';
   applyDogPhoto(localStorage.getItem('dogPhoto'));
   document.getElementById('settingsModal').classList.add('open');
 }
 
-function closeSettings(e) {
-  if (!e || e.target === document.getElementById('settingsModal')) {
+function closeSettings(e){
+  if(!e||e.target===document.getElementById('settingsModal'))
     document.getElementById('settingsModal').classList.remove('open');
-  }
 }
 
-function saveSettings() {
-  const s = {
-    name: document.getElementById('set-name').value || 'わんこ',
-    breed: document.getElementById('set-breed').value,
-    birth: document.getElementById('set-birth').value,
-    gender: document.getElementById('set-gender').value,
-    gsUrl: document.getElementById('set-gs-url').value,
-    webAppUrl: document.getElementById('set-webapp-url').value
+function saveSettings(){
+  const s={
+    name:document.getElementById('set-name').value||'わんこ',
+    breed:document.getElementById('set-breed').value,
+    birth:document.getElementById('set-birth').value,
+    gender:document.getElementById('set-gender').value,
+    gsUrl:document.getElementById('set-gs-url').value,
+    webAppUrl:document.getElementById('set-webapp-url').value
   };
-  DB.setObj('settings', s);
+  DB.setObj('settings',s);
   applySettings();
   closeSettings();
-  showSaveAnimation();
-
-  // プロフィールをGoogle Sheetsに同期
-  if (s.webAppUrl) {
-    const params = new URLSearchParams();
-    params.set('action', 'save_profile');
-    params.set('data', JSON.stringify({ name: s.name, breed: s.breed, birth: s.birth, gender: s.gender }));
-    fetch(s.webAppUrl, { method: 'POST', body: params, mode: 'no-cors' }).catch(() => {});
+  showToast('💾 設定を保存しました');
+  if(s.webAppUrl){
+    const params=new URLSearchParams();
+    params.set('action','save_profile');
+    params.set('data',JSON.stringify({name:s.name,breed:s.breed,birth:s.birth,gender:s.gender}));
+    fetch(s.webAppUrl,{method:'POST',body:params,mode:'no-cors'}).catch(()=>{});
   }
 }
 
-function applySettings() {
-  const s = DB.getObj('settings');
-  const name = s.name || 'わんこ';
-  document.getElementById('headerDogName').textContent = name;
-  document.getElementById('homeDogName').textContent = name;
-  document.getElementById('homeBreed').textContent = s.breed ? `${s.breed} / ${s.gender || ''}` : (s.gender || '犬種未設定');
+function applySettings(){
+  const s=DB.getObj('settings');
+  const name=s.name||'わんこ';
+  // ホーム
+  document.getElementById('homeDogName').textContent=name;
+  document.getElementById('homeBreed').textContent=s.breed?`${s.breed} / ${s.gender||''}`:(s.gender||'犬種未設定');
+  // プロフィール
+  document.getElementById('profileName').textContent=name;
+  document.getElementById('profileBreed').textContent=s.breed?`${s.breed} / ${s.gender||''}`:(s.gender||'犬種未設定');
 
-  // 生年月日・年齢表示
-  const birthEl = document.getElementById('homeBirth');
-  if (s.birth) {
-    const birth = new Date(s.birth);
-    const today = new Date();
-    let years = today.getFullYear() - birth.getFullYear();
-    let months = today.getMonth() - birth.getMonth();
-    if (today.getDate() < birth.getDate()) months--;
-    if (months < 0) { years--; months += 12; }
-    const birthStr = `${birth.getFullYear()}/${String(birth.getMonth()+1).padStart(2,'0')}/${String(birth.getDate()).padStart(2,'0')}`;
-    const ageStr = years > 0 ? `${years}歳${months > 0 ? months + 'ヶ月' : ''}` : `${months}ヶ月`;
-    birthEl.textContent = `🎂 ${birthStr}生まれ・${ageStr}`;
-    birthEl.style.display = 'block';
+  // 生年月日・年齢
+  const birthEl=document.getElementById('homeBirth');
+  const profBirth=document.getElementById('profileBirth');
+  if(s.birth){
+    const birth=new Date(s.birth);const today2=new Date();
+    let yrs=today2.getFullYear()-birth.getFullYear();
+    let mos=today2.getMonth()-birth.getMonth();
+    if(today2.getDate()<birth.getDate())mos--;
+    if(mos<0){yrs--;mos+=12;}
+    const bstr=`${birth.getFullYear()}/${String(birth.getMonth()+1).padStart(2,'0')}/${String(birth.getDate()).padStart(2,'0')}`;
+    const astr=yrs>0?`${yrs}歳${mos>0?mos+'ヶ月':''}`:`${mos}ヶ月`;
+    const txt=`🎂 ${bstr}生まれ・${astr}`;
+    birthEl.textContent=txt; birthEl.style.display='block';
+    profBirth.textContent=txt; profBirth.style.display='block';
   } else {
-    birthEl.style.display = 'none';
+    birthEl.style.display='none'; profBirth.style.display='none';
   }
 
-  const gsUrl = s.gsUrl;
-  const gsCard = document.getElementById('gsCard');
-  if (gsUrl) {
-    gsCard.style.display = 'block';
-    document.getElementById('gsLink').href = gsUrl;
-  } else {
-    gsCard.style.display = 'none';
+  // Google Sheets
+  const hasGs=!!s.gsUrl;
+  document.getElementById('gsCard').classList.toggle('visible',hasGs);
+  document.getElementById('gsCard2').classList.toggle('visible',hasGs);
+  if(hasGs){
+    document.getElementById('gsLink').href=s.gsUrl;
+    document.getElementById('gsLink2').href=s.gsUrl;
   }
-
-  // WebアプリURL設定済みなら同期ボタンを明るくする
-  const syncBtn = document.getElementById('syncBtn');
-  if (s.webAppUrl) {
-    syncBtn.style.opacity = '1';
-    syncBtn.title = 'Google Sheetsと同期';
-  } else {
-    syncBtn.style.opacity = '0.5';
-    syncBtn.title = '設定でWebアプリURLを登録してください';
-  }
+  // 同期ボタン opacity
+  const opacity=s.webAppUrl?'1':'0.5';
+  document.getElementById('syncBtn').style.opacity=opacity;
+  const sb2=document.getElementById('syncBtn2');
+  if(sb2) sb2.style.opacity=opacity;
 }
 
-// ========== リマインダー ==========
+// ========== Google Sheets同期 ==========
+function getWebAppUrl(){return DB.getObj('settings').webAppUrl||'';}
 
-const REMIND_CHECKS = [
-  { key: 'hospital', nextField: 'next', icon: '🏥', labelFn: (r) => (r.name || '動物病院') + ' 通院予定' },
-  { key: 'vaccine',  nextField: 'next', icon: '💉', labelFn: (r) => (r.type || 'ワクチン') + ' 接種予定' },
-  { key: 'medicine', nextField: 'next', icon: '💊', labelFn: (r) => (r.name || '投薬') + ' 次回予定' },
-  { key: 'trim',     nextField: 'next', icon: '✂️', labelFn: (r) => (r.salon || 'トリミング') + ' 予定' },
-  { key: 'filter',   nextField: 'next', icon: '💧', labelFn: () => '給水フィルター交換予定' },
-];
-
-function getUpcomingReminders(daysAhead = 7) {
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const limit = new Date(today); limit.setDate(limit.getDate() + daysAhead);
-  const reminders = [];
-
-  REMIND_CHECKS.forEach(({ key, nextField, icon, labelFn }) => {
-    const records = DB.get(key);
-    // 各タイプで最新の「次回」が設定されているレコードをチェック
-    const seen = new Set();
-    records.forEach(r => {
-      const rawNext = r[nextField];
-      if (!rawNext) return;
-      const nextDate = new Date(rawNext); nextDate.setHours(0, 0, 0, 0);
-      if (isNaN(nextDate.getTime())) return;
-      // 過去のものはスキップ、7日以内のもの
-      if (nextDate < today || nextDate > limit) return;
-      const sig = key + '_' + rawNext; // 重複排除
-      if (seen.has(sig)) return;
-      seen.add(sig);
-      const daysLeft = Math.round((nextDate - today) / 86400000);
-      reminders.push({ icon, label: labelFn(r), date: fmtDate(rawNext), daysLeft });
-    });
-  });
-
-  // 日数が近い順に並べる
-  return reminders.sort((a, b) => a.daysLeft - b.daysLeft);
+function showSyncBar(msg,state){
+  const bar=document.getElementById('syncBar');
+  bar.textContent=msg;bar.className='sync-bar '+state;
+  if(state==='success') setTimeout(()=>{bar.className='sync-bar';},2500);
 }
 
-function renderUpcoming() {
-  const reminders = getUpcomingReminders(7);
-  const container = document.getElementById('upcomingList');
-  if (!container) return;
-
-  if (reminders.length === 0) {
-    container.innerHTML = '<p style="font-size:13px;color:var(--text-light);">1週間以内の予定はありません</p>';
-    return;
-  }
-
-  container.innerHTML = reminders.map(r => {
-    const cls = r.daysLeft === 0 ? 'urgent' : r.daysLeft <= 2 ? 'urgent' : r.daysLeft <= 4 ? 'soon' : 'normal';
-    const dayLabel = r.daysLeft === 0 ? '今日！' : r.daysLeft === 1 ? '明日！' : r.daysLeft + '日後';
-    return `<div class="remind-item ${cls}">
-      <div class="remind-days ${cls}">${dayLabel}</div>
-      <div>
-        <div class="remind-label">${r.icon} ${r.label}</div>
-        <div class="remind-date">${r.date}</div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ---- Web通知 ----
-async function requestNotifPermission() {
-  if (!('Notification' in window)) {
-    alert('このブラウザは通知に対応していません。\niPhoneではホーム画面に追加してから開いてください。');
-    return;
-  }
-  const perm = await Notification.requestPermission();
-  if (perm === 'granted') {
-    sendUpcomingNotifications();
-    document.getElementById('notifBtn').style.display = 'none';
-    showSaveAnimation();
-  } else {
-    alert('通知が許可されませんでした。\niPhoneの設定 → Safari → 通知 から許可してください。');
+async function syncToSheets(type,record,action){
+  const url=getWebAppUrl();
+  if(!url)return;
+  try{
+    const params=new URLSearchParams();
+    params.set('action',action);params.set('type',type);
+    if(action==='add')params.set('data',JSON.stringify(record));
+    else if(action==='delete')params.set('id',String(record.id));
+    await fetch(url,{method:'POST',body:params,mode:'no-cors'});
+  } catch(e){
+    console.warn('Sheets同期エラー:',e);
+    showSyncBar('⚠️ 保存に失敗しました','error');
   }
 }
 
-function sendUpcomingNotifications() {
-  if (Notification.permission !== 'granted') return;
-  const reminders = getUpcomingReminders(7);
-  if (reminders.length === 0) return;
-
-  reminders.forEach((r, i) => {
-    setTimeout(() => {
-      const dayLabel = r.daysLeft === 0 ? '今日' : r.daysLeft + '日後';
-      new Notification('🐾 わんケア リマインダー', {
-        body: `${r.icon} ${r.label}（${dayLabel}：${r.date}）`,
-        icon: '🐾',
-        tag: 'wancare-' + i,
-      });
-    }, i * 500); // 少しずらして表示
-  });
-}
-
-function initNotifButton() {
-  const btn = document.getElementById('notifBtn');
-  if (!btn) return;
-  if (!('Notification' in window)) { btn.style.display = 'none'; return; }
-  if (Notification.permission === 'granted') {
-    btn.style.display = 'none';
-  } else if (Notification.permission === 'denied') {
-    btn.style.display = 'none';
-  } else {
-    btn.style.display = 'inline-block';
-  }
-}
-
-// ========== 履歴チップ（病院名・サロン名） ==========
-
-function saveSuggestion(storageKey, value) {
-  if (!value || !value.trim()) return;
-  const list = DB.get(storageKey);
-  const trimmed = value.trim();
-  // 既にあれば先頭に移動、なければ先頭に追加（最大10件）
-  const filtered = list.filter(v => v !== trimmed);
-  filtered.unshift(trimmed);
-  DB.set(storageKey, filtered.slice(0, 10));
-}
-
-function removeSuggestion(storageKey, value, inputId, chipClass) {
-  const list = DB.get(storageKey).filter(v => v !== value);
-  DB.set(storageKey, list);
-  renderChips(inputId, storageKey, chipClass);
-}
-
-function renderChips(inputId, storageKey, chipClass) {
-  const container = document.getElementById('chips-' + inputId);
-  if (!container) return;
-  const inputVal = (document.getElementById(inputId)?.value || '').trim().toLowerCase();
-  const list = DB.get(storageKey);
-  const filtered = inputVal
-    ? list.filter(v => v.toLowerCase().includes(inputVal))
-    : list;
-
-  // チップのHTML生成（インラインonclickは使わない）
-  if (filtered.length === 0) {
-    container.innerHTML = '';
-    container._chipMeta = null;
-    return;
-  }
-  container.innerHTML = filtered.map((v, i) => {
-    const safeText = v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    return `<span class="chip ${chipClass}" data-idx="${i}">${safeText}<span class="chip-del" data-del="${i}"> ✕</span></span>`;
-  }).join('');
-
-  // 値をコンテナに紐付けて保持（インデックスで参照）
-  container._chipMeta = { filtered, inputId, storageKey, chipClass };
-
-  // イベントリスナーを毎回付け替え（古いものを除去してから）
-  container.onclick = function(e) {
-    const meta = container._chipMeta;
-    if (!meta) return;
-
-    // ✕ ボタンのクリック
-    const delSpan = e.target.closest('[data-del]');
-    if (delSpan) {
-      e.stopPropagation();
-      const idx = parseInt(delSpan.dataset.del, 10);
-      const val = meta.filtered[idx];
-      removeSuggestion(meta.storageKey, val, meta.inputId, meta.chipClass);
-      return;
-    }
-
-    // チップ本体のクリック → 入力欄に反映
-    const chipSpan = e.target.closest('[data-idx]');
-    if (chipSpan) {
-      const idx = parseInt(chipSpan.dataset.idx, 10);
-      const val = meta.filtered[idx];
-      const inputEl = document.getElementById(meta.inputId);
-      if (inputEl) {
-        inputEl.value = val;
-      }
-      saveSuggestion(meta.storageKey, val);
-      renderChips(meta.inputId, meta.storageKey, meta.chipClass);
-    }
-  };
-}
-
-// ========== 犬の写真管理 ==========
-
-function handlePhotoSelect(input) {
-  const file = input.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    // キャンバスでリサイズして容量を抑える
-    const img = new Image();
-    img.onload = function() {
-      const canvas = document.createElement('canvas');
-      const SIZE = 300; // 最大300px角に縮小
-      let w = img.width, h = img.height;
-      if (w > h) { h = Math.round(h * SIZE / w); w = SIZE; }
-      else       { w = Math.round(w * SIZE / h); h = SIZE; }
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-      localStorage.setItem('dogPhoto', dataUrl);
-      applyDogPhoto(dataUrl);
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-function applyDogPhoto(dataUrl) {
-  // ホーム画面のアイコンを差し替え
-  const wrap = document.getElementById('homeDogIconWrap');
-  if (dataUrl) {
-    wrap.innerHTML = `<img src="${dataUrl}" class="home-dog-photo" alt="愛犬の写真">`;
-  } else {
-    wrap.innerHTML = '🐕';
-  }
-
-  // 設定プレビューも更新
-  const preview = document.getElementById('settingsPhotoPreview');
-  if (preview) {
-    if (dataUrl) {
-      preview.innerHTML = `<img src="${dataUrl}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--primary-light)">`;
-      document.getElementById('removePhotoBtn').style.display = 'inline-block';
-    } else {
-      preview.innerHTML = '<span style="font-size:50px">🐕</span>';
-      document.getElementById('removePhotoBtn').style.display = 'none';
-    }
-  }
-}
-
-function removeDogPhoto() {
-  localStorage.removeItem('dogPhoto');
-  applyDogPhoto(null);
-  document.getElementById('dogPhotoInput').value = '';
-}
-
-function clearAllData() {
-  if (!confirm('全データを削除しますか？この操作は元に戻せません。')) return;
-  ['hospital','vaccine','medicine','weight','walk','trim','filter','other','trip'].forEach(k => DB.set(k, []));
-  alert('全データを削除しました');
-  renderPage('home');
-}
-
-// ========== Google Sheets 同期 ==========
-
-function getWebAppUrl() {
-  return DB.getObj('settings').webAppUrl || '';
-}
-
-function showSyncBar(msg, state) {
-  const bar = document.getElementById('syncBar');
-  bar.textContent = msg;
-  bar.className = 'sync-bar ' + state;
-  if (state === 'success') {
-    setTimeout(() => { bar.className = 'sync-bar'; }, 2500);
-  }
-}
-
-// レコードをSheetsに送信（追加）
-async function syncToSheets(type, record, action) {
-  const url = getWebAppUrl();
-  if (!url) return; // URLが未設定なら何もしない
-
-  try {
-    const params = new URLSearchParams();
-    params.set('action', action);
-    params.set('type', type);
-    if (action === 'add') {
-      params.set('data', JSON.stringify(record));
-    } else if (action === 'delete') {
-      params.set('id', String(record.id));
-    }
-
-    // mode:'no-cors' でCORSリダイレクト問題を回避（GitHub Pages対応）
-    // Apps Scriptはこのモードでも書き込みは正常に処理されます
-    await fetch(url, { method: 'POST', body: params, mode: 'no-cors' });
-  } catch (e) {
-    console.warn('Sheets同期エラー（オフライン可能性）:', e);
-    showSyncBar('⚠️ 保存に失敗しました（オフライン or URL設定を確認）', 'error');
-  }
-}
-
-// Sheetsから全データを読み込んでlocalStorageに上書き
-async function loadFromSheets() {
-  const url = getWebAppUrl();
-  if (!url) return false;
-
-  const btn = document.getElementById('syncBtn');
+async function loadFromSheets(){
+  const url=getWebAppUrl();
+  if(!url)return false;
+  const btn=document.getElementById('syncBtn');
+  const btn2=document.getElementById('syncBtn2');
   btn.classList.add('spinning');
-  showSyncBar('🔄 Google Sheetsと同期中...', 'syncing');
-
-  try {
-    const res = await fetch(url + '?t=' + Date.now()); // キャッシュ回避
-    if (!res.ok) throw new Error('HTTPエラー: ' + res.status);
-    const json = await res.json();
-
-    if (json.status !== 'ok') throw new Error(json.message || '取得失敗');
-
-    const data = json.data;
-    // Sheetsのデータをlocalに保存（新しいIDで並び替え）
-    Object.keys(data).forEach(type => {
-      if (type === 'profile') return; // プロフィールは別処理
-      if (data[type] && data[type].length > 0) {
-        const sorted = data[type]
-          .map(r => ({ ...r, id: Number(r.id) || 0 }))
-          .sort((a, b) => b.id - a.id);
-        DB.set(type, sorted);
+  if(btn2) btn2.classList.add('spinning');
+  showSyncBar('🔄 Google Sheetsと同期中...','syncing');
+  try{
+    const res=await fetch(url+'?t='+Date.now());
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    if(json.status!=='ok')throw new Error(json.message||'取得失敗');
+    Object.keys(json.data).forEach(type=>{
+      if(type==='profile')return;
+      if(json.data[type]&&json.data[type].length>0){
+        const sorted=json.data[type].map(r=>({...r,id:Number(r.id)||0})).sort((a,b)=>b.id-a.id);
+        DB.set(type,sorted);
       }
     });
-
-    // プロフィール情報を復元（URLやパスワードはローカル優先）
-    if (data.profile) {
-      const current = DB.getObj('settings');
-      DB.setObj('settings', {
-        ...current,
-        name: data.profile.name || current.name,
-        breed: data.profile.breed || current.breed,
-        birth: data.profile.birth || current.birth,
-        gender: data.profile.gender || current.gender,
-      });
+    if(json.data.profile){
+      const cur=DB.getObj('settings');
+      DB.setObj('settings',{...cur,name:json.data.profile.name||cur.name,breed:json.data.profile.breed||cur.breed,birth:json.data.profile.birth||cur.birth,gender:json.data.profile.gender||cur.gender});
       applySettings();
     }
-
-    // 画面を更新
-    const activePage = document.querySelector('.page.active');
-    if (activePage) renderPage(activePage.id.replace('page-', ''));
+    const activePage=document.querySelector('.page.active');
+    if(activePage)renderPage(activePage.id.replace('page-',''));
     updateHomeStats();
-
-    showSyncBar('✅ 同期完了！最新データを取得しました', 'success');
+    showSyncBar('✅ 同期完了！','success');
     btn.classList.remove('spinning');
+    if(btn2)btn2.classList.remove('spinning');
     return true;
-  } catch (e) {
-    showSyncBar('⚠️ 同期失敗（オフラインか設定を確認）', 'error');
+  } catch(e){
+    showSyncBar('⚠️ 同期失敗（オフラインか設定確認）','error');
     btn.classList.remove('spinning');
-    console.error('loadFromSheets error:', e);
+    if(btn2)btn2.classList.remove('spinning');
     return false;
   }
 }
 
-// 手動同期ボタン
-async function manualSync() {
-  const url = getWebAppUrl();
-  if (!url) {
-    showSyncBar('⚙️ 設定でWebアプリURLを登録してください', 'error');
-    setTimeout(() => { document.getElementById('syncBar').className = 'sync-bar'; }, 3000);
-    return;
-  }
+async function manualSync(){
+  const url=getWebAppUrl();
+  if(!url){showSyncBar('⚙️ 設定でWebアプリURLを登録してください','error');setTimeout(()=>{document.getElementById('syncBar').className='sync-bar';},3000);return;}
   await loadFromSheets();
 }
 
+// ========== 犬の写真 ==========
+function handlePhotoSelect(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    const img=new Image();
+    img.onload=function(){
+      const canvas=document.createElement('canvas');
+      const SIZE=300;let w=img.width,h=img.height;
+      if(w>h){h=Math.round(h*SIZE/w);w=SIZE;}else{w=Math.round(w*SIZE/h);h=SIZE;}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const dataUrl=canvas.toDataURL('image/jpeg',0.82);
+      localStorage.setItem('dogPhoto',dataUrl);
+      applyDogPhoto(dataUrl);
+    };img.src=e.target.result;
+  };reader.readAsDataURL(file);
+}
+
+function applyDogPhoto(dataUrl){
+  const homeWrap=document.getElementById('homeDogIconWrap');
+  const profWrap=document.getElementById('profileAvatarWrap');
+  if(dataUrl){
+    homeWrap.innerHTML=`<img src="${dataUrl}" alt="愛犬の写真">`;
+    profWrap.innerHTML=`<img src="${dataUrl}" alt="愛犬の写真">`;
+  } else {
+    homeWrap.innerHTML='🐕'; profWrap.innerHTML='🐕';
+  }
+  const preview=document.getElementById('settingsPhotoPreview');
+  if(preview){
+    if(dataUrl){
+      preview.innerHTML=`<img src="${dataUrl}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--primary-light)">`;
+      document.getElementById('removePhotoBtn').style.display='inline-block';
+    } else {
+      preview.innerHTML='<span style="font-size:50px">🐕</span>';
+      document.getElementById('removePhotoBtn').style.display='none';
+    }
+  }
+}
+
+function removeDogPhoto(){
+  localStorage.removeItem('dogPhoto');
+  applyDogPhoto(null);
+  document.getElementById('dogPhotoInput').value='';
+}
+
+function clearAllData(){
+  if(!confirm('全データを削除しますか？この操作は元に戻せません。'))return;
+  ['hospital','vaccine','medicine','weight','walk','trim','filter','other','trip'].forEach(k=>DB.set(k,[]));
+  alert('全データを削除しました');
+  updateHomeStats();
+  renderTimeline();
+}
+
+// ========== 通知 ==========
+async function requestNotifPermission(){
+  if(!('Notification'in window)){alert('このブラウザは通知に対応していません。');return;}
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){sendUpcomingNotifications();showToast('🔔 通知が許可されました');}
+  else alert('通知が許可されませんでした。');
+}
+
+function sendUpcomingNotifications(){
+  if(Notification.permission!=='granted')return;
+  const reminders=getUpcomingReminders(7);
+  reminders.forEach((r,i)=>setTimeout(()=>{
+    const dl=r.daysLeft===0?'今日':r.daysLeft+'日後';
+    new Notification('🐾 わんケア リマインダー',{body:`${r.icon} ${r.label}（${dl}：${r.date}）`,tag:'wancare-'+i});
+  },i*500));
+}
+
+function initNotifButton(){
+  const btn=document.getElementById('notifBtn');
+  if(!btn)return;
+  if(!('Notification'in window)||Notification.permission!=='default'){btn.style.display='none';}
+  else{btn.style.display='inline-block';}
+}
+
+// ========== 履歴チップ ==========
+function saveSuggestion(storageKey,value){
+  if(!value||!value.trim())return;
+  const list=DB.get(storageKey);
+  const trimmed=value.trim();
+  const filtered=list.filter(v=>v!==trimmed);
+  filtered.unshift(trimmed);
+  DB.set(storageKey,filtered.slice(0,10));
+}
+
+function removeSuggestion(storageKey,value,inputId,chipClass){
+  DB.set(storageKey,DB.get(storageKey).filter(v=>v!==value));
+  renderChips(inputId,storageKey,chipClass);
+}
+
+function renderChips(inputId,storageKey,chipClass){
+  const container=document.getElementById('chips-'+inputId);
+  if(!container)return;
+  const inputVal=(document.getElementById(inputId)?.value||'').trim().toLowerCase();
+  const list=DB.get(storageKey);
+  const filtered=inputVal?list.filter(v=>v.toLowerCase().includes(inputVal)):list;
+  if(filtered.length===0){container.innerHTML='';container._chipMeta=null;return;}
+  container.innerHTML=filtered.map((v,i)=>{
+    const t=v.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return`<span class="chip ${chipClass}" data-idx="${i}">${t}<span class="chip-del" data-del="${i}"> ✕</span></span>`;
+  }).join('');
+  container._chipMeta={filtered,inputId,storageKey,chipClass};
+  container.onclick=function(e){
+    const meta=container._chipMeta;if(!meta)return;
+    const del=e.target.closest('[data-del]');
+    if(del){e.stopPropagation();removeSuggestion(meta.storageKey,meta.filtered[parseInt(del.dataset.del)],meta.inputId,meta.chipClass);return;}
+    const chip=e.target.closest('[data-idx]');
+    if(chip){const val=meta.filtered[parseInt(chip.dataset.idx)];const inp=document.getElementById(meta.inputId);if(inp)inp.value=val;saveSuggestion(meta.storageKey,val);renderChips(meta.inputId,meta.storageKey,meta.chipClass);}
+  };
+}
+
+// ========== トースト ==========
+function showToast(msg){
+  const div=document.createElement('div');
+  div.textContent=msg;
+  div.style.cssText='position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-10px);background:#333;color:white;padding:10px 20px;border-radius:20px;font-size:14px;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;';
+  document.body.appendChild(div);
+  requestAnimationFrame(()=>{div.style.opacity='1';div.style.transform='translateX(-50%) translateY(0)';});
+  setTimeout(()=>{div.style.opacity='0';setTimeout(()=>div.remove(),300);},1800);
+}
+
 // ========== 初期化 ==========
-window.addEventListener('DOMContentLoaded', async () => {
+window.addEventListener('DOMContentLoaded',async()=>{
   setTodayDates();
   applySettings();
   applyDogPhoto(localStorage.getItem('dogPhoto'));
   updateHomeStats();
   renderUpcoming();
   initNotifButton();
-  // 通知許可済みなら起動時にも通知
-  if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-    sendUpcomingNotifications();
-  }
-  // 起動時にSheetsからデータを読み込む（URLが設定済みの場合）
-  if (getWebAppUrl()) {
+  if(typeof Notification!=='undefined'&&Notification.permission==='granted') sendUpcomingNotifications();
+  if(getWebAppUrl()){
     await loadFromSheets();
-    renderUpcoming(); // Sheets読み込み後に再描画
+    renderUpcoming();
   }
 });
 </script>
