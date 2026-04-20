@@ -6,8 +6,12 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="わんケア">
-<link rel="apple-touch-icon" href="wancare-icon-180.png">
-<link rel="apple-touch-icon" sizes="180x180" href="wancare-icon-180.png">
+<link rel="apple-touch-icon" href="wancare-icon-v2-180.png">
+<link rel="apple-touch-icon" sizes="180x180" href="wancare-icon-v2-180.png">
+<link rel="apple-touch-icon" sizes="167x167" href="wancare-icon-v2-167.png">
+<link rel="apple-touch-icon" sizes="152x152" href="wancare-icon-v2-152.png">
+<link rel="apple-touch-icon" sizes="120x120" href="wancare-icon-v2-120.png">
+<link rel="icon" type="image/png" href="wancare-icon-v2-180.png">
 <title>🐾 わんケア</title>
 <style>
 :root {
@@ -345,7 +349,6 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
       <div>
         <div class="cal-title" id="calTitle">2026年4月</div>
-        <div class="cal-month-count" id="calMonthCount"></div>
       </div>
       <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
     </div>
@@ -598,7 +601,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <!-- ワクチン -->
         <div id="form-vaccine" class="form-section">
           <div class="form-card">
-            <div class="form-group"><label class="form-label">接種日</label><input type="date" class="form-input" id="vac-date" oninput="autoSetNextDate('vac-date','vac-next','year',1)"></div>
+            <div class="form-group"><label class="form-label">接種日</label><input type="date" class="form-input" id="vac-date" onchange="autoSetNextDate('vac-date','vac-next','year',1)"></div>
             <div class="form-group"><label class="form-label">ワクチン種類</label>
               <select class="form-select" id="vac-type">
                 <option value="">選択してください</option>
@@ -615,7 +618,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <!-- 投薬 -->
         <div id="form-medicine" class="form-section">
           <div class="form-card">
-            <div class="form-group"><label class="form-label">投薬日</label><input type="date" class="form-input" id="med-date" oninput="autoSetNextDate('med-date','med-next','month',1)"></div>
+            <div class="form-group"><label class="form-label">投薬日</label><input type="date" class="form-input" id="med-date" onchange="autoSetNextDate('med-date','med-next','month',1)"></div>
             <div class="form-group"><label class="form-label">薬の名前</label><input type="text" class="form-input" id="med-name" placeholder="フィラリア予防薬など"></div>
             <div class="form-group"><label class="form-label">種類</label>
               <select class="form-select" id="med-type">
@@ -667,7 +670,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <!-- トリミング -->
         <div id="form-trim" class="form-section">
           <div class="form-card">
-            <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="trim-date" oninput="autoSetNextDate('trim-date','trim-next','month',1)"></div>
+            <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="trim-date" onchange="autoSetNextDate('trim-date','trim-next','month',1)"></div>
             <div class="form-group"><label class="form-label">サロン名</label><input type="text" class="form-input" id="trim-salon" placeholder="○○ペットサロン" onfocus="renderChips('trim-salon','savedSalons','salon')" oninput="renderChips('trim-salon','savedSalons','salon')"><div class="suggestion-chips" id="chips-trim-salon"></div></div>
             <div class="form-group"><label class="form-label">メニュー</label>
               <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px" id="trim-menu-checks">
@@ -691,7 +694,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <!-- 給水フィルター -->
         <div id="form-filter" class="form-section">
           <div class="form-card">
-            <div class="form-group"><label class="form-label">交換日</label><input type="date" class="form-input" id="filter-date" oninput="autoSetNextDate('filter-date','filter-next','month',1)"></div>
+            <div class="form-group"><label class="form-label">交換日</label><input type="date" class="form-input" id="filter-date" onchange="autoSetNextDate('filter-date','filter-next','month',1)"></div>
             <div class="form-group"><label class="form-label">給水機の種類</label><input type="text" class="form-input" id="filter-machine" placeholder="ピュアクリスタルなど"></div>
             <div class="form-group"><label class="form-label">フィルターの種類</label><input type="text" class="form-input" id="filter-type" placeholder="軟水化フィルターなど"></div>
             <div class="form-group"><label class="form-label">次回交換予定日</label><input type="date" class="form-input" id="filter-next"></div>
@@ -778,6 +781,13 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     <button class="btn btn-primary" onclick="saveSettings()">💾 設定を保存</button>
     <div style="height:10px"></div>
     <button class="btn btn-secondary" onclick="closeSettings()">キャンセル</button>
+
+    <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border)">
+      <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px">📤 設定のバックアップ／復元</div>
+      <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:10px">別のデバイスで同じ設定を使いたいときに。エクスポートした文字列をメモ等に保存してください。</p>
+      <button class="btn btn-secondary" style="margin-bottom:8px" onclick="exportSettings()">📋 設定をエクスポート（コピー）</button>
+      <button class="btn btn-secondary" onclick="importSettings()">📥 設定をインポート（貼り付け）</button>
+    </div>
   </div>
 </div>
 
@@ -889,9 +899,8 @@ function renderPage(name) {
       const allDates=[];
       Object.keys(CAT_CFG).forEach(type=>{
         DB.get(type).forEach(r=>{
-          const raw=(r.date||r.start||r.createdAt||'').toString();
-          const ds=raw.slice(0,10).replace(/\//g,'-');
-          if(/^\d{4}-\d{2}-\d{2}$/.test(ds)) allDates.push(ds);
+          const ds=normalizeDate(r.date||r.start||r.createdAt);
+          if(ds) allDates.push(ds);
         });
       });
       allDates.sort((a,b)=>b.localeCompare(a));
@@ -912,6 +921,7 @@ let currentCat = null;
 
 function openAddSheet() {
   currentCat = null;
+  document.querySelectorAll('input[type="date"]').forEach(el=>el.value='');
   document.getElementById('addStepCats').classList.add('active');
   document.getElementById('addStepForm').classList.remove('active');
   document.getElementById('addStepSuccess').classList.remove('active');
@@ -1000,12 +1010,27 @@ function autoSetNextDate(srcId,tgtId,unit,n){const src=document.getElementById(s
 function localDateStr(d){const t=d||new Date();return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
 function setTodayDates(){
   const today=localDateStr();
-  document.querySelectorAll('input[type="date"]').forEach(el=>{if(!el.value)el.value=today;});
+  const nextIds=new Set(['vac-next','med-next','trim-next','filter-next']);
+  document.querySelectorAll('input[type="date"]').forEach(el=>{if(!el.value&&!nextIds.has(el.id))el.value=today;});
   [{src:'vac-date',tgt:'vac-next',unit:'year',n:1},{src:'med-date',tgt:'med-next',unit:'month',n:1},{src:'trim-date',tgt:'trim-next',unit:'month',n:1},{src:'filter-date',tgt:'filter-next',unit:'month',n:1}]
     .forEach(({src,tgt,unit,n})=>{const se=document.getElementById(src);const te=document.getElementById(tgt);if(se&&te&&se.value&&!te.value)te.value=unit==='month'?addMonths(se.value,n):addYears(se.value,n);});
 }
 
 // ========== 日付フォーマット ==========
+// どんな形式（Date, yyyy-mm-dd, yyyy/m/d, ISO文字列など）でも "yyyy-mm-dd" に正規化
+function normalizeDate(raw){
+  if(!raw)return'';
+  if(raw instanceof Date){
+    if(isNaN(raw.getTime()))return'';
+    return`${raw.getFullYear()}-${String(raw.getMonth()+1).padStart(2,'0')}-${String(raw.getDate()).padStart(2,'0')}`;
+  }
+  const s=String(raw).trim();
+  const m=s.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+  if(m)return`${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  const dt=new Date(s);
+  if(!isNaN(dt.getTime()))return`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  return'';
+}
 function fmtDate(d){
   if(!d)return'';
   const s=String(d);
@@ -1186,8 +1211,8 @@ function getAllRecords() {
     DB.get(type).forEach(r=>all.push({...r,_type:type,_cfg:cfg}));
   });
   return all.sort((a,b)=>{
-    const tc=d=>(d||'').toString().slice(0,10).replace(/\//g,'-');
-    const dd=tc(b.date).localeCompare(tc(a.date));
+    const td=d=>{const s=(d||'').toString().slice(0,10).replace(/\//g,'-');return s?new Date(s).getTime()||0:0;};
+    const dd=td(b.date)-td(a.date);
     return dd!==0?dd:(Number(b.id)||0)-(Number(a.id)||0);
   });
 }
@@ -1358,7 +1383,7 @@ function getUpcomingReminders(daysAhead=30){
       if(seen.has(sig))return;
       seen.add(sig);
       const daysLeft=Math.round((nextDate-today)/86400000);
-      reminders.push({iconType,label:labelFn(r),date:fmtDate(rawNext),daysLeft});
+      reminders.push({iconType,label:labelFn(r),date:fmtDate(rawNext),daysLeft,key});
     });
   });
   return reminders.sort((a,b)=>a.daysLeft-b.daysLeft);
@@ -1370,9 +1395,12 @@ function renderUpcoming(){
   if(!container)return;
   if(reminders.length===0){container.innerHTML='<p style="font-size:13px;color:var(--text-light);">30日以内の予定はありません</p>';return;}
   container.innerHTML=reminders.map(r=>{
-    const cls=r.daysLeft<=2?'urgent':r.daysLeft<=7?'soon':'normal';
+    const urgCls=r.daysLeft<=2?'urgent':r.daysLeft<=7?'soon':'normal';
     const dayLabel=r.daysLeft===0?'今日！':r.daysLeft===1?'明日！':r.daysLeft+'日後';
-    return`<div class="remind-item ${cls}"><div class="remind-days ${cls}">${dayLabel}</div><div style="display:flex;align-items:center;gap:8px">${csWrap(r.iconType,16)}<div><div class="remind-label">${r.label}</div><div class="remind-date">${r.date}</div></div></div></div>`;
+    const catColor=(CAT_CFG[r.key]||{}).color||'#e07b54';
+    const catBg=catColor.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16));
+    const bgStyle=`rgba(${catBg[0]},${catBg[1]},${catBg[2]},0.12)`;
+    return`<div class="remind-item" style="background:${bgStyle};border:1.5px solid ${catColor}44"><div class="remind-days ${urgCls}">${dayLabel}</div><div style="display:flex;align-items:center;gap:8px">${csWrap(r.iconType,16)}<div><div class="remind-label">${r.label}</div><div class="remind-date">${r.date}</div></div></div></div>`;
   }).join('');
 }
 
@@ -1401,10 +1429,8 @@ function renderCalendar(){
   const recordDays={};
   Object.entries(CAT_CFG).forEach(([type,cfg])=>{
     DB.get(type).forEach(r=>{
-      // dateフィールドまたはstartフィールド（旅行）を参照
-      const rawDate=(r.date||r.start||r.createdAt||'').toString();
-      const ds=rawDate.slice(0,10).replace(/\//g,'-');
-      if(!/^\d{4}-\d{2}-\d{2}$/.test(ds))return;
+      const ds=normalizeDate(r.date||r.start||r.createdAt);
+      if(!ds)return;
       if(!recordDays[ds])recordDays[ds]=new Set();
       recordDays[ds].add(cfg.color);
     });
@@ -1425,8 +1451,7 @@ function renderCalendar(){
   let monthTotal=0;
   Object.entries(CAT_CFG).forEach(([type])=>{
     monthTotal+=DB.get(type).filter(r=>{
-      const rawDate=r.date||r.start||r.createdAt||'';
-      const ds=rawDate.toString().slice(0,10).replace(/\//g,'-');
+      const ds=normalizeDate(r.date||r.start||r.createdAt);
       return ds.startsWith(monthPrefix);
     }).length;
   });
@@ -1473,8 +1498,7 @@ function renderCalDayRecords(){
   const dayRecords=[];
   Object.entries(CAT_CFG).forEach(([type,cfg])=>{
     DB.get(type).forEach(r=>{
-      const rawDate=(r.date||r.start||r.createdAt||'').toString();
-      const rds=rawDate.slice(0,10).replace(/\//g,'-');
+      const rds=normalizeDate(r.date||r.start||r.createdAt);
       if(rds===ds) dayRecords.push({...r,_type:type,_cfg:cfg});
     });
   });
@@ -1578,6 +1602,52 @@ function applySettings(){
   if(sb2) sb2.style.opacity=opacity;
 }
 
+// ========== 設定エクスポート／インポート ==========
+async function exportSettings(){
+  const s=DB.getObj('settings');
+  const photo=localStorage.getItem('dogPhoto')||'';
+  const payload={_app:'wancare',_v:1,settings:s,photo};
+  const str=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  try{
+    await navigator.clipboard.writeText(str);
+    showToast('📋 クリップボードにコピーしました');
+  }catch(e){
+    // クリップボードAPIが使えない場合はプロンプトで表示
+    prompt('以下の文字列をコピーして保存してください：',str);
+  }
+}
+
+async function importSettings(){
+  let str='';
+  try{
+    str=await navigator.clipboard.readText();
+  }catch(e){
+    str=prompt('エクスポートした文字列を貼り付けてください：')||'';
+  }
+  str=(str||'').trim();
+  if(!str){showToast('⚠️ 文字列が空です');return;}
+  let payload;
+  try{
+    payload=JSON.parse(decodeURIComponent(escape(atob(str))));
+  }catch(e){
+    showToast('⚠️ 形式が正しくありません');return;
+  }
+  if(!payload||payload._app!=='wancare'||!payload.settings){
+    showToast('⚠️ わんケアの設定データではありません');return;
+  }
+  if(!confirm('設定を上書きします。よろしいですか？'))return;
+  DB.setObj('settings',payload.settings);
+  if(payload.photo)localStorage.setItem('dogPhoto',payload.photo);
+  else localStorage.removeItem('dogPhoto');
+  applySettings();
+  applyDogPhoto(localStorage.getItem('dogPhoto'));
+  closeSettings();
+  showToast('✅ 設定を復元しました');
+  if(payload.settings.webAppUrl){
+    setTimeout(()=>loadFromSheets(),500);
+  }
+}
+
 // ========== Google Sheets同期 ==========
 function getWebAppUrl(){return DB.getObj('settings').webAppUrl||'';}
 
@@ -1630,6 +1700,9 @@ async function loadFromSheets(){
     const activePage=document.querySelector('.page.active');
     if(activePage)renderPage(activePage.id.replace('page-',''));
     updateHomeStats();
+    renderUpcoming();
+    renderTimeline();
+    renderCalendar();
     showSyncBar('✅ 同期完了！','success');
     btn.classList.remove('spinning');
     if(btn2)btn2.classList.remove('spinning');
