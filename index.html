@@ -779,6 +779,30 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     <div class="form-group"><label class="form-label">📊 Google スプレッドシートのURL</label><input type="url" class="form-input" id="set-gs-url" placeholder="https://docs.google.com/spreadsheets/..."></div>
     <div class="form-group"><label class="form-label">⚡ Apps Script Web アプリのURL（同期用）</label><input type="url" class="form-input" id="set-webapp-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
     <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:16px">Web アプリのURLを登録すると、入力が自動的にGoogle スプレッドシートに同期されます。</p>
+
+    <div style="margin-top:4px;padding-top:12px;border-top:1px dashed var(--border)">
+      <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px">🔔 通知設定</div>
+      <div class="form-group">
+        <label class="form-label">何日前から通知するか</label>
+        <select class="form-select" id="set-notif-days">
+          <option value="1">1日前</option>
+          <option value="3">3日前</option>
+          <option value="7">7日前</option>
+          <option value="14">14日前</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">通知するカテゴリ</label>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;font-size:13px;line-height:1.8">
+          <label><input type="checkbox" id="set-notif-hospital"> 通院</label>
+          <label><input type="checkbox" id="set-notif-vaccine"> ワクチン</label>
+          <label><input type="checkbox" id="set-notif-medicine"> 投薬</label>
+          <label><input type="checkbox" id="set-notif-trim"> トリミング</label>
+          <label><input type="checkbox" id="set-notif-filter"> 給水フィルター</label>
+        </div>
+      </div>
+    </div>
+
     <button class="btn btn-primary" onclick="saveSettings()">💾 設定を保存</button>
     <div style="height:10px"></div>
     <button class="btn btn-secondary" onclick="closeSettings()">キャンセル</button>
@@ -1369,6 +1393,9 @@ const REMIND_CHECKS=[
   {key:'filter',  nextField:'next',iconType:'filter',  labelFn:()=>'給水フィルター交換予定'},
 ];
 
+// 通知本文用の絵文字マップ（Notification API は SVG を描画できないため絵文字で代用）
+const REMIND_EMOJI={hospital:'🏥',vaccine:'💉',medicine:'💊',trim:'✂️',filter:'💧'};
+
 function getUpcomingReminders(daysAhead=30){
   const today=new Date();today.setHours(0,0,0,0);
   const limit=new Date(today);limit.setDate(limit.getDate()+daysAhead);
@@ -1385,7 +1412,7 @@ function getUpcomingReminders(daysAhead=30){
       if(seen.has(sig))return;
       seen.add(sig);
       const daysLeft=Math.round((nextDate-today)/86400000);
-      reminders.push({iconType,label:labelFn(r),date:fmtDate(rawNext),daysLeft,key});
+      reminders.push({iconType,label:labelFn(r),date:fmtDate(rawNext),daysLeft,key,id:r.id,rawNext});
     });
   });
   return reminders.sort((a,b)=>a.daysLeft-b.daysLeft);
@@ -1402,8 +1429,24 @@ function renderUpcoming(){
     const catColor=(CAT_CFG[r.key]||{}).color||'#e07b54';
     const catBg=catColor.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16));
     const bgStyle=`rgba(${catBg[0]},${catBg[1]},${catBg[2]},0.12)`;
-    return`<div class="remind-item" style="background:${bgStyle};border:1.5px solid ${catColor}44"><div class="remind-days ${urgCls}">${dayLabel}</div><div style="display:flex;align-items:center;gap:8px">${csWrap(r.iconType,16)}<div><div class="remind-label">${r.label}</div><div class="remind-date">${r.date}</div></div></div></div>`;
+    return`<div class="remind-item" style="background:${bgStyle};border:1.5px solid ${catColor}44">
+      <div class="remind-days ${urgCls}">${dayLabel}</div>
+      <div style="display:flex;align-items:center;gap:8px;flex:1">${csWrap(r.iconType,16)}<div><div class="remind-label">${r.label}</div><div class="remind-date">${r.date}</div></div></div>
+      <button onclick="markDone('${r.key}',${r.id})" style="background:#fff;border:1.5px solid ${catColor};color:${catColor};border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0">実施済み</button>
+    </div>`;
   }).join('');
+}
+
+// 予定を「実施済み」にする：next日付をクリアして一覧と通知から外す（dateは過去の実施日として残す）
+function markDone(key,id){
+  const records=DB.get(key);
+  const idx=records.findIndex(r=>r.id===id);
+  if(idx<0)return;
+  records[idx].next='';
+  DB.set(key,records);
+  renderUpcoming();
+  updateHomeStats();
+  showToast('✅ 実施済みにしました');
 }
 
 // ========== カレンダー ==========
@@ -1531,6 +1574,15 @@ function openSettings(){
   document.getElementById('set-gender').value=s.gender||'オス';
   document.getElementById('set-gs-url').value=s.gsUrl||'';
   document.getElementById('set-webapp-url').value=s.webAppUrl||'';
+  // 通知設定の読み込み
+  const ns=DB.getObj('notifSettings');
+  document.getElementById('set-notif-days').value=ns.daysAhead||7;
+  const en=ns.enabled||{};
+  document.getElementById('set-notif-hospital').checked=en.hospital!==false;
+  document.getElementById('set-notif-vaccine').checked =en.vaccine !==false;
+  document.getElementById('set-notif-medicine').checked=en.medicine!==false;
+  document.getElementById('set-notif-trim').checked    =en.trim    !==false;
+  document.getElementById('set-notif-filter').checked  =en.filter  !==false;
   applyDogPhoto(localStorage.getItem('dogPhoto'));
   document.getElementById('settingsModal').classList.add('open');
 }
@@ -1550,6 +1602,17 @@ function saveSettings(){
     webAppUrl:document.getElementById('set-webapp-url').value
   };
   DB.setObj('settings',s);
+  // 通知設定を保存
+  DB.setObj('notifSettings',{
+    daysAhead:Number(document.getElementById('set-notif-days').value)||7,
+    enabled:{
+      hospital:document.getElementById('set-notif-hospital').checked,
+      vaccine: document.getElementById('set-notif-vaccine').checked,
+      medicine:document.getElementById('set-notif-medicine').checked,
+      trim:    document.getElementById('set-notif-trim').checked,
+      filter:  document.getElementById('set-notif-filter').checked,
+    }
+  });
   applySettings();
   closeSettings();
   showToast('💾 設定を保存しました');
@@ -1787,11 +1850,33 @@ async function requestNotifPermission(){
 
 function sendUpcomingNotifications(){
   if(Notification.permission!=='granted')return;
-  const reminders=getUpcomingReminders(7);
-  reminders.forEach((r,i)=>setTimeout(()=>{
-    const dl=r.daysLeft===0?'今日':r.daysLeft+'日後';
-    new Notification('🐾 わんケア リマインダー',{body:`${r.icon} ${r.label}（${dl}：${r.date}）`,tag:'wancare-'+i});
-  },i*500));
+  // 通知設定（何日前から / カテゴリ別ON/OFF）を読み込む
+  const ns=DB.getObj('notifSettings');
+  const days=Number(ns.daysAhead)||7;
+  const enabled=ns.enabled||{hospital:true,vaccine:true,medicine:true,trim:true,filter:true};
+  // 「今日すでに送った通知」を覚えておくキー（日付で分ける）
+  const todayStr=fmtDate(new Date());
+  const sentKey='notifSent_'+todayStr;
+  const sent=DB.getObj(sentKey);
+  // 古い日付の通知済みキーは掃除
+  Object.keys(localStorage).forEach(k=>{
+    if(k.startsWith('notifSent_')&&k!==sentKey)localStorage.removeItem(k);
+  });
+
+  const reminders=getUpcomingReminders(days).filter(r=>enabled[r.key]!==false);
+  let delay=0;
+  reminders.forEach(r=>{
+    const sig=r.key+'_'+r.id+'_'+r.rawNext;
+    if(sent[sig])return; // 今日は既に通知済み
+    setTimeout(()=>{
+      const dl=r.daysLeft===0?'今日':r.daysLeft+'日後';
+      const emoji=REMIND_EMOJI[r.iconType]||'🐾';
+      new Notification('🐾 わんケア リマインダー',{body:`${emoji} ${r.label}(${dl}：${r.date})`,tag:'wancare-'+sig});
+    },delay);
+    delay+=500;
+    sent[sig]=1;
+  });
+  DB.setObj(sentKey,sent);
 }
 
 function initNotifButton(){
