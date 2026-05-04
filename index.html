@@ -1567,11 +1567,24 @@ function renderCalDayRecords(){
 }
 
 // ========== 設定 ==========
+// 生年月日をどんな形式でも yyyy-mm-dd に正規化（<input type="date"> 用）
+function normalizeBirth(v){
+  if(!v)return'';
+  const s=String(v);
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s; // 既に正しい形式
+  const d=new Date(s);
+  if(isNaN(d.getTime()))return'';
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,'0');
+  const day=String(d.getDate()).padStart(2,'0');
+  return`${y}-${m}-${day}`;
+}
+
 function openSettings(){
   const s=DB.getObj('settings');
   document.getElementById('set-name').value=s.name||'';
   document.getElementById('set-breed').value=s.breed||'';
-  document.getElementById('set-birth').value=s.birth||'';
+  document.getElementById('set-birth').value=normalizeBirth(s.birth);
   document.getElementById('set-gender').value=s.gender||'オス';
   document.getElementById('set-gs-url').value=s.gsUrl||'';
   document.getElementById('set-webapp-url').value=s.webAppUrl||'';
