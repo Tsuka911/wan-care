@@ -731,9 +731,6 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
               </select>
             </div>
             <div class="form-group"><label class="form-label">思い出・コメント</label><textarea class="form-textarea" id="trip-memo" placeholder="エピソードを記録しましょう！"></textarea></div>
-            <div class="form-group"><label class="form-label">📸 写真URL 1枚目</label><input type="url" class="form-input" id="trip-photo1" placeholder="https://..."></div>
-            <div class="form-group"><label class="form-label">写真URL 2枚目（任意）</label><input type="url" class="form-input" id="trip-photo2" placeholder="https://..."></div>
-            <div class="form-group"><label class="form-label">写真URL 3枚目（任意）</label><input type="url" class="form-input" id="trip-photo3" placeholder="https://..."></div>
           </div>
           <div id="trip-records"></div>
         </div>
@@ -1159,12 +1156,9 @@ function addRecord(type){
     record.hotel=document.getElementById('trip-hotel').value;
     record.hotelRating=document.getElementById('trip-hotel-rating').value;
     record.memo=document.getElementById('trip-memo').value;
-    record.photo1=document.getElementById('trip-photo1').value;
-    record.photo2=document.getElementById('trip-photo2').value;
-    record.photo3=document.getElementById('trip-photo3').value;
     if(!record.title&&!record.dest){alert('旅行タイトルまたは行き先を入力してください');return;}
     key='trip';
-    clearForm(['trip-title','trip-start','trip-end','trip-dest','trip-hotel','trip-memo','trip-photo1','trip-photo2','trip-photo3']);
+    clearForm(['trip-title','trip-start','trip-end','trip-dest','trip-hotel','trip-memo']);
     document.getElementById('trip-hotel-rating').value='';
   }
 
@@ -1227,7 +1221,14 @@ function getRecordSub(type, r) {
   if(type==='trim') return [r.menu, r.memo].filter(Boolean).join(' / ');
   if(type==='filter') return [r.machine, r.filterType].filter(Boolean).join(' / ');
   if(type==='other') return r.memo||'';
-  if(type==='trip') return [r.dest, r.hotel].filter(Boolean).join(' · ');
+  if(type==='trip'){
+    const parts=[];
+    if(r.dest) parts.push('📍'+r.dest);
+    if(r.start) parts.push(fmtDate(r.start)+(r.end?' 〜 '+fmtDate(r.end):''));
+    if(r.hotel) parts.push('🏨'+r.hotel+(r.hotelRating?' '+r.hotelRating:''));
+    if(r.memo) parts.push('📝'+r.memo);
+    return parts.join(' / ');
+  }
   return '';
 }
 
@@ -1322,9 +1323,7 @@ function renderRecordItem(key,r){
 
 function renderTripCard(r){
   const fmt=fmtDate;
-  const photos=[r.photo1,r.photo2,r.photo3].filter(Boolean);
-  const photoHtml=photos.map(p=>`<img src="${p}" class="travel-photo" onerror="this.style.display='none'" alt="旅行の写真">`).join('');
-  return`<div class="travel-card"><div class="travel-card-header"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="travel-card-title" style="display:flex;align-items:center;gap:6px">${cs('trip',18)} ${r.title||r.dest||'旅行'}</div><div class="travel-card-dates">${fmt(r.start)}${r.end?' 〜 '+fmt(r.end):''}</div></div><button class="delete-btn" style="color:rgba(255,255,255,0.6)" onclick="deleteRecord('trip',${r.id})">✕</button></div></div><div class="travel-card-body">${r.dest?`<div class="travel-info-row"><span>📍</span><span class="travel-info-text">${r.dest}</span></div>`:''} ${r.hotel?`<div class="travel-info-row"><span>🏨</span><span class="travel-info-text">${r.hotel}${r.hotelRating?' '+r.hotelRating:''}</span></div>`:''} ${r.memo?`<div class="travel-info-row"><span>📝</span><span class="travel-info-text">${r.memo}</span></div>`:''} ${photoHtml}</div></div>`;
+  return`<div class="travel-card"><div class="travel-card-header"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="travel-card-title" style="display:flex;align-items:center;gap:6px">${cs('trip',18)} ${r.title||r.dest||'旅行'}</div><div class="travel-card-dates">${fmt(r.start)}${r.end?' 〜 '+fmt(r.end):''}</div></div><button class="delete-btn" style="color:rgba(255,255,255,0.6)" onclick="deleteRecord('trip',${r.id})">✕</button></div></div><div class="travel-card-body">${r.dest?`<div class="travel-info-row"><span>📍</span><span class="travel-info-text">${r.dest}</span></div>`:''} ${r.hotel?`<div class="travel-info-row"><span>🏨</span><span class="travel-info-text">${r.hotel}${r.hotelRating?' '+r.hotelRating:''}</span></div>`:''} ${r.memo?`<div class="travel-info-row"><span>📝</span><span class="travel-info-text">${r.memo}</span></div>`:''}</div></div>`;
 }
 
 function renderWeightChart(){
