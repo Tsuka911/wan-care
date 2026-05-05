@@ -1179,7 +1179,8 @@ function addRecord(type){
 function clearForm(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
 
 function deleteRecord(key,id){
-  if(!confirm('この記録を削除しますか？'))return;
+  const deleted=DB.get(key).find(r=>r.id===id);
+  if(!deleted)return;
   const records=DB.get(key).filter(r=>r.id!==id);
   DB.set(key,records);
   renderRecords(key);
@@ -1187,6 +1188,31 @@ function deleteRecord(key,id){
   renderTimeline();
   renderCalendar();
   syncToSheets(key,{id},'delete');
+  showUndoToast('削除しました',()=>{
+    const cur=DB.get(key);
+    cur.unshift(deleted);
+    cur.sort((a,b)=>(Number(b.id)||0)-(Number(a.id)||0));
+    DB.set(key,cur);
+    renderRecords(key);
+    updateHomeStats();
+    renderTimeline();
+    renderCalendar();
+  });
+}
+
+function showUndoToast(msg,onUndo){
+  document.querySelectorAll('.undo-toast').forEach(el=>el.remove());
+  const div=document.createElement('div');
+  div.className='undo-toast';
+  div.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#333;color:white;padding:10px 16px;border-radius:20px;font-size:14px;z-index:9999;display:flex;align-items:center;gap:12px;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,0.3);';
+  div.innerHTML=`<span>${msg}</span><button style="background:rgba(255,255,255,0.2);border:none;color:white;padding:4px 10px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;">↩ 取り消す</button>`;
+  div.querySelector('button').addEventListener('click',()=>{
+    clearTimeout(timer);
+    div.remove();
+    onUndo();
+  });
+  document.body.appendChild(div);
+  const timer=setTimeout(()=>div.remove(),4000);
 }
 
 // ========== タイムライン ==========
@@ -1432,7 +1458,7 @@ function renderUpcoming(){
     return`<div class="remind-item" style="background:${bgStyle};border:1.5px solid ${catColor}44">
       <div class="remind-days ${urgCls}">${dayLabel}</div>
       <div style="display:flex;align-items:center;gap:8px;flex:1">${csWrap(r.iconType,16)}<div><div class="remind-label">${r.label}</div><div class="remind-date">${r.date}</div></div></div>
-      <button onclick="markDone('${r.key}',${r.id})" style="background:#fff;border:1.5px solid ${catColor};color:${catColor};border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0">実施済み</button>
+      <button onclick="markDone('${r.key}',${r.id})" style="background:#fff;border:1.5px solid ${catColor};color:${catColor};border-radius:10px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;flex-shrink:0">済</button>
     </div>`;
   }).join('');
 }
