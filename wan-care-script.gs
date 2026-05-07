@@ -138,9 +138,33 @@ function deleteRecord(type, id) {
 
 // ========== Web アプリのエントリポイント ==========
 
-// GETリクエスト：全データを返す
+// GETリクエスト：全データを返す／ショートカットからの散歩追加も処理
 function doGet(e) {
   try {
+    // ショートカットからの散歩データ追加（action=add_walk）
+    if (e.parameter.action === 'add_walk') {
+      const record = {
+        id:      Date.now(),
+        date:    e.parameter.date    || '',
+        time:    parseFloat(e.parameter.time) || 0,
+        dist:    parseFloat(e.parameter.dist) || 0,
+        course:  e.parameter.course  || 'ヘルスケア自動取込',
+        weather: e.parameter.weather || '',
+        memo:    e.parameter.memo    || 'Apple Watch自動連携'
+      };
+      const existing = getRecords('walk');
+      const existingDates = new Set(existing.map(r => toDateStr(r.date)));
+      if (existingDates.has(toDateStr(record.date))) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ status: 'ok', action: 'add_walk', skipped: true }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      addRecord('walk', record);
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'ok', action: 'add_walk', date: record.date, dist: record.dist }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     const result = {};
     Object.keys(SHEET_MAP).forEach(type => {
       result[type] = getRecords(type);
@@ -175,15 +199,6 @@ function doGet(e) {
 
 // POSTリクエスト：追加・削除
 function doPost(e) {
-  // デバッグ：受信内容をそのまま返す（確認後に削除）
-  return ContentService
-    .createTextOutput(JSON.stringify({
-      status: 'debug',
-      params: e.parameter,
-      postData: e.postData ? e.postData.contents : 'none'
-    }))
-    .setMimeType(ContentService.MimeType.JSON);
-
   try {
     const action = e.parameter.action;
     const type   = e.parameter.type;
