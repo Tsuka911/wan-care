@@ -161,13 +161,29 @@ function doGet(e) {
 
   } catch (err) {
     return ContentService
-      .createTextOutput(JSON.stringify({ status: 'error', message: err.message }))
+      .createTextOutput(JSON.stringify({
+        status: 'error',
+        message: err.message,
+        debug: {
+          method: 'GET',
+          params: JSON.stringify(e.parameter)
+        }
+      }))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
 // POSTリクエスト：追加・削除
 function doPost(e) {
+  // デバッグ：受信内容をそのまま返す（確認後に削除）
+  return ContentService
+    .createTextOutput(JSON.stringify({
+      status: 'debug',
+      params: e.parameter,
+      postData: e.postData ? e.postData.contents : 'none'
+    }))
+    .setMimeType(ContentService.MimeType.JSON);
+
   try {
     const action = e.parameter.action;
     const type   = e.parameter.type;
