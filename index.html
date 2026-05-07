@@ -1721,7 +1721,7 @@ function copyShortcutUrl(){
   navigator.clipboard.writeText(url).then(()=>showToast('✅ URLをコピーしました。ショートカットに貼り付けてください'));
 }
 function copyShortcutData(){
-  const text = '{"id":【ランダムID】,"date":"【散歩日】","time":0,"dist":【距離km】,"course":"ヘルスケア自動取込","weather":"","memo":"Apple Watch自動連携"}';
+  const text = '{"date":"【散歩日】","time":0,"dist":【距離km】,"course":"ヘルスケア自動取込","weather":"","memo":"Apple Watch自動連携"}';
   navigator.clipboard.writeText(text).then(()=>showToast('✅ dataをコピーしました。ショートカットに貼り付けてください'));
 }
 
