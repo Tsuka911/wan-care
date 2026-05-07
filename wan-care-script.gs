@@ -173,8 +173,20 @@ function doPost(e) {
     const type   = e.parameter.type;
 
     if (action === 'add') {
-      const cleanData = e.parameter.data.replace(/[\x00-\x1F\x7F]/g, '');
-      const record = JSON.parse(cleanData);
+      let record;
+      if (e.parameter.data) {
+        const cleanData = e.parameter.data.replace(/[\x00-\x1F\x7F]/g, '');
+        record = JSON.parse(cleanData);
+      } else {
+        record = {
+          date:   e.parameter.date   || '',
+          time:   parseFloat(e.parameter.time)  || 0,
+          dist:   parseFloat(e.parameter.dist)  || 0,
+          course: e.parameter.course || 'ヘルスケア自動取込',
+          weather:e.parameter.weather|| '',
+          memo:   e.parameter.memo   || 'Apple Watch自動連携'
+        };
+      }
       if (!record.id) record.id = Date.now();
       // 散歩記録は同日重複を防ぐ（ショートカットから1件ずつ送る場合も対応）
       if (type === 'walk') {
