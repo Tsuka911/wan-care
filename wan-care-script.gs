@@ -173,7 +173,8 @@ function doPost(e) {
     const type   = e.parameter.type;
 
     if (action === 'add') {
-      const record = JSON.parse(e.parameter.data);
+      const cleanData = e.parameter.data.replace(/[\x00-\x1F\x7F]/g, '');
+      const record = JSON.parse(cleanData);
       if (!record.id) record.id = Date.now();
       // 散歩記録は同日重複を防ぐ（ショートカットから1件ずつ送る場合も対応）
       if (type === 'walk') {
