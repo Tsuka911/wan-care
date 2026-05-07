@@ -174,7 +174,7 @@ function doPost(e) {
 
     if (action === 'add') {
       let record;
-      if (e.parameter.data) {
+      if (e.parameter.data && e.parameter.data !== 'undefined') {
         const cleanData = e.parameter.data.replace(/[\x00-\x1F\x7F]/g, '');
         record = JSON.parse(cleanData);
       } else {
