@@ -141,11 +141,6 @@ function deleteRecord(type, id) {
 // GETリクエスト：全データを返す／ショートカットからの散歩追加も処理
 function doGet(e) {
   try {
-    // デバッグ：受信パラメータを返す
-    return ContentService
-      .createTextOutput(JSON.stringify({ received: e.parameter }))
-      .setMimeType(ContentService.MimeType.JSON);
-
     // ショートカットからの散歩データ追加（action=add_walk）
     if (e.parameter.action === 'add_walk') {
       const record = {
