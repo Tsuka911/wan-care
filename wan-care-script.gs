@@ -264,7 +264,17 @@ function doPost(e) {
 
   } catch (err) {
     return ContentService
-      .createTextOutput(JSON.stringify({ status: 'error', message: err.message }))
+      .createTextOutput(JSON.stringify({
+        status: 'error',
+        message: err.message,
+        debug: {
+          action: String(e.parameter.action),
+          type:   String(e.parameter.type),
+          data:   String(e.parameter.data),
+          date:   String(e.parameter.date),
+          dist:   String(e.parameter.dist)
+        }
+      }))
       .setMimeType(ContentService.MimeType.JSON);
   }
 }
