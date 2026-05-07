@@ -778,6 +778,14 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     <div class="form-group"><label class="form-label" style="display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10"/></svg>Apps Script Web アプリのURL（同期用）</label><input type="url" class="form-input" id="set-webapp-url" placeholder="https://script.google.com/macros/s/.../exec"></div>
     <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:16px">Web アプリのURLを登録すると、入力が自動的にGoogle スプレッドシートに同期されます。</p>
 
+    <div style="margin-top:4px;padding-top:12px;border-top:1px dashed var(--border);margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;display:inline-flex;align-items:center;gap:6px">🦮 ショートカット連携用コピー</div>
+      <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:10px">iPhoneのショートカットアプリに貼り付けて使います。</p>
+      <button class="btn btn-secondary" style="margin-bottom:8px;width:100%" onclick="copyShortcutUrl()">📋 Apps Script URL をコピー</button>
+      <button class="btn btn-secondary" style="width:100%" onclick="copyShortcutData()">📋 data テキストをコピー</button>
+      <p style="font-size:11px;color:var(--text-light);line-height:1.6;margin-top:8px">dataをコピー後、ショートカットの入力欄に貼り付けて、<br>【ランダムID】【散歩日】【距離km】の部分を変数に置き換えてください。</p>
+    </div>
+
     <div style="margin-top:4px;padding-top:12px;border-top:1px dashed var(--border)">
       <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a1.4 1.4 0 0 0-1.4 1.4v.6A6.6 6.6 0 0 0 5.4 10.6v3.1l-1.3 2.2a1 1 0 0 0 .86 1.5h14.08a1 1 0 0 0 .86-1.5l-1.3-2.2v-3.1a6.6 6.6 0 0 0-5.2-6.4v-.6A1.4 1.4 0 0 0 12 2.2z"/><path d="M10 19a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>通知設定</div>
       <div class="form-group">
@@ -1704,6 +1712,17 @@ function applySettings(){
   document.getElementById('syncBtn').style.opacity=opacity;
   const sb2=document.getElementById('syncBtn2');
   if(sb2) sb2.style.opacity=opacity;
+}
+
+// ========== ショートカット連携用コピー ==========
+function copyShortcutUrl(){
+  const url = DB.getObj('settings').webAppUrl||'';
+  if(!url){showToast('⚠️ まずApps Script URLを設定・保存してください');return;}
+  navigator.clipboard.writeText(url).then(()=>showToast('✅ URLをコピーしました。ショートカットに貼り付けてください'));
+}
+function copyShortcutData(){
+  const text = '{"id":【ランダムID】,"date":"【散歩日】","time":0,"dist":【距離km】,"course":"ヘルスケア自動取込","weather":"","memo":"Apple Watch自動連携"}';
+  navigator.clipboard.writeText(text).then(()=>showToast('✅ dataをコピーしました。ショートカットに貼り付けてください'));
 }
 
 // ========== 設定エクスポート／インポート ==========
