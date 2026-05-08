@@ -881,6 +881,7 @@ const DB = {
   getObj:(k)=>{try{return JSON.parse(localStorage.getItem(k)||'{}');}catch{return{};}},
   setObj:(k,v)=>localStorage.setItem(k,JSON.stringify(v))
 };
+let currentEditId = null;
 
 // カテゴリ設定
 const CAT_CFG = {
@@ -962,6 +963,25 @@ function openAddSheet() {
 
 function closeAddSheet() {
   document.getElementById('addSheet').classList.remove('open');
+  currentEditId = null;
+  document.getElementById('formSaveBtn').textContent = '💾 記録を保存';
+}
+
+function editRecord(key, id) {
+  const r = DB.get(key).find(r => r.id === id);
+  if (!r) return;
+  openAddSheet();
+  selectCat(key);
+  currentEditId = id;
+  document.getElementById('formSaveBtn').textContent = '✏️ 更新する';
+  if (key === 'walk') {
+    document.getElementById('walk-date').value = r.date || '';
+    document.getElementById('walk-time').value = r.time || '';
+    document.getElementById('walk-dist').value = r.dist || '';
+    document.getElementById('walk-course').value = r.course || '';
+    document.getElementById('walk-weather').value = r.weather || '';
+    document.getElementById('walk-memo').value = r.memo || '';
+  }
 }
 
 function closeSheetOverlay(e) {
@@ -1127,6 +1147,17 @@ function addRecord(type){
     record.memo=document.getElementById('walk-memo').value;
     if(!record.time&&!record.dist){alert('時間か距離を入力してください');return;}
     key='walk';
+    if(currentEditId){
+      record.id=currentEditId;
+      const existing=DB.get('walk').filter(r=>r.id!==currentEditId);
+      DB.set('walk',[record,...existing].sort((a,b)=>b.id-a.id));
+      syncToSheets('walk',{id:currentEditId},'delete');
+      syncToSheets('walk',record,'add');
+      currentEditId=null;
+      document.getElementById('formSaveBtn').textContent='💾 記録を保存';
+      renderRecords('walk');updateHomeStats();renderTimeline();renderCalendar();
+      closeAddSheet();showToast('✅ 散歩記録を更新しました');return;
+    }
     clearForm(['walk-time','walk-dist','walk-course','walk-memo']);
   } else if(type==='trim'){
     record.date=document.getElementById('trim-date').value||d;
@@ -1352,7 +1383,8 @@ function renderRecordItem(key,r){
   else if(key==='trim'){title=r.salon||'トリミング';body=[r.menu,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#edfaf3;color:var(--daily)">${ico('trim')}${fmt(r.date)}</span>`;if(r.cost)tags+=`<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
   else if(key==='filter'){title='フィルター交換';body=[r.machine,r.filterType,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#ebf3fd;color:var(--travel)">${ico('filter')}${fmt(r.date)}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
   else if(key==='other'){title=r.type||'ケア';body=r.memo||'';tags=`<span class="record-tag" style="background:#f5f0fb;color:#7c6ec9">${ico('other')}${fmt(r.date)}</span>`;}
-  return`<div class="record-item"><div class="record-item-header"><div><div class="record-item-title">${title}</div><div>${tags}</div>${body?`<div class="record-item-body">${body}</div>`:''}</div><button class="delete-btn" onclick="deleteRecord('${key}',${r.id})">✕</button></div></div>`;
+  const editBtn=key==='walk'?`<button class="delete-btn" style="margin-right:4px;color:var(--daily)" onclick="editRecord('walk',${r.id})">✏️</button>`:'';
+  return`<div class="record-item"><div class="record-item-header"><div><div class="record-item-title">${title}</div><div>${tags}</div>${body?`<div class="record-item-body">${body}</div>`:''}</div><div style="display:flex;align-items:center">${editBtn}<button class="delete-btn" onclick="deleteRecord('${key}',${r.id})">✕</button></div></div></div>`;
 }
 
 function renderTripCard(r){
