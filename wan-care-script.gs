@@ -141,10 +141,10 @@ function deleteRecord(type, id) {
 // GETリクエスト：全データを返す／ショートカットからの散歩追加も処理
 function doGet(e) {
   try {
-    // ショートカットからの散歩データ追加（action=add_walk）
+    // 散歩データ追加（action=add_walk）
     if (e.parameter.action === 'add_walk') {
       const record = {
-        id:      Date.now(),
+        id:      e.parameter.id ? Number(e.parameter.id) : Date.now(),
         date:    e.parameter.date    || '',
         time:    parseFloat(e.parameter.time) || 0,
         dist:    parseFloat(e.parameter.dist) || 0,
@@ -154,7 +154,8 @@ function doGet(e) {
       };
       const existing = getRecords('walk');
       const existingDates = new Set(existing.map(r => toDateStr(r.date)));
-      if (existingDates.has(toDateStr(record.date))) {
+      const skipDup = !e.parameter.id && existingDates.has(toDateStr(record.date));
+      if (skipDup) {
         return ContentService
           .createTextOutput(JSON.stringify({ status: 'ok', action: 'add_walk', skipped: true }))
           .setMimeType(ContentService.MimeType.JSON);
@@ -162,6 +163,14 @@ function doGet(e) {
       addRecord('walk', record);
       return ContentService
         .createTextOutput(JSON.stringify({ status: 'ok', action: 'add_walk', date: record.date, dist: record.dist }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // 散歩データ削除（action=delete_walk）
+    if (e.parameter.action === 'delete_walk') {
+      deleteRecord('walk', e.parameter.id);
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'ok', action: 'delete_walk' }))
         .setMimeType(ContentService.MimeType.JSON);
     }
 

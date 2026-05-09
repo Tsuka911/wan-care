@@ -1151,8 +1151,12 @@ function addRecord(type){
       record.id=currentEditId;
       const existing=DB.get('walk').filter(r=>r.id!==currentEditId);
       DB.set('walk',[record,...existing].sort((a,b)=>b.id-a.id));
-      syncToSheets('walk',{id:currentEditId},'delete');
-      syncToSheets('walk',record,'add');
+      const url=getWebAppUrl();
+      if(url){
+        const enc=encodeURIComponent;
+        fetch(`${url}?action=delete_walk&id=${record.id}`,{mode:'no-cors'}).catch(()=>{});
+        fetch(`${url}?action=add_walk&id=${record.id}&date=${enc(record.date)}&time=${enc(record.time||0)}&dist=${enc(record.dist||0)}&course=${enc(record.course||'')}&weather=${enc(record.weather||'')}&memo=${enc(record.memo||'')}`,{mode:'no-cors'}).catch(()=>{});
+      }
       currentEditId=null;
       document.getElementById('formSaveBtn').textContent='💾 記録を保存';
       renderRecords('walk');updateHomeStats();renderTimeline();renderCalendar();
