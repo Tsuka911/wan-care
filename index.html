@@ -1636,6 +1636,8 @@ function markDone(key,id){
   if(idx<0)return;
   records[idx].next='';
   DB.set(key,records);
+  syncToSheets(key,{id:records[idx].id},'delete');
+  syncToSheets(key,records[idx],'add');
   renderUpcoming();
   updateHomeStats();
   showToast('✅ 実施済みにしました');
