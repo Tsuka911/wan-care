@@ -1494,20 +1494,20 @@ function updateHomeStats(){
     return normalizeDate(b.date).localeCompare(normalizeDate(a.date));
   }).slice(0,5);
 
-  const colorMap={health:'var(--health)',walk:'var(--daily)',daily:'var(--daily)',travel:'var(--travel)'};
-  const bgMap={health:'rgba(224,123,84,0.12)',walk:'rgba(106,184,154,0.12)',daily:'rgba(106,184,154,0.12)',travel:'rgba(91,155,213,0.12)'};
+  const colorMap={health:'var(--health)',walk:'var(--daily)',daily:'var(--daily)',travel:'var(--travel)',other:'var(--violet)'};
+  const bgMap={health:'rgba(224,123,84,0.12)',walk:'rgba(106,184,154,0.12)',daily:'rgba(106,184,154,0.12)',travel:'rgba(91,155,213,0.12)',other:'rgba(155,142,213,0.12)'};
   const recentList=document.getElementById('recentList');
   if(all.length===0){
     recentList.innerHTML='<li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>';
   } else {
-    recentList.innerHTML=all.map(r=>`
-      <li class="recent-item" style="background:${bgMap[r._cat]||'#f5f0eb'};border-left:3px solid ${colorMap[r._cat]||'#e07b54'}">
-        ${csWrap(r._type,18,bgMap[r._cat])}
+    recentList.innerHTML=all.map(r=>{const col=colorMap[r._type]||colorMap[r._cat]||'#e07b54';const bg=bgMap[r._type]||bgMap[r._cat]||'#f5f0eb';return`
+      <li class="recent-item" style="background:${bg};border-left:3px solid ${col}">
+        ${csWrap(r._type,18,bg)}
         <div class="recent-body">
           <div class="recent-text">${r._text}</div>
-          <span class="recent-date-badge" style="background:${colorMap[r._cat]||'var(--primary)'}">${fmtDate(r.date)}</span>
+          <span class="recent-date-badge" style="background:${col}">${fmtDate(r.date)}</span>
         </div>
-      </li>`).join('');
+      </li>`;}).join('');
   }
 }
 
