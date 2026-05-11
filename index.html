@@ -1006,13 +1006,64 @@ function editRecord(key, id) {
   selectCat(key);
   currentEditId = id;
   document.getElementById('formSaveBtn').textContent = '更新する';
-  if (key === 'walk') {
-    document.getElementById('walk-date').value = r.date || '';
-    document.getElementById('walk-time').value = r.time || '';
-    document.getElementById('walk-dist').value = r.dist || '';
-    document.getElementById('walk-course').value = r.course || '';
-    document.getElementById('walk-weather').value = r.weather || '';
-    document.getElementById('walk-memo').value = r.memo || '';
+  if(key==='hospital'){
+    document.getElementById('hosp-date').value=r.date||'';
+    document.getElementById('hosp-name').value=r.name||'';
+    document.getElementById('hosp-reason').value=r.reason||'';
+    document.getElementById('hosp-result').value=r.result||'';
+    document.getElementById('hosp-cost').value=r.cost||'';
+    document.getElementById('hosp-next').value=r.next||'';
+    document.getElementById('hosp-memo').value=r.memo||'';
+  } else if(key==='vaccine'){
+    document.getElementById('vac-date').value=r.date||'';
+    document.getElementById('vac-type').value=r.type||'';
+    document.getElementById('vac-next').value=r.next||'';
+    document.getElementById('vac-hospital').value=r.hospital||'';
+    document.getElementById('vac-memo').value=r.memo||'';
+  } else if(key==='medicine'){
+    document.getElementById('med-date').value=r.date||'';
+    document.getElementById('med-name').value=r.name||'';
+    document.getElementById('med-type').value=r.type||'';
+    document.getElementById('med-dose').value=r.dose||'';
+    document.getElementById('med-next').value=r.next||'';
+    document.getElementById('med-memo').value=r.memo||'';
+  } else if(key==='weight'){
+    document.getElementById('wt-date').value=r.date||'';
+    document.getElementById('wt-value').value=r.value||'';
+    document.getElementById('wt-memo').value=r.memo||'';
+  } else if(key==='walk'){
+    document.getElementById('walk-date').value=r.date||'';
+    document.getElementById('walk-time').value=r.time||'';
+    document.getElementById('walk-dist').value=r.dist||'';
+    document.getElementById('walk-course').value=r.course||'';
+    document.getElementById('walk-weather').value=r.weather||'';
+    document.getElementById('walk-memo').value=r.memo||'';
+  } else if(key==='trim'){
+    document.getElementById('trim-date').value=r.date||'';
+    document.getElementById('trim-salon').value=r.salon||'';
+    document.getElementById('trim-cost').value=r.cost||'';
+    document.getElementById('trim-next').value=r.next||'';
+    document.getElementById('trim-memo').value=r.memo||'';
+    const saved=(r.menu||'').split('、').filter(Boolean);
+    document.querySelectorAll('#trim-menu-checks input').forEach(c=>{c.checked=saved.includes(c.value);});
+  } else if(key==='filter'){
+    document.getElementById('filter-date').value=r.date||'';
+    document.getElementById('filter-machine').value=r.machine||'';
+    document.getElementById('filter-type').value=r.filterType||'';
+    document.getElementById('filter-next').value=r.next||'';
+    document.getElementById('filter-memo').value=r.memo||'';
+  } else if(key==='other'){
+    document.getElementById('other-date').value=r.date||'';
+    document.getElementById('other-type').value=r.type||'';
+    document.getElementById('other-memo').value=r.memo||'';
+  } else if(key==='trip'){
+    document.getElementById('trip-title').value=r.title||'';
+    document.getElementById('trip-start').value=r.start||'';
+    document.getElementById('trip-end').value=r.end||'';
+    document.getElementById('trip-dest').value=r.dest||'';
+    document.getElementById('trip-hotel').value=r.hotel||'';
+    document.getElementById('trip-hotel-rating').value=r.hotelRating||'';
+    document.getElementById('trip-memo').value=r.memo||'';
   }
 }
 
@@ -1191,7 +1242,7 @@ function addRecord(type){
       }
       currentEditId=null;
       document.getElementById('formSaveBtn').textContent='💾 記録を保存';
-      renderRecords('walk');updateHomeStats();renderTimeline();renderCalendar();
+      renderRecords('walk');updateHomeStats();renderWeightLine();renderWalkSummary();renderMemoryCard();renderTimeline();renderCalendar();
       closeAddSheet();showToast('✅ 散歩記録を更新しました');return;
     }
     clearForm(['walk-time','walk-dist','walk-course','walk-memo']);
@@ -1235,6 +1286,20 @@ function addRecord(type){
     key='trip';
     clearForm(['trip-title','trip-start','trip-end','trip-dest','trip-hotel','trip-memo']);
     document.getElementById('trip-hotel-rating').value='';
+  }
+
+  if(currentEditId){
+    record.id=currentEditId;
+    const existing=DB.get(key).filter(r=>r.id!==currentEditId);
+    DB.set(key,[record,...existing]);
+    if(getWebAppUrl()){
+      syncToSheets(key,{id:currentEditId},'delete');
+      syncToSheets(key,record,'add');
+    }
+    currentEditId=null;
+    document.getElementById('formSaveBtn').textContent='💾 記録を保存';
+    renderRecords(key);updateHomeStats();renderWeightLine();renderWalkSummary();renderMemoryCard();renderTimeline();renderCalendar();
+    closeAddSheet();showToast('✅ 記録を更新しました');return;
   }
 
   const records=DB.get(key);
@@ -1381,7 +1446,10 @@ function renderTimeline() {
                 <div class="travel-card-title">${title}</div>
                 <div class="travel-card-dates">${fmtDate(r.start)}${r.end?' 〜 '+fmtDate(r.end):''}</div>
               </div>
-              <button class="tl-del" style="color:rgba(255,255,255,0.7)" onclick="deleteRecord('trip',${r.id})">✕</button>
+              <div style="display:flex;gap:4px">
+                <button class="tl-del" style="color:rgba(255,255,255,0.8)" onclick="editRecord('trip',${r.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+                <button class="tl-del" style="color:rgba(255,255,255,0.7)" onclick="deleteRecord('trip',${r.id})">✕</button>
+              </div>
             </div>
           </div>
           ${(r.dest||r.hotel||r.memo)?`<div class="travel-card-body">
@@ -1409,6 +1477,7 @@ function renderTimeline() {
           </div>
           <div style="display:flex;align-items:flex-start;gap:4px;flex-shrink:0;margin-left:6px">
             <div class="tl-date">${dateStr}</div>
+            <button class="tl-del" style="color:#aaa" onclick="editRecord('${type}',${r.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
             <button class="tl-del" onclick="deleteRecord('${type}',${r.id})">✕</button>
           </div>
         </div>
