@@ -1488,10 +1488,12 @@ function updateHomeStats(){
     ...DB.get('other').map(r=>({...r,_cat:'daily',_type:'other',_text:r.type||'その他ケア'})),
     ...DB.get('trip').map(r=>({...r,_cat:'travel',_type:'trip',_text:r.title||r.dest||'旅行'})),
   ].sort((a,b)=>{
-    // 登録日時の新しい順（IDはDate.now()で採番）。IDが同値なら記録日降順でタイブレーク
-    const idDiff=(Number(b.id)||0)-(Number(a.id)||0);
-    if(idDiff!==0)return idDiff;
-    return normalizeDate(b.date).localeCompare(normalizeDate(a.date));
+    // 記録日の降順。同日なら登録日時（ID）の新しい順
+    const dateA=normalizeDate(a.date||a.start||'');
+    const dateB=normalizeDate(b.date||b.start||'');
+    const dateDiff=dateB.localeCompare(dateA);
+    if(dateDiff!==0)return dateDiff;
+    return(Number(b.id)||0)-(Number(a.id)||0);
   }).slice(0,5);
 
   const colorMap={health:'var(--health)',walk:'var(--daily)',daily:'var(--daily)',travel:'var(--travel)',other:'var(--violet)'};
