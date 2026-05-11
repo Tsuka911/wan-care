@@ -1719,10 +1719,21 @@ function renderCalendar(){
   const recordDays={};
   Object.entries(CAT_CFG).forEach(([type,cfg])=>{
     DB.get(type).forEach(r=>{
-      const ds=normalizeDate(r.date||r.start||r.createdAt);
-      if(!ds)return;
-      if(!recordDays[ds])recordDays[ds]=new Set();
-      recordDays[ds].add(cfg.color);
+      if(type==='trip'&&r.start&&r.end){
+        // 旅行は start〜end の全日に色をつける
+        const cur=new Date(r.start);const last=new Date(r.end);
+        while(cur<=last){
+          const ds=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
+          if(!recordDays[ds])recordDays[ds]=new Set();
+          recordDays[ds].add(cfg.color);
+          cur.setDate(cur.getDate()+1);
+        }
+      } else {
+        const ds=normalizeDate(r.date||r.start||r.createdAt);
+        if(!ds)return;
+        if(!recordDays[ds])recordDays[ds]=new Set();
+        recordDays[ds].add(cfg.color);
+      }
     });
   });
 
