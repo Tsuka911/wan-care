@@ -37,14 +37,37 @@ Google Sheetsをデータベースとして使い、Google Apps Script（GAS）�
   - チェックマークアイコン → `markDone()` で next をクリア（実施済み扱い）
 
 ## 編集機能の対応状況
-- **walk（散歩）のみ** フル編集対応（`editRecord()` + Google Sheets同期）
+- **全種別** フル編集対応（`editRecord(key, id)` + Google Sheets同期）
 - **nextフィールドの日付変更** は全種別で対応（`editNextDate()` / `confirmNextDate()`）
-- その他の種別はレコードの追加・削除のみ（編集不可）
+- 編集フロー：`editRecord()` でフォームに値をセット → `addRecord()` 内の `if(currentEditId)` ブロックで保存
+- walk編集のみ特殊（GASのGETリクエスト方式）、それ以外は `syncToSheets` の delete→add で同期
 
 ## Google Sheets同期
 - `syncToSheets(key, data, 'add'|'delete')` でPOST
 - walk だけ GET/POST の特殊処理あり（`action=add_walk` / `action=delete_walk`）
 - `mode: 'no-cors'` を使用しているためレスポンスは確認できない
+- 編集・済ボタン・日付変更はすべて delete→add のセットで同期
+
+## ホーム画面のビジュアルカード（追加済み）
+- **体重折れ線グラフ**（`renderWeightLine()`）: 体重2件以上で表示。`id="weightLineCard"`
+- **散歩サマリー**（`renderWalkSummary()`）: 連続日数・通算回数・通算距離。`id="walkSummaryCard"`
+- **思い出振り返り**（`renderMemoryCard()`）: 1年前±3日の記録をピックアップ。`id="memoryCard"`
+- これらは `renderPage('home')` 内と、記録追加・削除後に呼び出す必要がある
+
+## 記録タイムライン（記録タブ）
+- `renderTimeline()` で全種別を統一表示。`getAllRecords()` で全種別をまとめて日付降順ソート
+- **旅行（trip）のみ** `.travel-card` スタイル（青グラデーションヘッダー）で差し込み表示
+- 全種別に編集（鉛筆SVG）・削除（✕）ボタンあり
+
+## カレンダー
+- 旅行は `start〜end` の全日程にドットを表示（`renderCalendar` と `renderCalDayRecords` の両方で範囲判定）
+- 詳細タップ時も旅行は `.travel-card` スタイルで表示
+
+## アイコンとカラーの方針
+- すべてのアイコンはSVG（絵文字は使わない）
+- `cs(type, size)` 関数で種別アイコンSVGを生成
+- カテゴリカラー：health=#e07b54（オレンジ）/ daily=#6ab89a（緑）/ travel=#5b9bd5（青）/ other=#9b8ed5（紫）
+- `other`（その他ケア）は `cat:'daily'` だがカラーは紫。`colorMap` や `bgMap` では `_type` で個別指定が必要
 
 ## 注意事項
 - **このフォルダ（wan-care-deploy）が作業・デプロイ用**
