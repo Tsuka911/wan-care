@@ -2035,10 +2035,15 @@ async function confirmNextDate(key, id, newDate){
   const records = DB.get(key);
   const idx = records.findIndex(r => String(r.id) === String(id));
   if(idx < 0) return;
-  records[idx].next = normalizeDate(newDate) || newDate;
+  const normalizedDate = normalizeDate(newDate) || newDate;
+  records[idx].next = normalizedDate;
   DB.set(key, records);
-  await syncToSheets(key, {id: records[idx].id}, 'delete');
-  await syncToSheets(key, records[idx], 'add');
+  const url = getWebAppUrl();
+  if(url){
+    try{
+      await fetch(`${url}?action=update_next&type=${encodeURIComponent(key)}&id=${encodeURIComponent(id)}&next=${encodeURIComponent(normalizedDate)}&t=${Date.now()}`);
+    }catch(e){ console.warn('next更新エラー:',e); }
+  }
   renderUpcoming();
   updateHomeStats();
   showToast('予定日を更新しました');

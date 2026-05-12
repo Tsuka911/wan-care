@@ -186,6 +186,31 @@ function doGet(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
 
+    // 次回予定日の更新（action=update_next）
+    if (e.parameter.action === 'update_next') {
+      const type = e.parameter.type;
+      const id   = e.parameter.id;
+      const next = e.parameter.next || '';
+      if (!SHEET_MAP[type]) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ status: 'error', message: 'unknown type: ' + type }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      const records = getRecords(type);
+      const record = records.find(r => String(r.id) === String(id));
+      if (!record) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ status: 'error', message: 'record not found' }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      record.next = next;
+      deleteRecord(type, id);
+      addRecord(type, record);
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: 'ok', action: 'update_next' }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
     const result = {};
     Object.keys(SHEET_MAP).forEach(type => {
       result[type] = getRecords(type);
