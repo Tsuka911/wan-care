@@ -52,9 +52,23 @@ Google Sheetsをデータベースとして使い、Google Apps Script（GAS）�
 
 ## ホーム画面のビジュアルカード（追加済み）
 - **体重折れ線グラフ**（`renderWeightLine()`）: 体重2件以上で表示。`id="weightLineCard"`
-- **散歩サマリー**（`renderWalkSummary()`）: 連続日数・通算回数・通算距離。`id="walkSummaryCard"`
+- **散歩サマリー**（`renderWalkSummary()`）: 東海道の旅セクション＋3マスグリッド（通算回数・通算時間・通算距離）。`id="walkSummaryCard"`
 - **思い出振り返り**（`renderMemoryCard()`）: 1年前±3日の記録をピックアップ。`id="memoryCard"`
 - これらは `renderPage('home')` 内と、記録追加・削除後に呼び出す必要がある
+
+## 東海道五十三次マイルストーン（散歩サマリー内）
+- `TOKAIDO_MILESTONES` 定数（`renderWalkSummary` 直前に定義）：日本橋（0km）〜三条大橋（540km）の全55エントリ
+- 各エントリは `{km, name, pref, msg, hometown?}` を持つ
+- 通算距離をもとに現在の宿場・次の宿場・進捗率を計算して `id="tokaidoSection"` に描画
+- 進捗バー（藍色 `#2a5f8f`）＋旗マーカー（棒：藍色 / 旗：朱色 `#c0392b`）で現在地表示
+- 宿場到達時は朱色バッジ＋都府県タグ（`.tokaido-pref`）＋一言コメントを表示
+- **池鯉鮒宿**（愛知県・km:383）のみ `hometown:true` を設定し、金色バッジ（`.tokaido-badge-hometown`）で特別演出
+- 和紙風ベージュ背景（`#f5ede0`）で浮世絵ムードを演出
+
+## ホーム画面上部の統計ピル
+- 3つのピル：最新体重 / **連続日数**（`id="statWalks"`） / 前回通院
+- 連続日数は `updateHomeStats()` 内で計算（今日に記録がなければ昨日から遡るロジック）
+- ラベルは「日連続」
 
 ## 記録タイムライン（記録タブ）
 - `renderTimeline()` で全種別を統一表示。`getAllRecords()` で全種別をまとめて日付降順ソート
