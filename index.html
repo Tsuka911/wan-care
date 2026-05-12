@@ -2015,10 +2015,11 @@ function editNextDate(key, id, currentDate){
   const card = document.getElementById('remind-'+key+'-'+id);
   if(!card) return;
   if(card.querySelector('.edit-next-form')) return;
+  const normalizedDate = normalizeDate(currentDate);
   const form = document.createElement('div');
   form.className = 'edit-next-form';
   form.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.1)';
-  form.innerHTML = `<input type="date" value="${currentDate}" style="flex:1;padding:6px 8px;border:1.5px solid #ccc;border-radius:8px;font-size:13px">
+  form.innerHTML = `<input type="date" value="${normalizedDate}" style="flex:1;padding:6px 8px;border:1.5px solid #ccc;border-radius:8px;font-size:13px">
     <button onclick="confirmNextDate('${key}',${id},this.parentNode.querySelector('input').value)" style="background:#5b9bd5;color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer">確定</button>
     <button onclick="this.parentNode.remove()" style="background:#eee;color:#666;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer">✕</button>`;
   card.appendChild(form);
@@ -2029,7 +2030,7 @@ function confirmNextDate(key, id, newDate){
   const records = DB.get(key);
   const idx = records.findIndex(r => String(r.id) === String(id));
   if(idx < 0) return;
-  records[idx].next = newDate;
+  records[idx].next = normalizeDate(newDate) || newDate;
   DB.set(key, records);
   syncToSheets(key, {id: records[idx].id}, 'delete');
   syncToSheets(key, records[idx], 'add');
