@@ -463,33 +463,19 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
             <div class="cat-label">通院</div>
           </button>
 
-          <!-- ワクチン -->
-          <button class="cat-btn" onclick="selectCat('vaccine')">
+          <!-- お薬 -->
+          <button class="cat-btn" onclick="selectCat('meds')">
             <div class="cat-icon" style="background:#fff0eb;">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <rect x="8" y="13" width="16" height="7" rx="3.5" fill="#E07B54"/>
-                <rect x="22" y="14.5" width="5" height="4" rx="1" fill="#C86A3C"/>
-                <rect x="3" y="15.5" width="7" height="2" rx="1" fill="#B85C35"/>
-                <rect x="9" y="14.5" width="8" height="4" rx="2" fill="white" opacity="0.4"/>
-                <line x1="14" y1="13" x2="14" y2="20" stroke="white" stroke-width="1" opacity="0.5"/>
-                <line x1="17" y1="13" x2="17" y2="20" stroke="white" stroke-width="1" opacity="0.5"/>
+                <rect x="4" y="11" width="24" height="10" rx="5" fill="#E07B54"/>
+                <path d="M16 11v10" stroke="white" stroke-width="1.8"/>
+                <rect x="4" y="11" width="12" height="10" rx="5" fill="#E07B54" opacity="0.55"/>
+                <rect x="7" y="14.5" width="5" height="3" rx="1.5" fill="white" opacity="0.5"/>
+                <circle cx="24" cy="7" r="2.5" fill="#F0A080"/>
+                <circle cx="8" cy="26" r="2.5" fill="#F0A080"/>
               </svg>
             </div>
-            <div class="cat-label">ワクチン</div>
-          </button>
-
-          <!-- 投薬 -->
-          <button class="cat-btn" onclick="selectCat('medicine')">
-            <div class="cat-icon" style="background:#fff0eb;">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <rect x="6" y="12" width="20" height="9" rx="4.5" fill="#E07B54"/>
-                <path d="M16 12v9" stroke="white" stroke-width="1.5"/>
-                <rect x="6" y="12" width="10" height="9" rx="4.5" fill="#E07B54" opacity="0.6"/>
-                <rect x="20" y="6" width="7" height="4" rx="2" fill="#F0A080"/>
-                <rect x="5" y="24" width="7" height="4" rx="2" fill="#F0A080"/>
-              </svg>
-            </div>
-            <div class="cat-label">投薬</div>
+            <div class="cat-label">お薬</div>
           </button>
 
           <!-- 体重 -->
@@ -677,6 +663,44 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
             <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="med-memo" placeholder="服用状況など"></textarea></div>
           </div>
           <div id="medicine-records"></div>
+        </div>
+
+        <!-- お薬（ワクチン・投薬の統合フォーム） -->
+        <div id="form-meds" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">種類 <span style="color:#e07b54">*</span></label>
+              <select class="form-select" id="meds-kind" onchange="onMedsKindChange()">
+                <option value="">選択してください</option>
+                <option value="ワクチン">ワクチン</option>
+                <option value="投薬">投薬・お薬</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="meds-date" onchange="onMedsDateChange()"></div>
+            <!-- ワクチン時のみ表示 -->
+            <div id="meds-vac-fields" style="display:none">
+              <div class="form-group"><label class="form-label">ワクチン種類</label>
+                <select class="form-select" id="meds-vac-type">
+                  <option value="">選択してください</option>
+                  <option>混合ワクチン（5種）</option><option>混合ワクチン（8種）</option><option>混合ワクチン（10種）</option><option>狂犬病ワクチン</option><option>その他</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">病院名</label><input type="text" class="form-input" id="meds-hospital" placeholder="○○動物病院" onfocus="renderChips('meds-hospital','savedHospitals','hospital')" oninput="renderChips('meds-hospital','savedHospitals','hospital')"><div class="suggestion-chips" id="chips-meds-hospital"></div></div>
+            </div>
+            <!-- 投薬時のみ表示 -->
+            <div id="meds-med-fields" style="display:none">
+              <div class="form-group"><label class="form-label">薬の名前</label><input type="text" class="form-input" id="meds-name" placeholder="フィラリア予防薬など"></div>
+              <div class="form-group"><label class="form-label">種類</label>
+                <select class="form-select" id="meds-med-type">
+                  <option value="">選択してください</option>
+                  <option>フィラリア予防薬</option><option>ノミ・ダニ予防薬</option><option>消炎剤</option><option>抗生物質</option><option>ビタミン剤</option><option>その他</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">投与量</label><input type="text" class="form-input" id="meds-dose" placeholder="1錠"></div>
+            </div>
+            <div class="form-group"><label class="form-label">次回予定日</label><input type="date" class="form-input" id="meds-next"></div>
+            <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="meds-memo" placeholder="気になる点など"></textarea></div>
+          </div>
+          <div id="meds-records"></div>
         </div>
 
         <!-- 体重 -->
@@ -967,6 +991,7 @@ const CAT_CFG = {
   other:   {label:'その他ケア',color:'#9b8ed5',cat:'daily'},
   trip:    {label:'旅行',      color:'#5b9bd5',cat:'travel'},
   symptom: {label:'症状',      color:'#d95f75',cat:'health'},
+  meds:    {label:'お薬',      color:'#e07b54',cat:'health'},
 };
 
 // SVGアイコン定義（各所で共通利用）
@@ -981,11 +1006,12 @@ const CAT_SVG={
   other:   s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 25 C16 25 6 18 6 12 a5 5 0 0 1 10-1.5 a5 5 0 0 1 10 1.5 C26 18 16 25 16 25Z" fill="#9B8ED5"/><path d="M10 11 Q12 9 14 11" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/><circle cx="24" cy="8" r="1.5" fill="#9B8ED5"/><line x1="24" y1="5.5" x2="24" y2="6.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="24" y1="9.5" x2="24" y2="10.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="21.5" y1="8" x2="22.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="25.5" y1="8" x2="26.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/></svg>`,
   trip:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/><circle cx="13.5" cy="10" r="1" fill="#5B9BD5"/><circle cx="16" cy="9.5" r="1" fill="#5B9BD5"/><circle cx="18.5" cy="10" r="1" fill="#5B9BD5"/></svg>`,
   symptom: s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="13" y="3" width="6" height="14" rx="3" fill="#D95F75"/><rect x="14.5" y="4.5" width="3" height="4" rx="1.5" fill="white" opacity="0.45"/><rect x="9" y="15" width="14" height="7" rx="3" fill="#D95F75"/><line x1="13" y1="18.5" x2="19" y2="18.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="16" x2="16" y2="21" stroke="white" stroke-width="1.5" stroke-linecap="round"/><rect x="14" y="17" width="4" height="6" rx="1" fill="#D95F75" opacity="0.01"/><path d="M16 22 l-4 6 h8 z" fill="#D95F75"/></svg>`,
+  meds:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="4" y="11" width="24" height="10" rx="5" fill="#E07B54"/><path d="M16 11v10" stroke="white" stroke-width="1.8"/><rect x="4" y="11" width="12" height="10" rx="5" fill="#E07B54" opacity="0.55"/><rect x="7" y="14.5" width="5" height="3" rx="1.5" fill="white" opacity="0.5"/><circle cx="24" cy="7" r="2.5" fill="#F0A080"/><circle cx="8" cy="26" r="2.5" fill="#F0A080"/></svg>`,
 };
 // 短縮ヘルパー: cs('hospital',20) → SVG文字列
 function cs(type,size=16){return CAT_SVG[type]?CAT_SVG[type](size):'';}
 // アイコンラップ用: 背景色付きの丸いSVGアイコンdiv
-function csWrap(type,size=20,bg=''){const b=bg||{hospital:'rgba(224,123,84,0.15)',vaccine:'rgba(224,123,84,0.15)',medicine:'rgba(224,123,84,0.15)',weight:'rgba(224,123,84,0.15)',walk:'rgba(106,184,154,0.15)',trim:'rgba(106,184,154,0.15)',filter:'rgba(91,155,213,0.15)',other:'rgba(155,142,213,0.15)',trip:'rgba(91,155,213,0.15)'}[type]||'rgba(224,123,84,0.12)';return`<div style="width:36px;height:36px;border-radius:10px;background:${b};display:flex;align-items:center;justify-content:center;flex-shrink:0">${cs(type,size)}</div>`;}
+function csWrap(type,size=20,bg=''){const b=bg||{hospital:'rgba(224,123,84,0.15)',vaccine:'rgba(224,123,84,0.15)',medicine:'rgba(224,123,84,0.15)',meds:'rgba(224,123,84,0.15)',weight:'rgba(224,123,84,0.15)',walk:'rgba(106,184,154,0.15)',trim:'rgba(106,184,154,0.15)',filter:'rgba(91,155,213,0.15)',other:'rgba(155,142,213,0.15)',trip:'rgba(91,155,213,0.15)',symptom:'rgba(217,95,117,0.15)'}[type]||'rgba(224,123,84,0.12)';return`<div style="width:36px;height:36px;border-radius:10px;background:${b};display:flex;align-items:center;justify-content:center;flex-shrink:0">${cs(type,size)}</div>`;}
 
 // ========== ページ切替 ==========
 function showPage(name, btn) {
@@ -1115,6 +1141,20 @@ function editRecord(key, id) {
     document.getElementById('symp-status').value=r.status||'';
     document.getElementById('symp-next').value=r.next||'';
     document.getElementById('symp-memo').value=r.memo||'';
+  } else if(key==='meds'){
+    document.getElementById('meds-kind').value=r.kind||'';
+    document.getElementById('meds-date').value=r.date||'';
+    document.getElementById('meds-next').value=r.next||'';
+    document.getElementById('meds-memo').value=r.memo||'';
+    onMedsKindChange();
+    if(r.kind==='ワクチン'){
+      document.getElementById('meds-vac-type').value=r.vacType||'';
+      document.getElementById('meds-hospital').value=r.hospital||'';
+    } else {
+      document.getElementById('meds-name').value=r.name||'';
+      document.getElementById('meds-med-type').value=r.medType||'';
+      document.getElementById('meds-dose').value=r.dose||'';
+    }
   }
 }
 
@@ -1192,10 +1232,21 @@ function showAddSuccess(catId) {
 function addMonths(date,months){const d=new Date(date);d.setMonth(d.getMonth()+months);return localDateStr(d);}
 function addYears(date,years){const d=new Date(date);d.setFullYear(d.getFullYear()+years);return localDateStr(d);}
 function autoSetNextDate(srcId,tgtId,unit,n){const src=document.getElementById(srcId);const tgt=document.getElementById(tgtId);if(!src||!tgt||!src.value)return;tgt.value=unit==='month'?addMonths(src.value,n):addYears(src.value,n);}
+function onMedsKindChange(){
+  const kind=document.getElementById('meds-kind').value;
+  document.getElementById('meds-vac-fields').style.display=kind==='ワクチン'?'':'none';
+  document.getElementById('meds-med-fields').style.display=kind==='投薬'?'':'none';
+  if(kind) onMedsDateChange();
+}
+function onMedsDateChange(){
+  const kind=document.getElementById('meds-kind').value;
+  if(kind==='ワクチン') autoSetNextDate('meds-date','meds-next','year',1);
+  else if(kind==='投薬') autoSetNextDate('meds-date','meds-next','month',1);
+}
 function localDateStr(d){const t=d||new Date();return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
 function setTodayDates(){
   const today=localDateStr();
-  const nextIds=new Set(['vac-next','med-next','trim-next','filter-next','symp-next']);
+  const nextIds=new Set(['vac-next','med-next','trim-next','filter-next','symp-next','meds-next']);
   document.querySelectorAll('input[type="date"]').forEach(el=>{if(!el.value&&!nextIds.has(el.id))el.value=today;});
   [{src:'vac-date',tgt:'vac-next',unit:'year',n:1},{src:'med-date',tgt:'med-next',unit:'month',n:1},{src:'trim-date',tgt:'trim-next',unit:'month',n:1},{src:'filter-date',tgt:'filter-next',unit:'month',n:1}]
     .forEach(({src,tgt,unit,n})=>{const se=document.getElementById(src);const te=document.getElementById(tgt);if(se&&te&&se.value&&!te.value)te.value=unit==='month'?addMonths(se.value,n):addYears(se.value,n);});
@@ -1351,6 +1402,29 @@ function addRecord(type){
     clearForm(['symp-date','symp-name','symp-body','symp-detail','symp-next','symp-memo']);
     document.getElementById('symp-severity').value='';
     document.getElementById('symp-status').value='';
+  } else if(type==='meds'){
+    record.kind=document.getElementById('meds-kind').value;
+    record.date=document.getElementById('meds-date').value||d;
+    record.next=document.getElementById('meds-next').value;
+    record.memo=document.getElementById('meds-memo').value;
+    if(!record.kind){alert('種類（ワクチン／投薬）を選択してください');return;}
+    if(record.kind==='ワクチン'){
+      record.vacType=document.getElementById('meds-vac-type').value;
+      record.hospital=document.getElementById('meds-hospital').value;
+      saveSuggestion('savedHospitals',record.hospital);
+    } else {
+      record.name=document.getElementById('meds-name').value;
+      record.medType=document.getElementById('meds-med-type').value;
+      record.dose=document.getElementById('meds-dose').value;
+      if(!record.name){alert('薬の名前を入力してください');return;}
+    }
+    key='meds';
+    clearForm(['meds-date','meds-next','meds-memo','meds-hospital','meds-name','meds-dose']);
+    document.getElementById('meds-kind').value='';
+    document.getElementById('meds-vac-type').value='';
+    document.getElementById('meds-med-type').value='';
+    document.getElementById('meds-vac-fields').style.display='none';
+    document.getElementById('meds-med-fields').style.display='none';
   }
 
   if(currentEditId){
@@ -1442,6 +1516,7 @@ function getRecordLabel(type, r) {
   if(type==='other') return r.type||'ケア';
   if(type==='trip') return r.title||r.dest||'旅行';
   if(type==='symptom') return r.name||'症状';
+  if(type==='meds') return r.kind==='ワクチン'?(r.vacType||'ワクチン'):(r.name||r.medType||'投薬');
   return '記録';
 }
 
@@ -1463,6 +1538,10 @@ function getRecordSub(type, r) {
     return parts.join(' / ');
   }
   if(type==='symptom') return [r.severity, r.body, r.memo].filter(Boolean).join(' / ');
+  if(type==='meds'){
+    if(r.kind==='ワクチン') return [r.hospital, r.memo].filter(Boolean).join(' / ');
+    return [r.medType, r.dose?r.dose+'投与':'', r.memo].filter(Boolean).join(' / ');
+  }
   return '';
 }
 
@@ -1588,8 +1667,16 @@ function renderRecordItem(key,r){
     if(r.status) tags+=`<span class="record-tag" style="background:${statusColor.bg};color:${statusColor.color}">${r.status}</span>`;
     if(r.next) tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">受診予定: ${fmt(r.next)}</span>`;
   }
+  else if(key==='meds'){
+    const icoType=r.kind==='ワクチン'?'vaccine':'medicine';
+    title=r.kind==='ワクチン'?(r.vacType||'ワクチン'):(r.name||r.medType||'投薬');
+    body=r.kind==='ワクチン'?[r.hospital,r.memo].filter(Boolean).join(' / '):[r.medType,r.dose?r.dose+'投与':'',r.memo].filter(Boolean).join(' / ');
+    tags=`<span class="record-tag" style="background:#fff0eb;color:var(--health)">${ico(icoType)}${fmt(r.date)}</span>`;
+    if(r.kind) tags=`<span class="record-tag" style="background:#fff0eb;color:var(--health)">${ico('meds')}${r.kind}</span> `+tags;
+    if(r.next) tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
+  }
   const editSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
-  const editBtn=(key==='walk'||key==='symptom')?`<button class="delete-btn" style="margin-right:4px;color:${key==='symptom'?'#d95f75':'var(--daily)'}" onclick="editRecord('${key}',${r.id})">${editSvg}</button>`:'';
+  const editBtn=(key==='walk'||key==='symptom'||key==='meds')?`<button class="delete-btn" style="margin-right:4px;color:${key==='symptom'?'#d95f75':'var(--health)'}" onclick="editRecord('${key}',${r.id})">${editSvg}</button>`:'';
   return`<div class="record-item"><div class="record-item-header"><div><div class="record-item-title">${title}</div><div>${tags}</div>${body?`<div class="record-item-body">${body}</div>`:''}</div><div style="display:flex;align-items:center">${editBtn}<button class="delete-btn" onclick="deleteRecord('${key}',${r.id})">✕</button></div></div></div>`;
 }
 
@@ -1633,6 +1720,7 @@ function updateHomeStats(){
     ...DB.get('other').map(r=>({...r,_cat:'daily',_type:'other',_text:r.type||'その他ケア'})),
     ...DB.get('trip').map(r=>({...r,_cat:'travel',_type:'trip',_text:r.title||r.dest||'旅行'})),
     ...DB.get('symptom').map(r=>({...r,_cat:'health',_type:'symptom',_text:`症状: ${r.name||'症状'}`})),
+    ...DB.get('meds').map(r=>({...r,_cat:'health',_type:'meds',_text:r.kind==='ワクチン'?`ワクチン: ${r.vacType||'ワクチン'}`:`投薬: ${r.name||'投薬'}`})),
   ].sort((a,b)=>{
     // 記録日の降順。同日なら登録日時（ID）の新しい順
     const dateA=normalizeDate(a.date||a.start||'');
@@ -1758,6 +1846,7 @@ const REMIND_CHECKS=[
   {key:'trim',    nextField:'next',iconType:'trim',    labelFn:(r)=>(r.salon||'トリミング')+' 予定'},
   {key:'filter',  nextField:'next',iconType:'filter',  labelFn:()=>'給水フィルター交換予定'},
   {key:'symptom', nextField:'next',iconType:'symptom', labelFn:(r)=>(r.name||'症状')+'の受診予定'},
+  {key:'meds',    nextField:'next',iconType:'meds',    labelFn:(r)=>r.kind==='ワクチン'?(r.vacType||'ワクチン')+' 接種予定':(r.name||'投薬')+' 次回予定'},
 ];
 
 // 通知本文用の絵文字マップ（Notification API は SVG を描画できないため絵文字で代用）

@@ -80,6 +80,12 @@ const SHEET_MAP = {
     headers: ['ID', '日付', '症状名', '程度', '部位・様子', '詳しい経過', '現在の状態', '受診予定日', 'メモ'],
     toRow: (r) => [r.id, r.date, r.name, r.severity, r.body, r.detail, r.status, r.next, r.memo],
     fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), name: row[2], severity: row[3], body: row[4], detail: row[5], status: row[6], next: toDateStr(row[7]), memo: row[8] })
+  },
+  meds: {
+    name: 'お薬記録',
+    headers: ['ID', '日付', '種類', 'ワクチン種類', '病院名', '薬の名前', '薬の分類', '投与量', '次回予定日', 'メモ'],
+    toRow: (r) => [r.id, r.date, r.kind, r.vacType, r.hospital, r.name, r.medType, r.dose, r.next, r.memo],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), kind: row[2], vacType: row[3], hospital: row[4], name: row[5], medType: row[6], dose: row[7], next: toDateStr(row[8]), memo: row[9] })
   }
 };
 
