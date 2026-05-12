@@ -2002,10 +2002,14 @@ function markDone(key,id){
   const records=DB.get(key);
   const idx=records.findIndex(r=>r.id===id);
   if(idx<0)return;
-  records[idx].next='';
+  const rec=records[idx];
+  const label=(CAT_CFG[key]&&CAT_CFG[key].label)||'予定';
+  const dateStr=rec.next?`（${rec.next}）`:'';
+  if(!confirm(`「${label}」の予定${dateStr}を実施済みにしますか？`))return;
+  rec.next='';
   DB.set(key,records);
-  syncToSheets(key,{id:records[idx].id},'delete');
-  syncToSheets(key,records[idx],'add');
+  syncToSheets(key,{id:rec.id},'delete');
+  syncToSheets(key,rec,'add');
   renderUpcoming();
   updateHomeStats();
   showToast('✅ 実施済みにしました');
@@ -2014,16 +2018,19 @@ function markDone(key,id){
 function editNextDate(key, id, currentDate){
   const card = document.getElementById('remind-'+key+'-'+id);
   if(!card) return;
-  if(card.querySelector('.edit-next-form')) return;
+  const existing = card.nextElementSibling;
+  if(existing && existing.classList.contains('edit-next-form')){
+    existing.remove();
+    return;
+  }
   const normalizedDate = normalizeDate(currentDate);
   const form = document.createElement('div');
   form.className = 'edit-next-form';
-  form.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 12px 8px;margin-top:-2px;box-sizing:border-box;overflow:hidden';
+  form.style.cssText = 'padding:6px 12px 8px;margin-top:-2px;box-sizing:border-box;overflow:hidden';
   form.innerHTML = `
     <input type="date" value="${normalizedDate}"
       onchange="confirmNextDate('${key}',${id},this.value)"
-      style="flex:1;min-width:0;padding:6px 8px;border:1.5px solid #ccc;border-radius:8px;font-size:16px;box-sizing:border-box">
-    <button onclick="this.closest('.edit-next-form').remove()" style="flex-shrink:0;background:#eee;color:#666;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer">✕</button>`;
+      style="width:100%;padding:6px 8px;border:1.5px solid #ccc;border-radius:8px;font-size:16px;box-sizing:border-box">`;
   card.insertAdjacentElement('afterend', form);
 }
 
