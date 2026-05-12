@@ -280,6 +280,20 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
 .walk-sum-cell{text-align:center;background:#f3faf7;border-radius:10px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;}
 .walk-sum-val{font-size:18px;font-weight:900;color:var(--daily);}
 .walk-sum-unit{font-size:10px;color:var(--text-light);}
+.tokaido-section{background:#f5ede0;border-radius:10px;padding:12px;margin-bottom:10px;}
+.tokaido-header{font-size:11px;font-weight:700;color:#7a5c3a;margin-bottom:8px;letter-spacing:0.05em;}
+.tokaido-bar-wrap{position:relative;height:28px;margin-bottom:4px;}
+.tokaido-bar-bg{position:absolute;top:50%;left:0;right:0;height:5px;background:#d9cfc4;border-radius:3px;transform:translateY(-50%);}
+.tokaido-bar-fill{position:absolute;top:50%;left:0;height:5px;background:#2a5f8f;border-radius:3px;transform:translateY(-50%);transition:width 0.4s ease;}
+.tokaido-dog-pos{position:absolute;top:50%;transform:translate(-50%,-50%);}
+.tokaido-bar-labels{display:flex;justify-content:space-between;font-size:9px;color:#9a8070;margin-bottom:6px;}
+.tokaido-milestone{display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;}
+.tokaido-badge{background:#c0392b;color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:10px;white-space:nowrap;box-shadow:0 1px 4px rgba(192,57,43,0.35);}
+.tokaido-badge-hometown{background:#c9a84c;color:#fff;font-size:13px;font-weight:700;padding:4px 12px;border-radius:10px;white-space:nowrap;box-shadow:0 2px 6px rgba(201,168,76,0.5);}
+.tokaido-pref{font-size:10px;color:#8a7060;background:#e8ddd0;padding:2px 6px;border-radius:6px;}
+.tokaido-msg{font-size:11px;color:#5a4030;font-style:italic;margin-bottom:4px;}
+.tokaido-next{font-size:10px;color:#8a7060;margin-bottom:2px;}
+.tokaido-count{font-size:10px;color:#9a8070;text-align:right;}
 .memory-card{background:linear-gradient(135deg,#fff8f4,#f4f0fc);border:1.5px solid #e8ddf6;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;}
 .memory-card-label{font-size:10px;font-weight:800;letter-spacing:.06em;color:#9b8ed5;margin-bottom:6px;}
 .memory-card-title{font-size:15px;font-weight:800;color:var(--text);}
@@ -313,7 +327,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <div class="home-stat-pill">
         <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="6.5" cy="25.5" r="1" fill="white" opacity="0.55"/><circle cx="8" cy="26.5" r="1" fill="white" opacity="0.55"/><circle cx="9.5" cy="25.5" r="1" fill="white" opacity="0.55"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg></div>
         <div class="home-stat-value" id="statWalks">--</div>
-        <div class="home-stat-label">今月散歩</div>
+        <div class="home-stat-label">日連続</div>
       </div>
       <div class="home-stat-pill">
         <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/><rect x="13" y="3" width="6" height="8" rx="3" fill="#E07B54"/><rect x="14.5" y="4.5" width="3" height="5" rx="1.5" fill="white" opacity="0.5"/><rect x="14" y="13" width="4" height="10" rx="2" fill="white"/><rect x="11" y="16" width="10" height="4" rx="2" fill="white"/></svg></div>
@@ -336,6 +350,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     </div>
     <div id="walkSummaryCard" class="vis-card" style="display:none">
       <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg>これまでの散歩記録</div>
+      <div id="tokaidoSection"></div>
       <div class="walk-summary-grid" id="walkSummaryGrid"></div>
     </div>
     <div class="card" style="background:linear-gradient(160deg,#fffaf7,#fff);border:1.5px solid var(--primary-light);">
@@ -1702,9 +1717,15 @@ function updateHomeStats(){
   const weights=DB.get('weight');
   document.getElementById('statWeight').textContent=weights.length?weights[0].value+'kg':'--';
   const now=new Date();
-  const ym=`${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}`;
-  const walks=DB.get('walk').filter(r=>{const d=fmtDate(r.date);return d&&d.startsWith(ym);});
-  document.getElementById('statWalks').textContent=walks.length+'回';
+  const walkAll=DB.get('walk');
+  const today2=localDateStr();
+  const dateset2=new Set(walkAll.map(r=>(r.date||'').slice(0,10)).filter(Boolean));
+  const toDateKey2=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  let streak2=0;
+  const cur2=new Date(today2);
+  if(!dateset2.has(toDateKey2(cur2))) cur2.setDate(cur2.getDate()-1);
+  while(dateset2.has(toDateKey2(cur2))){streak2++;cur2.setDate(cur2.getDate()-1);}
+  document.getElementById('statWalks').textContent=streak2+'日';
   const hospitals=DB.get('hospital');
   document.getElementById('statHospital').textContent=hospitals.length?fmtDate(hospitals[0].date).slice(5)||'--':'--';
 
@@ -1773,6 +1794,64 @@ function renderWeightLine(){
   svg.innerHTML=`<polyline points="${polyline}" fill="none" stroke="var(--primary-light)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${polyline}" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/>${dots}${labels}${yMin}${yMax}`;
 }
 
+const TOKAIDO_MILESTONES=[
+  {km:0,   name:'日本橋',    pref:'東京都',  msg:'さあ、旅の始まり！'},
+  {km:8,   name:'品川宿',    pref:'東京都',  msg:'東海道最初の宿場。江戸の玄関口。'},
+  {km:22,  name:'川崎宿',    pref:'神奈川県',msg:'多摩川を渡って川崎へ。'},
+  {km:32,  name:'神奈川宿',  pref:'神奈川県',msg:'横浜の地へ到着。'},
+  {km:40,  name:'保土ヶ谷宿',pref:'神奈川県',msg:''},
+  {km:49,  name:'戸塚宿',    pref:'神奈川県',msg:''},
+  {km:62,  name:'藤沢宿',    pref:'神奈川県',msg:'遊行寺の大銀杏が迎える。'},
+  {km:71,  name:'平塚宿',    pref:'神奈川県',msg:''},
+  {km:84,  name:'大磯宿',    pref:'神奈川県',msg:''},
+  {km:92,  name:'小田原宿',  pref:'神奈川県',msg:'箱根の手前で腹ごしらえ。'},
+  {km:108, name:'箱根宿',    pref:'神奈川県',msg:'天下の険を越えた！'},
+  {km:121, name:'三島宿',    pref:'静岡県',  msg:'富士山が姿を現す。'},
+  {km:132, name:'沼津宿',    pref:'静岡県',  msg:''},
+  {km:140, name:'原宿',      pref:'静岡県',  msg:'富士の絶景を眺めながら歩く。'},
+  {km:155, name:'吉原宿',    pref:'静岡県',  msg:''},
+  {km:167, name:'蒲原宿',    pref:'静岡県',  msg:''},
+  {km:175, name:'由比宿',    pref:'静岡県',  msg:'薩埵峠の絶景！海と富士山。'},
+  {km:183, name:'興津宿',    pref:'静岡県',  msg:''},
+  {km:193, name:'江尻宿',    pref:'静岡県',  msg:''},
+  {km:202, name:'府中宿',    pref:'静岡県',  msg:'駿府城下。静岡に到着！'},
+  {km:212, name:'丸子宿',    pref:'静岡県',  msg:'とろろ汁の名物宿場。'},
+  {km:222, name:'岡部宿',    pref:'静岡県',  msg:''},
+  {km:231, name:'藤枝宿',    pref:'静岡県',  msg:''},
+  {km:241, name:'島田宿',    pref:'静岡県',  msg:''},
+  {km:249, name:'金谷宿',    pref:'静岡県',  msg:'大井川を渡る。'},
+  {km:257, name:'日坂宿',    pref:'静岡県',  msg:''},
+  {km:265, name:'掛川宿',    pref:'静岡県',  msg:''},
+  {km:273, name:'袋井宿',    pref:'静岡県',  msg:'東海道のちょうど真ん中！'},
+  {km:282, name:'見付宿',    pref:'静岡県',  msg:''},
+  {km:290, name:'浜松宿',    pref:'静岡県',  msg:'浜名湖のほとりへ。'},
+  {km:305, name:'舞坂宿',    pref:'静岡県',  msg:''},
+  {km:311, name:'新居宿',    pref:'静岡県',  msg:''},
+  {km:320, name:'白須賀宿',  pref:'静岡県',  msg:''},
+  {km:328, name:'二川宿',    pref:'愛知県',  msg:''},
+  {km:337, name:'吉田宿',    pref:'愛知県',  msg:''},
+  {km:347, name:'御油宿',    pref:'愛知県',  msg:''},
+  {km:353, name:'赤坂宿',    pref:'愛知県',  msg:''},
+  {km:361, name:'藤川宿',    pref:'愛知県',  msg:''},
+  {km:372, name:'岡崎宿',    pref:'愛知県',  msg:'徳川家康の生誕地。'},
+  {km:383, name:'池鯉鮒宿',  pref:'愛知県',  msg:'わが地元に帰ってきた！！',hometown:true},
+  {km:392, name:'鳴海宿',    pref:'愛知県',  msg:''},
+  {km:399, name:'宮宿',      pref:'愛知県',  msg:'名古屋・熱田神宮に到着！'},
+  {km:418, name:'桑名宿',    pref:'三重県',  msg:'七里の渡し。船で海を渡る。'},
+  {km:432, name:'四日市宿',  pref:'三重県',  msg:''},
+  {km:443, name:'石薬師宿',  pref:'三重県',  msg:''},
+  {km:449, name:'庄野宿',    pref:'三重県',  msg:''},
+  {km:457, name:'亀山宿',    pref:'三重県',  msg:''},
+  {km:464, name:'関宿',      pref:'三重県',  msg:''},
+  {km:473, name:'坂下宿',    pref:'三重県',  msg:''},
+  {km:486, name:'土山宿',    pref:'滋賀県',  msg:''},
+  {km:498, name:'水口宿',    pref:'滋賀県',  msg:''},
+  {km:511, name:'石部宿',    pref:'滋賀県',  msg:''},
+  {km:522, name:'草津宿',    pref:'滋賀県',  msg:''},
+  {km:531, name:'大津宿',    pref:'滋賀県',  msg:'京都まであと少し！'},
+  {km:540, name:'三条大橋',  pref:'京都府',  msg:'ゴール！京都に到着！五十三次の旅、完結！'},
+];
+
 function renderWalkSummary(){
   const card=document.getElementById('walkSummaryCard');
   const grid=document.getElementById('walkSummaryGrid');
@@ -1781,29 +1860,51 @@ function renderWalkSummary(){
   if(all.length===0){card.style.display='none';return;}
   card.style.display='';
 
-  // 連続日数（今日に記録がなければ昨日から遡る）
-  const today=localDateStr();
-  const dateset=new Set(all.map(r=>(r.date||'').slice(0,10)).filter(Boolean));
-  const toDateKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  let streak=0;
-  const cur=new Date(today);
-  if(!dateset.has(toDateKey(cur))) cur.setDate(cur.getDate()-1);
-  while(dateset.has(toDateKey(cur))){
-    streak++;cur.setDate(cur.getDate()-1);
-  }
-
-  // 通算回数・通算距離
+  // 通算回数・通算距離・通算時間
   const totalCnt=all.length;
   const totalDist=all.reduce((s,r)=>s+(parseFloat(r.dist)||0),0);
   const distStr=totalDist===0?'--':(totalDist%1===0?totalDist:totalDist.toFixed(1));
+  const totalTime=all.reduce((s,r)=>s+(parseInt(r.time)||0),0);
+  const hh=Math.floor(totalTime/60),mm=totalTime%60;
+  const timeStr=totalTime===0?'--':(hh>0?`${hh}h${mm>0?mm+'m':''}`:`${mm}分`);
 
-  const svgFlame=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--daily)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>`;
+  // 東海道マイルストーン描画
+  const tokSec=document.getElementById('tokaidoSection');
+  if(tokSec){
+    const passed=TOKAIDO_MILESTONES.filter(m=>totalDist>=m.km);
+    const current=passed[passed.length-1]||TOKAIDO_MILESTONES[0];
+    const next=TOKAIDO_MILESTONES.find(m=>totalDist<m.km);
+    const goal=TOKAIDO_MILESTONES[TOKAIDO_MILESTONES.length-1];
+    const progress=Math.min(totalDist/goal.km,1);
+    const passedCount=passed.filter(m=>m.km>0).length;
+    const isHometown=current.hometown===true;
+    const svgDog=`<svg width="22" height="22" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#2a5f8f"/><circle cx="5.5" cy="21.5" r="1.6" fill="#2a5f8f"/><circle cx="8" cy="20.5" r="1.6" fill="#2a5f8f"/><circle cx="10.5" cy="21.5" r="1.6" fill="#2a5f8f"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#2a5f8f" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#2a5f8f" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#2a5f8f" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#2a5f8f" opacity="0.7"/></svg>`;
+    tokSec.innerHTML=`
+      <div class="tokaido-section">
+        <div class="tokaido-header">東海道の旅</div>
+        <div class="tokaido-bar-wrap">
+          <div class="tokaido-bar-bg"></div>
+          <div class="tokaido-bar-fill" style="width:${progress*100}%"></div>
+          <div class="tokaido-dog-pos" style="left:${Math.max(progress*100,0)}%">${svgDog}</div>
+        </div>
+        <div class="tokaido-bar-labels"><span>日本橋</span><span>三条大橋</span></div>
+        <div class="tokaido-milestone">
+          <span class="${isHometown?'tokaido-badge-hometown':'tokaido-badge'}">${current.name} に到着！</span>
+          <span class="tokaido-pref">${current.pref}</span>
+        </div>
+        <div class="tokaido-msg">${current.msg||'一夜の宿を取る。旅はつづく。'}</div>
+        ${next?`<div class="tokaido-next">次の宿場：${next.name}（${next.pref}）まであと ${(next.km-totalDist).toFixed(1)}km</div>`:''}
+        <div class="tokaido-count">${passedCount}/53 宿通過</div>
+      </div>`;
+  }
+
   const svgPaw=`<svg width="20" height="20" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg>`;
+  const svgClock=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--daily)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
   const svgPin=`<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--daily)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 1 7 7c0 5.25-7 13-7 13S5 14.25 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>`;
 
   grid.innerHTML=`
-    <div class="walk-sum-cell">${svgFlame}<div class="walk-sum-val">${streak}</div><div class="walk-sum-unit">日連続</div></div>
     <div class="walk-sum-cell">${svgPaw}<div class="walk-sum-val">${totalCnt}</div><div class="walk-sum-unit">通算回数</div></div>
+    <div class="walk-sum-cell">${svgClock}<div class="walk-sum-val">${timeStr}</div><div class="walk-sum-unit">通算時間</div></div>
     <div class="walk-sum-cell">${svgPin}<div class="walk-sum-val">${distStr}</div><div class="walk-sum-unit">通算km</div></div>`;
 }
 
