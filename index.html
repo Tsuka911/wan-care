@@ -2018,13 +2018,13 @@ function editNextDate(key, id, currentDate){
   const normalizedDate = normalizeDate(currentDate);
   const form = document.createElement('div');
   form.className = 'edit-next-form';
-  form.style.cssText = 'margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.1);display:flex;align-items:center;gap:6px;box-sizing:border-box;width:100%;overflow:hidden';
+  form.style.cssText = 'display:flex;align-items:center;gap:6px;padding:6px 12px 8px;margin-top:-2px;box-sizing:border-box;overflow:hidden';
   form.innerHTML = `
     <input type="date" value="${normalizedDate}"
       onchange="confirmNextDate('${key}',${id},this.value)"
       style="flex:1;min-width:0;padding:6px 8px;border:1.5px solid #ccc;border-radius:8px;font-size:16px;box-sizing:border-box">
     <button onclick="this.closest('.edit-next-form').remove()" style="flex-shrink:0;background:#eee;color:#666;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer">✕</button>`;
-  card.appendChild(form);
+  card.insertAdjacentElement('afterend', form);
 }
 
 async function confirmNextDate(key, id, newDate){
