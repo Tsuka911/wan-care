@@ -20,17 +20,19 @@ Google Sheetsをデータベースとして使い、Google Apps Script（GAS）�
 | 種別キー | シート名 | nextフィールド | デフォルト次回 |
 |---|---|---|---|
 | hospital | 通院記録 | next（次回予定） | なし（手入力） |
-| vaccine | ワクチン | next（次回予定） | +1年 |
-| medicine | 投薬記録 | next（次回） | +1ヶ月 |
+| vaccine | ワクチン | next（次回予定） | +1年 ※旧キー。新規記録はmeds |
+| medicine | 投薬記録 | next（次回） | +1ヶ月 ※旧キー。新規記録はmeds |
+| meds | お薬記録 | next（次回予定日） | ワクチン:+1年 / 投薬:+1ヶ月 |
 | trim | トリミング | next（次回） | +1ヶ月 |
 | filter | フィルター交換 | next（次回交換日） | +1ヶ月 |
+| symptom | 症状記録 | next（受診予定日） | なし（手入力） |
 | weight | 体重記録 | なし | — |
 | walk | 散歩記録 | なし | — |
 | other | その他ケア | なし | — |
 | trip | 旅行記録 | なし | — |
 
 ## ホーム画面「もうすぐの予定」
-- `REMIND_CHECKS` 配列で対象種別を定義（hospital / vaccine / medicine / trim / filter）
+- `REMIND_CHECKS` 配列で対象種別を定義（hospital / vaccine / medicine / trim / filter / symptom / meds）
 - `getUpcomingReminders(30)` で30日以内の next 日付を持つレコードを抽出
 - `renderUpcoming()` で表示。各カードに2つのSVGアイコンボタンあり：
   - カレンダー＋ペンアイコン → `editNextDate()` で日付をインライン編集
@@ -63,11 +65,27 @@ Google Sheetsをデータベースとして使い、Google Apps Script（GAS）�
 - 旅行は `start〜end` の全日程にドットを表示（`renderCalendar` と `renderCalDayRecords` の両方で範囲判定）
 - 詳細タップ時も旅行は `.travel-card` スタイルで表示
 
+## 症状記録（symptom）
+- 愛犬の様子がおかしいときに記録し、獣医への説明メモとして使う
+- フィールド：日付・症状名（必須）・程度・部位・詳しい経過・現在の状態・受診予定日・メモ
+- 「現在の状態」は様子見中 / 病院受診済 / 回復の3択。タイムラインでカラーバッジ表示
+- 受診予定日（next）を入れると「もうすぐの予定」にリマインダー表示
+
+## お薬記録（meds）― ワクチン・投薬の統合キー
+- メニューの「ワクチン」「投薬」ボタンを「お薬」1枠に統合。新規記録はすべて `meds` キーに保存
+- 既存の `vaccine` / `medicine` データはCAT_CFGに残してあり、タイムライン・リマインダーで引き続き表示される
+- フォームで「種類」（ワクチン or 投薬）を選ぶと対応フィールドが表示切り替え
+  - ワクチン：ワクチン種類セレクト + 病院名
+  - 投薬：薬の名前 + 薬の種類セレクト + 投与量
+- 次回予定日はワクチン選択で+1年、投薬選択で+1ヶ月を自動設定（`onMedsKindChange()` / `onMedsDateChange()`）
+- medsフィールド：`{id, date, kind, vacType, hospital, name, medType, dose, next, memo}`
+
 ## アイコンとカラーの方針
 - すべてのアイコンはSVG（絵文字は使わない）
 - `cs(type, size)` 関数で種別アイコンSVGを生成
-- カテゴリカラー：health=#e07b54（オレンジ）/ daily=#6ab89a（緑）/ travel=#5b9bd5（青）/ other=#9b8ed5（紫）
+- カテゴリカラー：health=#e07b54（オレンジ）/ daily=#6ab89a（緑）/ travel=#5b9bd5（青）/ other=#9b8ed5（紫）/ symptom=#d95f75（ピンク）
 - `other`（その他ケア）は `cat:'daily'` だがカラーは紫。`colorMap` や `bgMap` では `_type` で個別指定が必要
+- `symptom` は `cat:'health'` だがカラーはピンク（#d95f75）。同様に `_type` で個別指定が必要
 
 ## 注意事項
 - **このフォルダ（wan-care-deploy）が作業・デプロイ用**
