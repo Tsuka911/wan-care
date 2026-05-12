@@ -2593,6 +2593,9 @@ window.addEventListener('DOMContentLoaded',async()=>{
   applyDogPhoto(localStorage.getItem('dogPhoto'));
   updateHomeStats();
   renderUpcoming();
+  renderWeightLine();
+  renderWalkSummary();
+  renderMemoryCard();
   initNotifButton();
   if(typeof Notification!=='undefined'&&Notification.permission==='granted') sendUpcomingNotifications();
   if(getWebAppUrl()){
