@@ -70,6 +70,18 @@ Google Sheetsをデータベースとして使い、Google Apps Script（GAS）�
 - 連続日数は `updateHomeStats()` 内で計算（今日に記録がなければ昨日から遡るロジック）
 - ラベルは「日連続」
 
+## 「もうすぐの予定」日付編集（iOS対応済み）
+- カレンダーアイコン → `editNextDate(key, id, currentDate)` で日付入力フォームを表示
+- **フォームの挿入位置**：`card.insertAdjacentElement('afterend', form)` でカードの直後に挿入
+  - `.remind-item` が `display:flex` の横並びなので、`appendChild` するとフォームがはみ出す
+- **自動保存**：`input[type="date"]` の `onchange` で `confirmNextDate()` を呼び出す（確定ボタンなし）
+  - iOSではデートピッカーを閉じた瞬間に `onchange` が発火して保存される
+- **日付の正規化**：`normalizeDate(currentDate)` で必ず `YYYY-MM-DD` 形式にしてからinputにセット
+  - スラッシュ区切り（`YYYY/MM/DD`）のままだとiOSのデートピッカーが空になる
+- **Sheets同期**：POSTリクエスト（`no-cors`）はiOSで届かないことがあるため、GETリクエスト方式を採用
+  - `?action=update_next&type=...&id=...&next=...` でGASに送信
+  - GAS側の `doGet` に `update_next` アクションを実装（`getRecords` → `deleteRecord` → `addRecord`）
+
 ## 記録タイムライン（記録タブ）
 - `renderTimeline()` で全種別を統一表示。`getAllRecords()` で全種別をまとめて日付降順ソート
 - **旅行（trip）のみ** `.travel-card` スタイル（青グラデーションヘッダー）で差し込み表示
