@@ -2030,18 +2030,18 @@ function editNextDate(key, id, currentDate){
   card.appendChild(form);
 }
 
-function confirmNextDate(key, id, newDate){
+async function confirmNextDate(key, id, newDate){
   if(!newDate) return;
   const records = DB.get(key);
   const idx = records.findIndex(r => String(r.id) === String(id));
   if(idx < 0) return;
   records[idx].next = normalizeDate(newDate) || newDate;
   DB.set(key, records);
-  syncToSheets(key, {id: records[idx].id}, 'delete');
-  syncToSheets(key, records[idx], 'add');
+  await syncToSheets(key, {id: records[idx].id}, 'delete');
+  await syncToSheets(key, records[idx], 'add');
   renderUpcoming();
   updateHomeStats();
-  showToast('📅 予定日を更新しました');
+  showToast('予定日を更新しました');
 }
 
 // ========== カレンダー ==========
