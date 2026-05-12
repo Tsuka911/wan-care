@@ -2018,15 +2018,12 @@ function editNextDate(key, id, currentDate){
   const normalizedDate = normalizeDate(currentDate);
   const form = document.createElement('div');
   form.className = 'edit-next-form';
-  form.style.cssText = 'margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.1)';
+  form.style.cssText = 'margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,0,0,0.1);display:flex;align-items:center;gap:6px;box-sizing:border-box;width:100%;overflow:hidden';
   form.innerHTML = `
-    <div style="font-size:11px;color:#888;margin-bottom:4px">日付を選ぶと自動で保存されます</div>
-    <div style="display:flex;align-items:center;gap:6px">
-      <input type="date" value="${normalizedDate}"
-        onchange="confirmNextDate('${key}',${id},this.value)"
-        style="flex:1;padding:6px 8px;border:1.5px solid #ccc;border-radius:8px;font-size:16px">
-      <button onclick="this.closest('.edit-next-form').remove()" style="background:#eee;color:#666;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer">✕</button>
-    </div>`;
+    <input type="date" value="${normalizedDate}"
+      onchange="confirmNextDate('${key}',${id},this.value)"
+      style="flex:1;min-width:0;padding:6px 8px;border:1.5px solid #ccc;border-radius:8px;font-size:16px;box-sizing:border-box">
+    <button onclick="this.closest('.edit-next-form').remove()" style="flex-shrink:0;background:#eee;color:#666;border:none;border-radius:8px;padding:6px 10px;font-size:13px;cursor:pointer">✕</button>`;
   card.appendChild(form);
 }
 
