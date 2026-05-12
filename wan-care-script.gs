@@ -74,6 +74,12 @@ const SHEET_MAP = {
     headers: ['ID', '出発日', '帰宅日', '行き先', '旅行タイトル', '宿泊施設', '評価', 'メモ', '写真1', '写真2', '写真3'],
     toRow: (r) => [r.id, r.start, r.end, r.dest, r.title, r.hotel, r.hotelRating, r.memo, r.photo1, r.photo2, r.photo3],
     fromRow: (row) => ({ id: row[0], start: toDateStr(row[1]), end: toDateStr(row[2]), dest: row[3], title: row[4], hotel: row[5], hotelRating: row[6], memo: row[7], photo1: row[8], photo2: row[9], photo3: row[10], date: toDateStr(row[1]) })
+  },
+  symptom: {
+    name: '症状記録',
+    headers: ['ID', '日付', '症状名', '程度', '部位・様子', '詳しい経過', '現在の状態', '受診予定日', 'メモ'],
+    toRow: (r) => [r.id, r.date, r.name, r.severity, r.body, r.detail, r.status, r.next, r.memo],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), name: row[2], severity: row[3], body: row[4], detail: row[5], status: row[6], next: toDateStr(row[7]), memo: row[8] })
   }
 };
 

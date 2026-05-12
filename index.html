@@ -597,6 +597,21 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
             <div class="cat-label">旅行</div>
           </button>
 
+          <!-- 症状 -->
+          <button class="cat-btn" onclick="selectCat('symptom')">
+            <div class="cat-icon" style="background:#fceef1;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <rect x="13" y="3" width="6" height="14" rx="3" fill="#D95F75"/>
+                <rect x="14.5" y="4.5" width="3" height="4" rx="1.5" fill="white" opacity="0.45"/>
+                <rect x="9" y="15" width="14" height="7" rx="3" fill="#D95F75"/>
+                <line x1="13" y1="18.5" x2="19" y2="18.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <line x1="16" y1="16" x2="16" y2="21" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                <path d="M16 22 l-4 6 h8 z" fill="#D95F75"/>
+              </svg>
+            </div>
+            <div class="cat-label">症状</div>
+          </button>
+
         </div>
       </div>
     </div>
@@ -763,6 +778,35 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
           <div id="trip-records"></div>
         </div>
 
+        <!-- 症状 -->
+        <div id="form-symptom" class="form-section">
+          <div class="form-card">
+            <div class="form-group"><label class="form-label">気になり始めた日 <span style="color:#d95f75">*</span></label><input type="date" class="form-input" id="symp-date"></div>
+            <div class="form-group"><label class="form-label">症状の概要 <span style="color:#d95f75">*</span></label><input type="text" class="form-input" id="symp-name" placeholder="嘔吐、食欲不振、足を引きずるなど"></div>
+            <div class="form-group"><label class="form-label">程度</label>
+              <select class="form-select" id="symp-severity">
+                <option value="">選択</option>
+                <option>軽微（少し気になる程度）</option>
+                <option>中程度（いつもと明らかに違う）</option>
+                <option>重篤（すぐ病院へ）</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">部位・様子</label><input type="text" class="form-input" id="symp-body" placeholder="お腹、左後足、全体的にぐったりなど"></div>
+            <div class="form-group"><label class="form-label">詳しい経過</label><textarea class="form-textarea" id="symp-detail" placeholder="いつから・何回・どんな様子か&#10;（獣医さんへの説明メモとして使えます）"></textarea></div>
+            <div class="form-group"><label class="form-label">現在の状態</label>
+              <select class="form-select" id="symp-status">
+                <option value="">選択</option>
+                <option>様子見中</option>
+                <option>病院受診済</option>
+                <option>回復</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">受診予定日</label><input type="date" class="form-input" id="symp-next" placeholder="入力するとホームに予定として表示されます"></div>
+            <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="symp-memo" placeholder="食欲・排泄・元気度など気になることを自由に"></textarea></div>
+          </div>
+          <div id="symptom-records"></div>
+        </div>
+
       </div><!-- /form-scroll -->
       <div class="form-save-bar">
         <button class="btn btn-primary" id="formSaveBtn" onclick="saveCurrentForm()">💾 記録を保存</button>
@@ -922,6 +966,7 @@ const CAT_CFG = {
   filter:  {label:'給水フィルター',color:'#5b9bd5',cat:'daily'},
   other:   {label:'その他ケア',color:'#9b8ed5',cat:'daily'},
   trip:    {label:'旅行',      color:'#5b9bd5',cat:'travel'},
+  symptom: {label:'症状',      color:'#d95f75',cat:'health'},
 };
 
 // SVGアイコン定義（各所で共通利用）
@@ -935,6 +980,7 @@ const CAT_SVG={
   filter:  s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 5 C16 5 7 15 7 20 a9 9 0 0 0 18 0 C25 15 16 5 16 5Z" fill="#5B9BD5"/><ellipse cx="12" cy="18" rx="2" ry="3.5" fill="white" opacity="0.35" transform="rotate(-15 12 18)"/><circle cx="22" cy="8" r="1.5" fill="#5B9BD5" opacity="0.5"/><circle cx="24" cy="13" r="1" fill="#5B9BD5" opacity="0.4"/></svg>`,
   other:   s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 25 C16 25 6 18 6 12 a5 5 0 0 1 10-1.5 a5 5 0 0 1 10 1.5 C26 18 16 25 16 25Z" fill="#9B8ED5"/><path d="M10 11 Q12 9 14 11" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/><circle cx="24" cy="8" r="1.5" fill="#9B8ED5"/><line x1="24" y1="5.5" x2="24" y2="6.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="24" y1="9.5" x2="24" y2="10.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="21.5" y1="8" x2="22.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="25.5" y1="8" x2="26.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/></svg>`,
   trip:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/><circle cx="13.5" cy="10" r="1" fill="#5B9BD5"/><circle cx="16" cy="9.5" r="1" fill="#5B9BD5"/><circle cx="18.5" cy="10" r="1" fill="#5B9BD5"/></svg>`,
+  symptom: s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="13" y="3" width="6" height="14" rx="3" fill="#D95F75"/><rect x="14.5" y="4.5" width="3" height="4" rx="1.5" fill="white" opacity="0.45"/><rect x="9" y="15" width="14" height="7" rx="3" fill="#D95F75"/><line x1="13" y1="18.5" x2="19" y2="18.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="16" x2="16" y2="21" stroke="white" stroke-width="1.5" stroke-linecap="round"/><rect x="14" y="17" width="4" height="6" rx="1" fill="#D95F75" opacity="0.01"/><path d="M16 22 l-4 6 h8 z" fill="#D95F75"/></svg>`,
 };
 // 短縮ヘルパー: cs('hospital',20) → SVG文字列
 function cs(type,size=16){return CAT_SVG[type]?CAT_SVG[type](size):'';}
@@ -1060,6 +1106,15 @@ function editRecord(key, id) {
     document.getElementById('trip-hotel').value=r.hotel||'';
     document.getElementById('trip-hotel-rating').value=r.hotelRating||'';
     document.getElementById('trip-memo').value=r.memo||'';
+  } else if(key==='symptom'){
+    document.getElementById('symp-date').value=r.date||'';
+    document.getElementById('symp-name').value=r.name||'';
+    document.getElementById('symp-severity').value=r.severity||'';
+    document.getElementById('symp-body').value=r.body||'';
+    document.getElementById('symp-detail').value=r.detail||'';
+    document.getElementById('symp-status').value=r.status||'';
+    document.getElementById('symp-next').value=r.next||'';
+    document.getElementById('symp-memo').value=r.memo||'';
   }
 }
 
@@ -1140,7 +1195,7 @@ function autoSetNextDate(srcId,tgtId,unit,n){const src=document.getElementById(s
 function localDateStr(d){const t=d||new Date();return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
 function setTodayDates(){
   const today=localDateStr();
-  const nextIds=new Set(['vac-next','med-next','trim-next','filter-next']);
+  const nextIds=new Set(['vac-next','med-next','trim-next','filter-next','symp-next']);
   document.querySelectorAll('input[type="date"]').forEach(el=>{if(!el.value&&!nextIds.has(el.id))el.value=today;});
   [{src:'vac-date',tgt:'vac-next',unit:'year',n:1},{src:'med-date',tgt:'med-next',unit:'month',n:1},{src:'trim-date',tgt:'trim-next',unit:'month',n:1},{src:'filter-date',tgt:'filter-next',unit:'month',n:1}]
     .forEach(({src,tgt,unit,n})=>{const se=document.getElementById(src);const te=document.getElementById(tgt);if(se&&te&&se.value&&!te.value)te.value=unit==='month'?addMonths(se.value,n):addYears(se.value,n);});
@@ -1282,6 +1337,20 @@ function addRecord(type){
     key='trip';
     clearForm(['trip-title','trip-start','trip-end','trip-dest','trip-hotel','trip-memo']);
     document.getElementById('trip-hotel-rating').value='';
+  } else if(type==='symptom'){
+    record.date=document.getElementById('symp-date').value||d;
+    record.name=document.getElementById('symp-name').value;
+    record.severity=document.getElementById('symp-severity').value;
+    record.body=document.getElementById('symp-body').value;
+    record.detail=document.getElementById('symp-detail').value;
+    record.status=document.getElementById('symp-status').value;
+    record.next=document.getElementById('symp-next').value;
+    record.memo=document.getElementById('symp-memo').value;
+    if(!record.name){alert('症状の概要を入力してください');return;}
+    key='symptom';
+    clearForm(['symp-date','symp-name','symp-body','symp-detail','symp-next','symp-memo']);
+    document.getElementById('symp-severity').value='';
+    document.getElementById('symp-status').value='';
   }
 
   if(currentEditId){
@@ -1372,6 +1441,7 @@ function getRecordLabel(type, r) {
   if(type==='filter') return 'フィルター交換';
   if(type==='other') return r.type||'ケア';
   if(type==='trip') return r.title||r.dest||'旅行';
+  if(type==='symptom') return r.name||'症状';
   return '記録';
 }
 
@@ -1392,6 +1462,7 @@ function getRecordSub(type, r) {
     if(r.memo) parts.push('📝'+r.memo);
     return parts.join(' / ');
   }
+  if(type==='symptom') return [r.severity, r.body, r.memo].filter(Boolean).join(' / ');
   return '';
 }
 
@@ -1509,7 +1580,16 @@ function renderRecordItem(key,r){
   else if(key==='trim'){title=r.salon||'トリミング';body=[r.menu,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#edfaf3;color:var(--daily)">${ico('trim')}${fmt(r.date)}</span>`;if(r.cost)tags+=`<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
   else if(key==='filter'){title='フィルター交換';body=[r.machine,r.filterType,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#ebf3fd;color:var(--travel)">${ico('filter')}${fmt(r.date)}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
   else if(key==='other'){title=r.type||'ケア';body=r.memo||'';tags=`<span class="record-tag" style="background:#f5f0fb;color:#7c6ec9">${ico('other')}${fmt(r.date)}</span>`;}
-  const editBtn=key==='walk'?`<button class="delete-btn" style="margin-right:4px;color:var(--daily)" onclick="editRecord('walk',${r.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>`:'';
+  else if(key==='symptom'){
+    title=r.name||'症状';
+    const statusColor={'':{bg:'#fce9ed',color:'#c44b68'},'様子見中':{bg:'#fff4e0',color:'#a07000'},'病院受診済':{bg:'#fff0eb',color:'#c0511a'},'回復':{bg:'#edfaf3',color:'#3a8a65'}}[r.status||'']||{bg:'#fce9ed',color:'#c44b68'};
+    body=[r.severity, r.body, r.detail, r.memo].filter(Boolean).join(' / ');
+    tags=`<span class="record-tag" style="background:#fce9ed;color:#d95f75">${ico('symptom')}${fmt(r.date)}</span>`;
+    if(r.status) tags+=`<span class="record-tag" style="background:${statusColor.bg};color:${statusColor.color}">${r.status}</span>`;
+    if(r.next) tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">受診予定: ${fmt(r.next)}</span>`;
+  }
+  const editSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
+  const editBtn=(key==='walk'||key==='symptom')?`<button class="delete-btn" style="margin-right:4px;color:${key==='symptom'?'#d95f75':'var(--daily)'}" onclick="editRecord('${key}',${r.id})">${editSvg}</button>`:'';
   return`<div class="record-item"><div class="record-item-header"><div><div class="record-item-title">${title}</div><div>${tags}</div>${body?`<div class="record-item-body">${body}</div>`:''}</div><div style="display:flex;align-items:center">${editBtn}<button class="delete-btn" onclick="deleteRecord('${key}',${r.id})">✕</button></div></div></div>`;
 }
 
@@ -1552,6 +1632,7 @@ function updateHomeStats(){
     ...DB.get('filter').map(r=>({...r,_cat:'daily',_type:'filter',_text:'フィルター交換'})),
     ...DB.get('other').map(r=>({...r,_cat:'daily',_type:'other',_text:r.type||'その他ケア'})),
     ...DB.get('trip').map(r=>({...r,_cat:'travel',_type:'trip',_text:r.title||r.dest||'旅行'})),
+    ...DB.get('symptom').map(r=>({...r,_cat:'health',_type:'symptom',_text:`症状: ${r.name||'症状'}`})),
   ].sort((a,b)=>{
     // 記録日の降順。同日なら登録日時（ID）の新しい順
     const dateA=normalizeDate(a.date||a.start||'');
@@ -1612,12 +1693,14 @@ function renderWalkSummary(){
   if(all.length===0){card.style.display='none';return;}
   card.style.display='';
 
-  // 連続日数（今日を含む直近の連続散歩日数）
+  // 連続日数（今日に記録がなければ昨日から遡る）
   const today=localDateStr();
   const dateset=new Set(all.map(r=>(r.date||'').slice(0,10)).filter(Boolean));
+  const toDateKey=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   let streak=0;
   const cur=new Date(today);
-  while(dateset.has(`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`)){
+  if(!dateset.has(toDateKey(cur))) cur.setDate(cur.getDate()-1);
+  while(dateset.has(toDateKey(cur))){
     streak++;cur.setDate(cur.getDate()-1);
   }
 
@@ -1674,6 +1757,7 @@ const REMIND_CHECKS=[
   {key:'medicine',nextField:'next',iconType:'medicine',labelFn:(r)=>(r.name||'投薬')+' 次回予定'},
   {key:'trim',    nextField:'next',iconType:'trim',    labelFn:(r)=>(r.salon||'トリミング')+' 予定'},
   {key:'filter',  nextField:'next',iconType:'filter',  labelFn:()=>'給水フィルター交換予定'},
+  {key:'symptom', nextField:'next',iconType:'symptom', labelFn:(r)=>(r.name||'症状')+'の受診予定'},
 ];
 
 // 通知本文用の絵文字マップ（Notification API は SVG を描画できないため絵文字で代用）
