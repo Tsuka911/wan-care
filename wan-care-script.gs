@@ -19,25 +19,30 @@ function toDateStr(val) {
   return s;
 }
 
+// isPlanOnly フラグの読み書きヘルパー（boolean / 'TRUE' / 'FALSE' / 空 のいずれにも対応）
+function planOnlyOut(v) { return v ? 'TRUE' : ''; }
+function planOnlyIn(v) { return v === true || v === 'TRUE' || v === 'true'; }
+
 // 各シートの定義（シート名と列の対応）
+// 「予定のみ」列は、もうすぐの予定 → ＋新規 から登録した「予定だけ」のレコードを識別するためのフラグ
 const SHEET_MAP = {
   hospital: {
     name: '通院記録',
-    headers: ['ID', '日付', '病院名', '受診内容', '診断・処置', '費用', '次回予定', 'メモ'],
-    toRow: (r) => [r.id, r.date, r.name, r.reason, r.result, r.cost, r.next, r.memo],
-    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), name: row[2], reason: row[3], result: row[4], cost: row[5], next: toDateStr(row[6]), memo: row[7] })
+    headers: ['ID', '日付', '病院名', '受診内容', '診断・処置', '費用', '次回予定', 'メモ', '予定のみ'],
+    toRow: (r) => [r.id, r.date, r.name, r.reason, r.result, r.cost, r.next, r.memo, planOnlyOut(r.isPlanOnly)],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), name: row[2], reason: row[3], result: row[4], cost: row[5], next: toDateStr(row[6]), memo: row[7], isPlanOnly: planOnlyIn(row[8]) })
   },
   vaccine: {
     name: 'ワクチン',
-    headers: ['ID', '接種日', '種類', '次回予定', '病院名', 'メモ'],
-    toRow: (r) => [r.id, r.date, r.type, r.next, r.hospital, r.memo],
-    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), type: row[2], next: toDateStr(row[3]), hospital: row[4], memo: row[5] })
+    headers: ['ID', '接種日', '種類', '次回予定', '病院名', 'メモ', '予定のみ'],
+    toRow: (r) => [r.id, r.date, r.type, r.next, r.hospital, r.memo, planOnlyOut(r.isPlanOnly)],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), type: row[2], next: toDateStr(row[3]), hospital: row[4], memo: row[5], isPlanOnly: planOnlyIn(row[6]) })
   },
   medicine: {
     name: '投薬記録',
-    headers: ['ID', '投薬日', '薬の名前', '種類', '投与量', '次回', 'メモ'],
-    toRow: (r) => [r.id, r.date, r.name, r.type, r.dose, r.next, r.memo],
-    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), name: row[2], type: row[3], dose: row[4], next: toDateStr(row[5]), memo: row[6] })
+    headers: ['ID', '投薬日', '薬の名前', '種類', '投与量', '次回', 'メモ', '予定のみ'],
+    toRow: (r) => [r.id, r.date, r.name, r.type, r.dose, r.next, r.memo, planOnlyOut(r.isPlanOnly)],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), name: row[2], type: row[3], dose: row[4], next: toDateStr(row[5]), memo: row[6], isPlanOnly: planOnlyIn(row[7]) })
   },
   weight: {
     name: '体重記録',
@@ -53,15 +58,15 @@ const SHEET_MAP = {
   },
   trim: {
     name: 'トリミング',
-    headers: ['ID', '日付', 'サロン名', 'メニュー', '費用', '次回', 'メモ'],
-    toRow: (r) => [r.id, r.date, r.salon, r.menu, r.cost, r.next, r.memo],
-    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), salon: row[2], menu: row[3], cost: row[4], next: toDateStr(row[5]), memo: row[6] })
+    headers: ['ID', '日付', 'サロン名', 'メニュー', '費用', '次回', 'メモ', '予定のみ'],
+    toRow: (r) => [r.id, r.date, r.salon, r.menu, r.cost, r.next, r.memo, planOnlyOut(r.isPlanOnly)],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), salon: row[2], menu: row[3], cost: row[4], next: toDateStr(row[5]), memo: row[6], isPlanOnly: planOnlyIn(row[7]) })
   },
   filter: {
     name: 'フィルター交換',
-    headers: ['ID', '交換日', '給水機', 'フィルター種類', '次回交換日', 'メモ'],
-    toRow: (r) => [r.id, r.date, r.machine, r.filterType, r.next, r.memo],
-    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), machine: row[2], filterType: row[3], next: toDateStr(row[4]), memo: row[5] })
+    headers: ['ID', '交換日', '給水機', 'フィルター種類', '次回交換日', 'メモ', '予定のみ'],
+    toRow: (r) => [r.id, r.date, r.machine, r.filterType, r.next, r.memo, planOnlyOut(r.isPlanOnly)],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), machine: row[2], filterType: row[3], next: toDateStr(row[4]), memo: row[5], isPlanOnly: planOnlyIn(row[6]) })
   },
   other: {
     name: 'その他ケア',
@@ -77,19 +82,19 @@ const SHEET_MAP = {
   },
   symptom: {
     name: '症状記録',
-    headers: ['ID', '日付', '症状名', '程度', '部位・様子', '詳しい経過', '現在の状態', '受診予定日', 'メモ'],
-    toRow: (r) => [r.id, r.date, r.name, r.severity, r.body, r.detail, r.status, r.next, r.memo],
-    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), name: row[2], severity: row[3], body: row[4], detail: row[5], status: row[6], next: toDateStr(row[7]), memo: row[8] })
+    headers: ['ID', '日付', '症状名', '程度', '部位・様子', '詳しい経過', '現在の状態', '受診予定日', 'メモ', '予定のみ'],
+    toRow: (r) => [r.id, r.date, r.name, r.severity, r.body, r.detail, r.status, r.next, r.memo, planOnlyOut(r.isPlanOnly)],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), name: row[2], severity: row[3], body: row[4], detail: row[5], status: row[6], next: toDateStr(row[7]), memo: row[8], isPlanOnly: planOnlyIn(row[9]) })
   },
   meds: {
     name: 'お薬記録',
-    headers: ['ID', '日付', '種類', 'ワクチン種類', '病院名', '薬の名前', '薬の分類', '投与量', '次回予定日', 'メモ'],
-    toRow: (r) => [r.id, r.date, r.kind, r.vacType, r.hospital, r.name, r.medType, r.dose, r.next, r.memo],
-    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), kind: row[2], vacType: row[3], hospital: row[4], name: row[5], medType: row[6], dose: row[7], next: toDateStr(row[8]), memo: row[9] })
+    headers: ['ID', '日付', '種類', 'ワクチン種類', '病院名', '薬の名前', '薬の分類', '投与量', '次回予定日', 'メモ', '予定のみ'],
+    toRow: (r) => [r.id, r.date, r.kind, r.vacType, r.hospital, r.name, r.medType, r.dose, r.next, r.memo, planOnlyOut(r.isPlanOnly)],
+    fromRow: (row) => ({ id: row[0], date: toDateStr(row[1]), kind: row[2], vacType: row[3], hospital: row[4], name: row[5], medType: row[6], dose: row[7], next: toDateStr(row[8]), memo: row[9], isPlanOnly: planOnlyIn(row[10]) })
   }
 };
 
-// シートを取得（なければ作成）
+// シートを取得（なければ作成、既存シートのヘッダー不足は自動補完）
 function getOrCreateSheet(type) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const config = SHEET_MAP[type];
@@ -105,6 +110,18 @@ function getOrCreateSheet(type) {
     headerRange.setFontColor('#ffffff');
     headerRange.setFontWeight('bold');
     sheet.setFrozenRows(1);
+  } else {
+    // 既存シートのマイグレーション：SHEET_MAP に追加した新カラム（例：「予定のみ」）が
+    // ヘッダー行に無ければ、不足分を自動追加する。データ列はそのまま維持される。
+    const lastCol = sheet.getLastColumn();
+    if (lastCol < config.headers.length) {
+      const missing = config.headers.slice(lastCol);
+      const newRange = sheet.getRange(1, lastCol + 1, 1, missing.length);
+      newRange.setValues([missing]);
+      newRange.setBackground('#4a90d9');
+      newRange.setFontColor('#ffffff');
+      newRange.setFontWeight('bold');
+    }
   }
   return sheet;
 }

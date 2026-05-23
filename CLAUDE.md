@@ -108,7 +108,20 @@
 - カード右上「＋ 新規」ボタン → `openNewUpcoming()` で軽量モーダル `#upcomingSheet` を開く
 - 入力は「種別 / 予定日 / メモ」のみ
 - 種別の選択肢は新規方針に合わせ、旧キー `vaccine`/`medicine` は除外（代わりに「お薬（ワクチン）」「お薬（投薬）」を `meds` の kind 付きで出す）
-- `saveNewUpcoming()` で `date` と `next` を同じ予定日にセットして DB に追加 → `syncToSheets`
+- `saveNewUpcoming()` で `date` と `next` を同じ予定日にセット + **`isPlanOnly: true`** を付けて DB に追加 → `syncToSheets`
+
+### 「予定だけ」レコード（`isPlanOnly: true`）の扱い
+- 新規予定 (`saveNewUpcoming`) で追加されたレコードは `isPlanOnly: true` が付き、**実績ではない**扱い
+- 以下のビューから除外される：直近の記録（`updateHomeStats` 内）／前回通院ピル（`statHospital`）／記録タブ（`getAllRecords`）／カテゴリ別記録一覧（`renderRecords`）
+- 「もうすぐの予定」（`renderUpcoming` / `getUpcomingReminders`）にだけ表示される
+- 実施済みボタンから記録フォーム経由で保存した「実績レコード」は別IDで新規追加されるので `isPlanOnly` が付かず、通常通り全ビューに出る
+- 元の予定レコードは `next` を空にされて「もうすぐの予定」から消え、`isPlanOnly: true` のまま残るので他ビューにも引き続き出ない
+- 直近の記録などをフィルタするときは `.filter(r=>!r.isPlanOnly)` を必ず付けること（新しいビューを追加するときも忘れずに）
+
+### Sheets 側の「予定のみ」カラム
+- 対象シート（通院・ワクチン・投薬・トリミング・フィルター・症状・お薬）の末尾に「予定のみ」カラムを追加
+- `wan-care-script.gs` の `SHEET_MAP` で定義。GAS の `getOrCreateSheet` がヘッダー不足を検知すれば自動補完するので、既存シートを手で編集する必要はない
+- 値は `'TRUE'` / `''`（空）の文字列。`planOnlyIn()` / `planOnlyOut()` ヘルパーで boolean と相互変換
 
 ### 自前確認ダイアログ
 - `customConfirm(msg, onOk)` / `closeConfirmDialog(ok)` / `#confirmDialog`

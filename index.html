@@ -1630,7 +1630,10 @@ function getRecordSub(type, r) {
 function getAllRecords() {
   const all=[];
   Object.entries(CAT_CFG).forEach(([type,cfg])=>{
-    DB.get(type).forEach(r=>all.push({...r,_type:type,_cfg:cfg}));
+    DB.get(type).forEach(r=>{
+      if(r.isPlanOnly)return; // 「予定だけ」は記録タブには出さない
+      all.push({...r,_type:type,_cfg:cfg});
+    });
   });
   return all.sort((a,b)=>{
     const td=d=>{const s=(d||'').toString().slice(0,10).replace(/\//g,'-');return s?new Date(s).getTime()||0:0;};
@@ -1716,7 +1719,7 @@ function renderTimeline() {
 
 // ========== 個別レコード表示（シート内履歴） ==========
 function renderRecords(key) {
-  const records=DB.get(key);
+  const records=DB.get(key).filter(r=>!r.isPlanOnly); // 「予定だけ」はカテゴリ別記録一覧に出さない
   const container=document.getElementById(key+'-records');
   if(!container)return;
   if(records.length===0){container.innerHTML='';return;}
@@ -1793,22 +1796,24 @@ function updateHomeStats(){
   if(!dateset2.has(toDateKey2(cur2))) cur2.setDate(cur2.getDate()-1);
   while(dateset2.has(toDateKey2(cur2))){streak2++;cur2.setDate(cur2.getDate()-1);}
   document.getElementById('statWalks').textContent=streak2+'日';
-  const hospitals=DB.get('hospital');
+  // 「予定だけ」（isPlanOnly）レコードは実績ではないので統計・直近の記録から除外
+  const notPlan=r=>!r.isPlanOnly;
+  const hospitals=DB.get('hospital').filter(notPlan);
   document.getElementById('statHospital').textContent=hospitals.length?fmtDate(hospitals[0].date).slice(5)||'--':'--';
 
-  // 直近の記録
+  // 直近の記録（isPlanOnly は除外）
   const all=[
-    ...DB.get('hospital').map(r=>({...r,_cat:'health',_type:'hospital',_text:`通院: ${r.reason||r.name||'通院'}`})),
-    ...DB.get('vaccine').map(r=>({...r,_cat:'health',_type:'vaccine',_text:`ワクチン: ${r.type||'ワクチン'}`})),
-    ...DB.get('medicine').map(r=>({...r,_cat:'health',_type:'medicine',_text:`投薬: ${r.name||'投薬'}`})),
-    ...DB.get('weight').map(r=>({...r,_cat:'health',_type:'weight',_text:`体重 ${r.value}kg`})),
-    ...DB.get('walk').map(r=>({...r,_cat:'walk',_type:'walk',_text:`散歩 ${r.time?r.time+'分':''}`})),
-    ...DB.get('trim').map(r=>({...r,_cat:'daily',_type:'trim',_text:'トリミング'})),
-    ...DB.get('filter').map(r=>({...r,_cat:'daily',_type:'filter',_text:'フィルター交換'})),
-    ...DB.get('other').map(r=>({...r,_cat:'daily',_type:'other',_text:r.type||'その他ケア'})),
-    ...DB.get('trip').map(r=>({...r,_cat:'travel',_type:'trip',_text:r.title||r.dest||'旅行'})),
-    ...DB.get('symptom').map(r=>({...r,_cat:'health',_type:'symptom',_text:`症状: ${r.name||'症状'}`})),
-    ...DB.get('meds').map(r=>({...r,_cat:'health',_type:'meds',_text:r.kind==='ワクチン'?`ワクチン: ${r.vacType||'ワクチン'}`:`投薬: ${r.name||'投薬'}`})),
+    ...DB.get('hospital').filter(notPlan).map(r=>({...r,_cat:'health',_type:'hospital',_text:`通院: ${r.reason||r.name||'通院'}`})),
+    ...DB.get('vaccine').filter(notPlan).map(r=>({...r,_cat:'health',_type:'vaccine',_text:`ワクチン: ${r.type||'ワクチン'}`})),
+    ...DB.get('medicine').filter(notPlan).map(r=>({...r,_cat:'health',_type:'medicine',_text:`投薬: ${r.name||'投薬'}`})),
+    ...DB.get('weight').filter(notPlan).map(r=>({...r,_cat:'health',_type:'weight',_text:`体重 ${r.value}kg`})),
+    ...DB.get('walk').filter(notPlan).map(r=>({...r,_cat:'walk',_type:'walk',_text:`散歩 ${r.time?r.time+'分':''}`})),
+    ...DB.get('trim').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'trim',_text:'トリミング'})),
+    ...DB.get('filter').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'filter',_text:'フィルター交換'})),
+    ...DB.get('other').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'other',_text:r.type||'その他ケア'})),
+    ...DB.get('trip').filter(notPlan).map(r=>({...r,_cat:'travel',_type:'trip',_text:r.title||r.dest||'旅行'})),
+    ...DB.get('symptom').filter(notPlan).map(r=>({...r,_cat:'health',_type:'symptom',_text:`症状: ${r.name||'症状'}`})),
+    ...DB.get('meds').filter(notPlan).map(r=>({...r,_cat:'health',_type:'meds',_text:r.kind==='ワクチン'?`ワクチン: ${r.vacType||'ワクチン'}`:`投薬: ${r.name||'投薬'}`})),
   ].sort((a,b)=>{
     // 記録日の降順。同日なら登録日時（ID）の新しい順
     const dateA=normalizeDate(a.date||a.start||'');
@@ -2171,7 +2176,8 @@ function saveNewUpcoming(){
     createdAt:localDateStr(),
     date:normalized,
     next:normalized,
-    memo:memo
+    memo:memo,
+    isPlanOnly:true  // 予定だけ／実績ではない（直近の記録・記録タブからは除外、もうすぐの予定にだけ表示）
   };
   if(key==='meds') record.kind=kind;
   const records=DB.get(key);
