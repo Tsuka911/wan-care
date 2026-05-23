@@ -327,7 +327,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <div class="home-stat-pill">
         <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="6.5" cy="25.5" r="1" fill="white" opacity="0.55"/><circle cx="8" cy="26.5" r="1" fill="white" opacity="0.55"/><circle cx="9.5" cy="25.5" r="1" fill="white" opacity="0.55"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg></div>
         <div class="home-stat-value" id="statWalks">--</div>
-        <div class="home-stat-label">日連続</div>
+        <div class="home-stat-label">連続</div>
       </div>
       <div class="home-stat-pill">
         <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/><rect x="13" y="3" width="6" height="8" rx="3" fill="#E07B54"/><rect x="14.5" y="4.5" width="3" height="5" rx="1.5" fill="white" opacity="0.5"/><rect x="14" y="13" width="4" height="10" rx="2" fill="white"/><rect x="11" y="16" width="10" height="4" rx="2" fill="white"/></svg></div>
@@ -340,29 +340,32 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     <div class="card" id="upcomingCard">
       <div class="card-title" style="justify-content:space-between">
         <span style="display:inline-flex;align-items:center;gap:6px;color:var(--primary-dark);"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a1.4 1.4 0 0 0-1.4 1.4v.6A6.6 6.6 0 0 0 5.4 10.6v3.1l-1.3 2.2a1 1 0 0 0 .86 1.5h14.08a1 1 0 0 0 .86-1.5l-1.3-2.2v-3.1a6.6 6.6 0 0 0-5.2-6.4v-.6A1.4 1.4 0 0 0 12 2.2z"/><path d="M10 19a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>もうすぐの予定</span>
-        <button id="notifBtn" onclick="requestNotifPermission()" style="display:none;font-size:11px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--primary);background:white;color:var(--primary);cursor:pointer;font-weight:600">通知ON</button>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button onclick="openNewUpcoming()" style="font-size:11px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--primary);background:var(--primary);color:white;cursor:pointer;font-weight:700">＋ 新規</button>
+          <button id="notifBtn" onclick="requestNotifPermission()" style="display:none;font-size:11px;padding:4px 10px;border-radius:8px;border:1.5px solid var(--primary);background:white;color:var(--primary);cursor:pointer;font-weight:600">通知ON</button>
+        </div>
       </div>
       <div id="upcomingList"><p style="font-size:13px;color:var(--text-light);">予定を登録するとここに表示されます</p></div>
-    </div>
-    <div id="weightLineCard" class="vis-card" style="display:none">
-      <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>体重の推移</div>
-      <svg class="weight-line-svg" id="weightLineSvg"></svg>
     </div>
     <div id="walkSummaryCard" class="vis-card" style="display:none">
       <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg>これまでの散歩記録</div>
       <div id="tokaidoSection"></div>
       <div class="walk-summary-grid" id="walkSummaryGrid"></div>
     </div>
-    <div class="card" style="background:linear-gradient(160deg,#fffaf7,#fff);border:1.5px solid var(--primary-light);">
-      <div class="card-title" style="color:var(--primary-dark);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2.2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="13" y2="18"/></svg>直近の記録</div>
-      <ul class="recent-list" id="recentList" style="list-style:none;display:flex;flex-direction:column;gap:6px;">
-        <li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>
-      </ul>
+    <div id="weightLineCard" class="vis-card" style="display:none">
+      <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>体重の推移</div>
+      <svg class="weight-line-svg" id="weightLineSvg"></svg>
     </div>
     <div id="memoryCard" class="memory-card" style="display:none">
       <div class="memory-card-label">📷 思い出</div>
       <div class="memory-card-title" id="memoryCardTitle"></div>
       <div class="memory-card-sub" id="memoryCardSub"></div>
+    </div>
+    <div class="card" style="background:linear-gradient(160deg,#fffaf7,#fff);border:1.5px solid var(--primary-light);">
+      <div class="card-title" style="color:var(--primary-dark);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2.2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="13" y2="18"/></svg>直近の記録</div>
+      <ul class="recent-list" id="recentList" style="list-style:none;display:flex;flex-direction:column;gap:6px;">
+        <li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>
+      </ul>
     </div>
   </div>
 </main>
@@ -446,6 +449,55 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
 </main>
 
 <!-- ===== 追加シート ===== -->
+<!-- 確認ダイアログ（ボタン文字をカスタマイズできる版） -->
+<div id="confirmDialog" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;padding:24px">
+  <div style="background:white;border-radius:16px;padding:20px;max-width:340px;width:100%;box-shadow:0 6px 32px rgba(0,0,0,0.3)">
+    <div id="confirmDialogMsg" style="font-size:14px;line-height:1.6;color:var(--text);margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeConfirmDialog(false)" style="flex:1;padding:10px;border:1.5px solid var(--border);background:white;color:var(--text);border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">もどる</button>
+      <button onclick="closeConfirmDialog(true)" style="flex:1;padding:10px;border:none;background:var(--primary);color:white;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer">OK</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新規予定モーダル（軽量：種別＋日付＋メモのみ） -->
+<div class="sheet-overlay" id="upcomingSheet" onclick="if(event.target===this)closeNewUpcoming()">
+  <div class="sheet-panel" style="max-height:80vh">
+    <div class="sheet-handle"></div>
+    <div class="sheet-topbar">
+      <div style="width:34px"></div>
+      <div class="sheet-title">予定を追加</div>
+      <button class="sheet-close" onclick="closeNewUpcoming()">✕</button>
+    </div>
+    <div style="overflow-y:auto;padding:8px 16px 16px;flex:1">
+      <label style="display:block;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text)">種別</div>
+        <select id="newUp-cat" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;background:white">
+          <option value="">選んでください</option>
+          <option value="hospital">通院</option>
+          <option value="meds-vac">お薬（ワクチン）</option>
+          <option value="meds-med">お薬（投薬）</option>
+          <option value="trim">トリミング</option>
+          <option value="filter">給水フィルター交換</option>
+          <option value="symptom">症状の再診</option>
+        </select>
+      </label>
+      <label style="display:block;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text)">予定日</div>
+        <input type="date" id="newUp-date" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;background:white;box-sizing:border-box">
+      </label>
+      <label style="display:block;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;color:var(--text)">メモ（任意）</div>
+        <textarea id="newUp-memo" rows="2" style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;background:white;box-sizing:border-box;font-family:inherit;resize:vertical"></textarea>
+      </label>
+    </div>
+    <div class="form-save-bar" style="display:flex;gap:8px">
+      <button onclick="closeNewUpcoming()" style="flex:1;padding:12px;border:1.5px solid var(--border);background:white;color:var(--text);border-radius:12px;font-weight:700;font-size:15px;cursor:pointer">キャンセル</button>
+      <button onclick="saveNewUpcoming()" style="flex:2;padding:12px;border:none;background:var(--primary);color:white;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer">予定を保存</button>
+    </div>
+  </div>
+</div>
+
 <div class="sheet-overlay" id="addSheet" onclick="closeSheetOverlay(event)">
   <div class="sheet-panel">
 
@@ -845,6 +897,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       </div><!-- /form-scroll -->
       <div class="form-save-bar">
         <button class="btn btn-primary" id="formSaveBtn" onclick="saveCurrentForm()">💾 記録を保存</button>
+        <button id="skipDoneBtn" onclick="skipDoneRecord()" style="display:none;width:100%;margin-top:8px;padding:10px;border:1.5px solid var(--border);background:white;color:var(--text-light);border-radius:12px;font-weight:600;font-size:13px;cursor:pointer">予定だけキャンセル（記録は付けない）</button>
       </div>
     </div><!-- /addStepForm -->
 
@@ -1075,7 +1128,10 @@ function openAddSheet() {
 function closeAddSheet() {
   document.getElementById('addSheet').classList.remove('open');
   currentEditId = null;
+  pendingDoneRef = null;
   document.getElementById('formSaveBtn').textContent = '💾 記録を保存';
+  const skipBtn = document.getElementById('skipDoneBtn');
+  if(skipBtn) skipBtn.style.display = 'none';
 }
 
 function editRecord(key, id) {
@@ -1461,6 +1517,21 @@ function addRecord(type){
   if(getWebAppUrl()){
     showSyncBar('📤 Google Sheetsに送信中...','syncing');
     syncToSheets(key,record,'add').then(()=>showSyncBar('✅ Sheetsに保存しました','success'));
+  }
+
+  // 「実施済み」フローから来た場合は、元の予定の next をクリア（記録自体は履歴として残す）
+  if(pendingDoneRef && pendingDoneRef.key===key){
+    const oldRecords=DB.get(pendingDoneRef.key);
+    const oldIdx=oldRecords.findIndex(r=>r.id===pendingDoneRef.id);
+    if(oldIdx>=0){
+      oldRecords[oldIdx].next='';
+      DB.set(pendingDoneRef.key,oldRecords);
+      const url=getWebAppUrl();
+      if(url){
+        fetch(`${url}?action=update_next&type=${encodeURIComponent(pendingDoneRef.key)}&id=${encodeURIComponent(pendingDoneRef.id)}&next=&t=${Date.now()}`).catch(e=>console.warn('next クリア失敗:',e));
+      }
+    }
+    pendingDoneRef=null;
   }
 
   showAddSuccess(key);
@@ -1997,22 +2068,122 @@ function renderUpcoming(){
   }).join('');
 }
 
-// 予定を「実施済み」にする：next日付をクリアして一覧と通知から外す（dateは過去の実施日として残す）
+// 「実施済み」フローで開いた元レコードの参照（保存後に next をクリアするために使う）
+let pendingDoneRef = null;
+
+// 種別 → 日付input id の対応表
+const CAT_DATE_INPUT_ID = {
+  hospital:'hosp-date', vaccine:'vac-date', medicine:'med-date',
+  trim:'trim-date', filter:'filter-date', symptom:'symp-date', meds:'meds-date'
+};
+
+// 予定の「実施済み」ボタン：その種別の新規記録フォームを開き、保存後に元の予定の next をクリアする
 function markDone(key,id){
-  const records=DB.get(key);
-  const idx=records.findIndex(r=>r.id===id);
-  if(idx<0)return;
-  const rec=records[idx];
+  const rec=DB.get(key).find(r=>r.id===id);
+  if(!rec)return;
+  pendingDoneRef={key,id};
+  // 既存の addSheet を開いて該当種別のフォームを直接表示
+  document.getElementById('addSheet').classList.add('open');
+  document.getElementById('addStepSuccess').classList.remove('active');
+  selectCat(key);
+  // 日付の初期値を「元の予定日」にしておく（今日ではなく）
+  const dateInputId=CAT_DATE_INPUT_ID[key];
+  if(dateInputId && rec.next){
+    const dateEl=document.getElementById(dateInputId);
+    if(dateEl) dateEl.value=normalizeDate(rec.next)||rec.next;
+  }
+  // meds の場合は kind を引き継ぐ
+  if(key==='meds' && rec.kind){
+    const kindEl=document.getElementById('meds-kind');
+    if(kindEl){ kindEl.value=rec.kind; onMedsKindChange(); }
+  }
+  // 「予定だけキャンセル」ボタンを表示（このフローのときだけ）
+  const skipBtn=document.getElementById('skipDoneBtn');
+  if(skipBtn) skipBtn.style.display='';
+}
+
+// カスタム確認ダイアログ（「もどる」「OK」表記）
+let _confirmCallback = null;
+function customConfirm(msg, onOk){
+  document.getElementById('confirmDialogMsg').textContent = msg;
+  _confirmCallback = onOk;
+  document.getElementById('confirmDialog').style.display = 'flex';
+}
+function closeConfirmDialog(ok){
+  document.getElementById('confirmDialog').style.display = 'none';
+  const cb = _confirmCallback;
+  _confirmCallback = null;
+  if(ok && cb) cb();
+}
+
+// 記録は付けずに元の予定だけ取り消す（予定がキャンセルになった等）
+function skipDoneRecord(){
+  if(!pendingDoneRef){ closeAddSheet(); return; }
+  const {key,id}=pendingDoneRef;
   const label=(CAT_CFG[key]&&CAT_CFG[key].label)||'予定';
-  const dateStr=rec.next?`（${rec.next}）`:'';
-  if(!confirm(`「${label}」の予定${dateStr}を実施済みにしますか？`))return;
-  rec.next='';
+  customConfirm(`「${label}」の予定を、記録を付けずにキャンセルしますか？`, async()=>{
+    const records=DB.get(key);
+    const idx=records.findIndex(r=>r.id===id);
+    if(idx>=0){
+      records[idx].next='';
+      DB.set(key,records);
+      const url=getWebAppUrl();
+      if(url){
+        try{
+          await fetch(`${url}?action=update_next&type=${encodeURIComponent(key)}&id=${encodeURIComponent(id)}&next=&t=${Date.now()}`);
+        }catch(e){ console.warn('next クリア失敗:',e); }
+      }
+    }
+    pendingDoneRef=null;
+    closeAddSheet();
+    renderUpcoming();
+    updateHomeStats();
+    showToast('予定を取り消しました');
+  });
+}
+
+// 新規予定モーダルを開く
+function openNewUpcoming(){
+  document.getElementById('newUp-cat').value='';
+  document.getElementById('newUp-date').value=localDateStr();
+  document.getElementById('newUp-memo').value='';
+  document.getElementById('upcomingSheet').classList.add('open');
+}
+
+function closeNewUpcoming(){
+  document.getElementById('upcomingSheet').classList.remove('open');
+}
+
+// 新規予定を保存（種別＋日付＋メモのみの軽量フロー）
+function saveNewUpcoming(){
+  const catSel=document.getElementById('newUp-cat').value;
+  const date=document.getElementById('newUp-date').value;
+  const memo=document.getElementById('newUp-memo').value;
+  if(!catSel){ alert('種別を選んでください'); return; }
+  if(!date){ alert('予定日を入れてください'); return; }
+  // meds は kind を分けてある
+  let key=catSel, kind='';
+  if(catSel==='meds-vac'){ key='meds'; kind='ワクチン'; }
+  else if(catSel==='meds-med'){ key='meds'; kind='投薬'; }
+  const normalized=normalizeDate(date)||date;
+  const record={
+    id:Date.now(),
+    createdAt:localDateStr(),
+    date:normalized,
+    next:normalized,
+    memo:memo
+  };
+  if(key==='meds') record.kind=kind;
+  const records=DB.get(key);
+  records.unshift(record);
   DB.set(key,records);
-  syncToSheets(key,{id:rec.id},'delete');
-  syncToSheets(key,rec,'add');
+  if(getWebAppUrl()) syncToSheets(key,record,'add');
+  closeNewUpcoming();
   renderUpcoming();
   updateHomeStats();
-  showToast('✅ 実施済みにしました');
+  renderTimeline();
+  renderCalendar();
+  showToast('✅ 予定を追加しました');
 }
 
 function editNextDate(key, id, currentDate){
