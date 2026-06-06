@@ -12,7 +12,8 @@
 
 ## 触ってはいけないもの・基本ルール
 - **このフォルダ（wan-care-deploy）が作業・デプロイ用**。`Cowork_test/Wancare` はバックアップ専用、編集しない
-- GASのエンドポイントURLは `index.html` 内の `GAS_URL` 変数に記載。**公開しない**
+- GASのエンドポイントURL（Apps Script Web アプリのURL）は **`index.html` にハードコードしない**。設定画面で入力し、各端末の localStorage（`settings.webAppUrl`）に保存する方式。`getWebAppUrl()` で取得する
+  - この設計のおかげで `index.html` を GitHub Pages で公開してもURLは漏れない。実URLをコードに直書きしないこと（漏洩防止）
 - 絵文字は使わない。アイコンはすべてSVG（`cs(type, size)` 関数で生成）
 
 ---
