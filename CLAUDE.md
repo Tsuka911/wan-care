@@ -71,8 +71,13 @@
 
 ## ホーム画面の主要セクション（場所の地図）
 
-統計ピル：`updateHomeStats()`（最新体重 / 連続日数 / 前回通院）
+統計ピル：`updateHomeStats()`（最新体重 / 連続日数 / 今日の日没）
 - 散歩ピルの値は `streak2+'日'`、ラベルは「連続」（「日」を重ねない）
+- 3つ目のピル（旧「前回通院」`statHospital`）は「今日の日没」`statSunset` に差し替え済み
+  - 散歩に行くタイミングの参考用。`updateHomeStats()` 末尾から `updateSunsetPill()` を呼ぶ
+  - 地域は設定画面の「日没を表示する地域」（`set-sunset-city` → `settings.sunsetCity`、既定 `nagoya`）。座標は `SUNSET_CITIES` 定数（主要都市プリセット）
+  - 日没は無料の `api.sunrise-sunset.org`（APIキー不要・CORS対応、`no-cors` 不要）から取得。返り値はUTCなので `new Date()` で端末TZ（JST）へ自動変換して表示
+  - `sunsetCache`（`{date, cityId, sunset}`）に当日分をキャッシュ。同日・同都市ならAPIを呼ばない。取得失敗してもアプリは壊さず `--` のまま
 
 縦並び順（上から下）：
 1. もうすぐの予定：`renderUpcoming()` → `id="upcomingCard"`
@@ -112,7 +117,7 @@
 
 ### 「予定だけ」レコード（`isPlanOnly: true`）の扱い
 - 新規予定 (`saveNewUpcoming`) で追加されたレコードは `isPlanOnly: true` が付き、**実績ではない**扱い
-- 以下のビューから除外される：直近の記録（`updateHomeStats` 内）／前回通院ピル（`statHospital`）／記録タブ（`getAllRecords`）／カテゴリ別記録一覧（`renderRecords`）
+- 以下のビューから除外される：直近の記録（`updateHomeStats` 内）／記録タブ（`getAllRecords`）／カテゴリ別記録一覧（`renderRecords`）
 - 「もうすぐの予定」（`renderUpcoming` / `getUpcomingReminders`）にだけ表示される
 - 実施済みボタンから記録フォーム経由で保存した「実績レコード」は別IDで新規追加されるので `isPlanOnly` が付かず、通常通り全ビューに出る
 - 元の予定レコードは `next` を空にされて「もうすぐの予定」から消え、`isPlanOnly: true` のまま残るので他ビューにも引き続き出ない

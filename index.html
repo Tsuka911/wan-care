@@ -330,9 +330,9 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <div class="home-stat-label">連続</div>
       </div>
       <div class="home-stat-pill">
-        <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/><rect x="13" y="3" width="6" height="8" rx="3" fill="#E07B54"/><rect x="14.5" y="4.5" width="3" height="5" rx="1.5" fill="white" opacity="0.5"/><rect x="14" y="13" width="4" height="10" rx="2" fill="white"/><rect x="11" y="16" width="10" height="4" rx="2" fill="white"/></svg></div>
-        <div class="home-stat-value" id="statHospital">--</div>
-        <div class="home-stat-label">前回通院</div>
+        <div class="home-stat-icon"><svg width="22" height="22" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="17" r="6" fill="#E07B54"/><path d="M5 24h22" stroke="#E07B54" stroke-width="2.5" stroke-linecap="round"/><line x1="16" y1="4" x2="16" y2="8" stroke="#E07B54" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="8" x2="8.5" y2="10.5" stroke="#E07B54" stroke-width="2" stroke-linecap="round"/><line x1="26" y1="8" x2="23.5" y2="10.5" stroke="#E07B54" stroke-width="2" stroke-linecap="round"/><line x1="3" y1="17" x2="6" y2="17" stroke="#E07B54" stroke-width="2" stroke-linecap="round"/><line x1="26" y1="17" x2="29" y2="17" stroke="#E07B54" stroke-width="2" stroke-linecap="round"/></svg></div>
+        <div class="home-stat-value" id="statSunset">--</div>
+        <div class="home-stat-label">今日の日没</div>
       </div>
     </div>
   </div>
@@ -939,11 +939,12 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:16px">Web アプリのURLを登録すると、入力が自動的にGoogle スプレッドシートに同期されます。</p>
 
     <div style="margin-top:4px;padding-top:12px;border-top:1px dashed var(--border);margin-bottom:12px">
-      <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;display:inline-flex;align-items:center;gap:6px">🦮 ショートカット連携用コピー</div>
-      <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:10px">iPhoneのショートカットアプリに貼り付けて使います。</p>
-      <button class="btn btn-secondary" style="margin-bottom:8px;width:100%" onclick="copyShortcutUrl()">📋 Apps Script URL をコピー</button>
-      <button class="btn btn-secondary" style="width:100%" onclick="copyShortcutData()">📋 data テキストをコピー</button>
-      <p style="font-size:11px;color:var(--text-light);line-height:1.6;margin-top:8px">dataをコピー後、ショートカットの入力欄に貼り付けて、<br>【ランダムID】【散歩日】【距離km】の部分を変数に置き換えてください。</p>
+      <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.2" y1="10.2" x2="5.6" y2="11.6"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.4" y1="11.6" x2="19.8" y2="10.2"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 9 16 6"/></svg>日没時刻の表示</div>
+      <div class="form-group">
+        <label class="form-label">日没を表示する地域</label>
+        <select class="form-select" id="set-sunset-city"></select>
+        <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-top:6px">散歩の参考に、選んだ地域の「今日の日没時刻」をホーム上部に表示します。</p>
+      </div>
     </div>
 
     <div style="margin-top:4px;padding-top:12px;border-top:1px dashed var(--border)">
@@ -1798,8 +1799,8 @@ function updateHomeStats(){
   document.getElementById('statWalks').textContent=streak2+'日';
   // 「予定だけ」（isPlanOnly）レコードは実績ではないので統計・直近の記録から除外
   const notPlan=r=>!r.isPlanOnly;
-  const hospitals=DB.get('hospital').filter(notPlan);
-  document.getElementById('statHospital').textContent=hospitals.length?fmtDate(hospitals[0].date).slice(5)||'--':'--';
+  // 3つ目の統計ピルは「今日の日没」（散歩の参考用）
+  updateSunsetPill();
 
   // 直近の記録（isPlanOnly は除外）
   const all=[
@@ -1864,6 +1865,56 @@ function renderWeightLine(){
   const yMax=`<text x="2" y="${padT+4}" font-size="8" fill="#8a7a72">${maxV}</text>`;
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.innerHTML=`<polyline points="${polyline}" fill="none" stroke="var(--primary-light)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${polyline}" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/>${dots}${labels}${yMin}${yMax}`;
+}
+
+// ========== 日没時刻（散歩の参考用） ==========
+// 主要都市のプリセット座標。設定で選んだ地域の「今日の日没」をホーム統計ピルに表示する
+const SUNSET_CITIES=[
+  {id:'sapporo',  name:'札幌',  lat:43.06, lng:141.35},
+  {id:'sendai',   name:'仙台',  lat:38.27, lng:140.87},
+  {id:'tokyo',    name:'東京',  lat:35.68, lng:139.69},
+  {id:'nagoya',   name:'名古屋',lat:35.18, lng:136.91},
+  {id:'osaka',    name:'大阪',  lat:34.69, lng:135.50},
+  {id:'hiroshima',name:'広島',  lat:34.39, lng:132.46},
+  {id:'fukuoka',  name:'福岡',  lat:33.59, lng:130.40},
+  {id:'naha',     name:'那覇',  lat:26.21, lng:127.68},
+];
+const SUNSET_DEFAULT_CITY='nagoya';
+
+// 設定で選ばれている都市オブジェクトを返す（未設定なら名古屋）
+function getSunsetCity(){
+  const id=DB.getObj('settings').sunsetCity||SUNSET_DEFAULT_CITY;
+  return SUNSET_CITIES.find(c=>c.id===id)||SUNSET_CITIES.find(c=>c.id===SUNSET_DEFAULT_CITY);
+}
+
+// 統計ピルに今日の日没を表示する。
+// まずキャッシュ（当日・同都市）があれば即描画 → 無ければ無料APIから取得して表示＆キャッシュ
+async function updateSunsetPill(){
+  const el=document.getElementById('statSunset');
+  if(!el)return;
+  const city=getSunsetCity();
+  const today=localDateStr();
+  const cache=DB.getObj('sunsetCache');
+  if(cache.date===today&&cache.cityId===city.id&&cache.sunset){
+    el.textContent=cache.sunset;
+    return; // 当日分は取得済みなのでAPIを呼ばない
+  }
+  if(!cache.sunset)el.textContent='--';
+  try{
+    const url=`https://api.sunrise-sunset.org/json?lat=${city.lat}&lng=${city.lng}&date=today&formatted=0`;
+    const res=await fetch(url);
+    if(!res.ok)throw new Error('HTTP '+res.status);
+    const json=await res.json();
+    if(json.status!=='OK'||!json.results||!json.results.sunset)throw new Error('日没データなし');
+    // results.sunset はUTC。new Date が端末のタイムゾーン（JST）へ自動変換する
+    const t=new Date(json.results.sunset);
+    const hhmm=t.toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+    el.textContent=hhmm;
+    DB.setObj('sunsetCache',{date:today,cityId:city.id,sunset:hhmm});
+  }catch(e){
+    // 取得失敗してもアプリは壊さない。キャッシュ値が無ければ '--' のまま
+    if(!cache.sunset)el.textContent='--';
+  }
 }
 
 const TOKAIDO_MILESTONES=[
@@ -2396,6 +2447,12 @@ function openSettings(){
   document.getElementById('set-gender').value=s.gender||'オス';
   document.getElementById('set-gs-url').value=s.gsUrl||'';
   document.getElementById('set-webapp-url').value=s.webAppUrl||'';
+  // 日没の地域ドロップダウンを生成して現在値を選択
+  const citySel=document.getElementById('set-sunset-city');
+  if(citySel){
+    citySel.innerHTML=SUNSET_CITIES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    citySel.value=s.sunsetCity||SUNSET_DEFAULT_CITY;
+  }
   // 通知設定の読み込み
   const ns=DB.getObj('notifSettings');
   document.getElementById('set-notif-days').value=ns.daysAhead||7;
@@ -2421,7 +2478,8 @@ function saveSettings(){
     birth:document.getElementById('set-birth').value,
     gender:document.getElementById('set-gender').value,
     gsUrl:document.getElementById('set-gs-url').value,
-    webAppUrl:document.getElementById('set-webapp-url').value
+    webAppUrl:document.getElementById('set-webapp-url').value,
+    sunsetCity:document.getElementById('set-sunset-city').value||SUNSET_DEFAULT_CITY
   };
   DB.setObj('settings',s);
   // 通知設定を保存
@@ -2436,6 +2494,7 @@ function saveSettings(){
     }
   });
   applySettings();
+  updateHomeStats(); // 日没ピルを新しい地域で更新
   closeSettings();
   showToast('💾 設定を保存しました');
   if(s.webAppUrl){
@@ -2485,17 +2544,6 @@ function applySettings(){
   document.getElementById('syncBtn').style.opacity=opacity;
   const sb2=document.getElementById('syncBtn2');
   if(sb2) sb2.style.opacity=opacity;
-}
-
-// ========== ショートカット連携用コピー ==========
-function copyShortcutUrl(){
-  const url = DB.getObj('settings').webAppUrl||'';
-  if(!url){showToast('⚠️ まずApps Script URLを設定・保存してください');return;}
-  navigator.clipboard.writeText(url).then(()=>showToast('✅ URLをコピーしました。ショートカットに貼り付けてください'));
-}
-function copyShortcutData(){
-  const text = '{"date":"【散歩日】","time":0,"dist":【距離km】,"course":"ヘルスケア自動取込","weather":"","memo":"Apple Watch自動連携"}';
-  navigator.clipboard.writeText(text).then(()=>showToast('✅ dataをコピーしました。ショートカットに貼り付けてください'));
 }
 
 // ========== 設定エクスポート／インポート ==========
