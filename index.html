@@ -2316,7 +2316,7 @@ function renderCalendar(){
           cur.setDate(cur.getDate()+1);
         }
       } else {
-        const ds=normalizeDate(r.date||r.start||r.createdAt);
+        const ds=normalizeDate((r.isPlanOnly&&r.next)?r.next:(r.date||r.start||r.createdAt));
         if(!ds)return;
         if(!recordDays[ds])recordDays[ds]=new Set();
         recordDays[ds].add(cfg.color);
@@ -2389,7 +2389,7 @@ function renderCalDayRecords(){
       if(type==='trip'&&r.start&&r.end){
         if(ds>=r.start&&ds<=r.end) dayRecords.push({...r,_type:type,_cfg:cfg});
       } else {
-        const rds=normalizeDate(r.date||r.start||r.createdAt);
+        const rds=normalizeDate((r.isPlanOnly&&r.next)?r.next:(r.date||r.start||r.createdAt));
         if(rds===ds) dayRecords.push({...r,_type:type,_cfg:cfg});
       }
     });
