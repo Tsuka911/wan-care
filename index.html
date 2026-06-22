@@ -337,6 +337,14 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     </div>
   </div>
   <div class="home-content">
+    <button class="card" id="shoppingOpenBtn" onclick="openShoppingSheet()" style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;cursor:pointer;border:1.5px solid var(--primary-light);background:linear-gradient(160deg,#fffaf7,#fff);font-family:inherit">
+      <span style="flex-shrink:0;width:42px;height:42px;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:22px">🛒</span>
+      <span style="flex:1">
+        <span style="display:block;font-size:15px;font-weight:700;color:var(--primary-dark)">買い物リスト</span>
+        <span style="display:block;font-size:12px;color:var(--text-light);margin-top:2px">買い足す消耗品をチェック</span>
+      </span>
+      <span style="flex-shrink:0;color:var(--primary);font-size:18px">›</span>
+    </button>
     <div class="card" id="upcomingCard">
       <div class="card-title" style="justify-content:space-between">
         <span style="display:inline-flex;align-items:center;gap:6px;color:var(--primary-dark);"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a1.4 1.4 0 0 0-1.4 1.4v.6A6.6 6.6 0 0 0 5.4 10.6v3.1l-1.3 2.2a1 1 0 0 0 .86 1.5h14.08a1 1 0 0 0 .86-1.5l-1.3-2.2v-3.1a6.6 6.6 0 0 0-5.2-6.4v-.6A1.4 1.4 0 0 0 12 2.2z"/><path d="M10 19a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>もうすぐの予定</span>
@@ -494,6 +502,35 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     <div class="form-save-bar" style="display:flex;gap:8px">
       <button onclick="closeNewUpcoming()" style="flex:1;padding:12px;border:1.5px solid var(--border);background:white;color:var(--text);border-radius:12px;font-weight:700;font-size:15px;cursor:pointer">キャンセル</button>
       <button onclick="saveNewUpcoming()" style="flex:2;padding:12px;border:none;background:var(--primary);color:white;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer">予定を保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 買い物リスト（消耗品） ===== -->
+<div class="sheet-overlay" id="shoppingSheet" onclick="if(event.target===this)closeShoppingSheet()">
+  <div class="sheet-panel" style="max-height:85vh">
+    <div class="sheet-handle"></div>
+    <div class="sheet-topbar">
+      <div style="width:34px"></div>
+      <div class="sheet-title">🛒 買い物リスト</div>
+      <button class="sheet-close" onclick="closeShoppingSheet()">✕</button>
+    </div>
+    <div style="overflow-y:auto;padding:8px 16px 16px;flex:1">
+      <!-- 買うものリスト -->
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--primary-dark)">買うもの</div>
+      <div id="shoppingListEl" style="display:flex;flex-direction:column;gap:8px;margin-bottom:22px"></div>
+
+      <!-- 定番から追加 -->
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text)">定番から追加</div>
+      <div id="shoppingCandidatesEl" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px"></div>
+
+      <!-- 新しく追加 -->
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:var(--text)">新しく追加</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="shopping-new" placeholder="例：消臭スプレー" onkeydown="if(event.key==='Enter')addShoppingNew()" style="flex:1;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:16px;background:white;box-sizing:border-box;font-family:inherit">
+        <button onclick="addShoppingNew()" style="flex-shrink:0;padding:10px 16px;border:none;background:var(--primary);color:white;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer">追加</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-light);margin-top:6px">追加したものは「定番」にも登録され、次回から選べます。</div>
     </div>
   </div>
 </div>
@@ -2210,6 +2247,117 @@ function closeNewUpcoming(){
   document.getElementById('upcomingSheet').classList.remove('open');
 }
 
+// ========== 買い物リスト（消耗品） ==========
+const SHOPPING_DEFAULTS = ['うんち袋','トイレシーツ','ドッグフード','おやつ','ウェットティッシュ','消臭スプレー','歯磨きガム','涙やけ拭き取りシート'];
+
+// 候補が未設定なら定番で初期化（初回のみ）
+function initShoppingCandidates(){
+  if(localStorage.getItem('shoppingCandidates')===null){
+    DB.set('shoppingCandidates', SHOPPING_DEFAULTS);
+  }
+}
+
+function openShoppingSheet(){
+  initShoppingCandidates();
+  renderShopping();
+  document.getElementById('shoppingSheet').classList.add('open');
+}
+
+function closeShoppingSheet(){
+  document.getElementById('shoppingSheet').classList.remove('open');
+}
+
+// 買うものリストと候補チップを描画
+function renderShopping(){
+  const list = DB.get('shoppingList');
+  const cands = DB.get('shoppingCandidates');
+
+  // 買うものリスト
+  const listEl = document.getElementById('shoppingListEl');
+  if(list.length===0){
+    listEl.innerHTML = '<p style="font-size:13px;color:var(--text-light);margin:0">下の候補から選ぶか、新しく追加してください。</p>';
+  } else {
+    listEl.innerHTML = list.map(item => `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:white;border:1.5px solid var(--border);border-radius:12px">
+        <span style="flex:1;font-size:15px;color:var(--text)">${escapeHtml(item.name)}</span>
+        <button onclick="completeShoppingItem(${item.id})" style="flex-shrink:0;padding:6px 12px;border:none;background:var(--primary);color:white;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer">✓ 買った</button>
+      </div>
+    `).join('');
+  }
+
+  // 候補チップ
+  const candEl = document.getElementById('shoppingCandidatesEl');
+  if(cands.length===0){
+    candEl.innerHTML = '<p style="font-size:13px;color:var(--text-light);margin:0">候補がありません。「新しく追加」から登録できます。</p>';
+  } else {
+    candEl.innerHTML = cands.map(name => `
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:8px 10px;background:white;border:1.5px solid var(--primary-light);border-radius:20px">
+        <button onclick="addShoppingFromCandidate('${escapeAttr(name)}')" style="border:none;background:none;color:var(--primary-dark);font-size:14px;font-weight:600;cursor:pointer;padding:0">＋ ${escapeHtml(name)}</button>
+        <button onclick="removeCandidate('${escapeAttr(name)}')" title="候補から削除" style="border:none;background:none;color:var(--text-light);font-size:14px;cursor:pointer;padding:0;line-height:1">×</button>
+      </span>
+    `).join('');
+  }
+}
+
+// 候補タップ → 買うものリストへ追加（同名が既にあれば追加しない）
+function addShoppingFromCandidate(name){
+  const list = DB.get('shoppingList');
+  if(list.some(i => i.name===name)){
+    showToast('すでにリストにあります');
+    return;
+  }
+  list.push({ id: Date.now(), name });
+  DB.set('shoppingList', list);
+  renderShopping();
+}
+
+// 入力欄から追加 → 買うものリスト＋候補にも登録
+function addShoppingNew(){
+  const input = document.getElementById('shopping-new');
+  const name = input.value.trim();
+  if(!name) return;
+
+  const list = DB.get('shoppingList');
+  if(!list.some(i => i.name===name)){
+    list.push({ id: Date.now(), name });
+    DB.set('shoppingList', list);
+  }
+
+  const cands = DB.get('shoppingCandidates');
+  if(!cands.includes(name)){
+    cands.push(name);
+    DB.set('shoppingCandidates', cands);
+  }
+
+  input.value='';
+  renderShopping();
+}
+
+// 「買った」→ リストから削除（候補には残す）
+function completeShoppingItem(id){
+  const list = DB.get('shoppingList').filter(i => i.id!==id);
+  DB.set('shoppingList', list);
+  renderShopping();
+  showToast('買い物リストから外しました');
+}
+
+// 候補そのものを削除
+function removeCandidate(name){
+  customConfirm(`「${name}」を定番候補から削除しますか？`, ()=>{
+    const cands = DB.get('shoppingCandidates').filter(n => n!==name);
+    DB.set('shoppingCandidates', cands);
+    renderShopping();
+  });
+}
+
+// HTMLエスケープ（表示崩れ・誤動作防止）
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){
+  return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+
 // 新規予定を保存（種別＋日付＋メモのみの軽量フロー）
 function saveNewUpcoming(){
   const catSel=document.getElementById('newUp-cat').value;
@@ -2815,6 +2963,7 @@ function showToast(msg){
 window.addEventListener('DOMContentLoaded',async()=>{
   setTodayDates();
   applySettings();
+  initShoppingCandidates();
   applyDogPhoto(localStorage.getItem('dogPhoto'));
   updateHomeStats();
   renderUpcoming();
