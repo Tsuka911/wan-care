@@ -11,7 +11,7 @@
 - バックエンドは `wan-care-script.gs`（Google Apps Script）+ Google Sheets（データ保存）
 
 ## 触ってはいけないもの・基本ルール
-- **このフォルダ（wan-care-deploy）が作業・デプロイ用**。`Cowork_test/Wancare` はバックアップ専用、編集しない
+- **このフォルダ（wan-care-deploy）が唯一の作業・デプロイ用フォルダ**。以前あった別フォルダ（`Cowork_test/Wancare` バックアップ）は作業フォルダの取り違え整理時に削除済み。今はこのフォルダだけが正。他にコピーを作らない
 - GASのエンドポイントURL（Apps Script Web アプリのURL）は **`index.html` にハードコードしない**。設定画面で入力し、各端末の localStorage（`settings.webAppUrl`）に保存する方式。`getWebAppUrl()` で取得する
   - この設計のおかげで `index.html` を GitHub Pages で公開してもURLは漏れない。実URLをコードに直書きしないこと（漏洩防止）
 - 絵文字は使わない。アイコンはすべてSVG（`cs(type, size)` 関数で生成）
@@ -133,3 +133,10 @@
 - `customConfirm(msg, onOk)` / `closeConfirmDialog(ok)` / `#confirmDialog`
 - ブラウザの `confirm()` はボタン文字を変更できないため自作（「もどる」「OK」表記が出せる）
 - 現状は「予定だけキャンセル」からのみ使用。今後 confirm を置き換える際にも流用可
+
+## 買い物リスト（消耗品）
+- ホームのボタン `#shoppingOpenBtn` → `openShoppingSheet()` で下から出るボトムシート `#shoppingSheet` を開く
+- **このアプリで唯一 Sheets 同期しない機能。データは localStorage のみ**（`DB.get/set` で `shoppingList`＝買うもの / `shoppingCandidates`＝候補）。健康記録とは性質が違う買い物メモなので同期不要と判断。今後も指示がない限り Sheets 連携は追加しない
+- 候補の初期値は `SHOPPING_DEFAULTS` 定数。`initShoppingCandidates()` が初回だけ localStorage に流し込む
+- 自由入力で追加したものは候補にも自動登録。「買った」(`completeShoppingItem`) はリストから消すだけで候補には残す
+- **起動時の描画リスト（`updateHomeStats` 等）には追加不要**。ホームにあるのは静的なボタンだけで、中身はシートを開いた時に `renderShopping()` が描画する。ビジュアルカード系（もうすぐの予定・体重グラフ等）の起動時描画ルールとは別物
