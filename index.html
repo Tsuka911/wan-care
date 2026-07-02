@@ -1554,7 +1554,10 @@ function addRecord(type){
   // Google Sheets同期
   if(getWebAppUrl()){
     showSyncBar('📤 Google Sheetsに送信中...','syncing');
-    syncToSheets(key,record,'add').then(()=>showSyncBar('✅ Sheetsに保存しました','success'));
+    syncToSheets(key,record,'add').then(ok=>{
+      if(key==='walk'&&ok===false) showSyncBar('📴 今は送れませんでした。次回の同期で自動的に送ります','error');
+      else showSyncBar('✅ Sheetsに保存しました','success');
+    });
   }
 
   // 「実施済み」フローから来た場合は、元の予定の next をクリア（記録自体は履歴として残す）
@@ -2749,9 +2752,37 @@ function showSyncBar(msg,state){
   if(state==='success') setTimeout(()=>{bar.className='sync-bar';},2500);
 }
 
+// 未同期の散歩を保持するキュー（localStorage: walkUnsynced = {id: record}）
+// no-cors POST は iOS Safari で届かないことがあり、届かないまま次回 loadFromSheets で
+// ローカルが上書きされると記録が消える。そこで散歩の追加だけは成否を確認し、
+// 失敗したものをキューに退避 → loadFromSheets でマージ復活＆再送する。
+function addUnsyncedWalk(rec){const m=DB.getObj('walkUnsynced');m[rec.id]=rec;DB.setObj('walkUnsynced',m);}
+function removeUnsyncedWalk(id){const m=DB.getObj('walkUnsynced');if(m[id]!=null){delete m[id];DB.setObj('walkUnsynced',m);}}
+
+// 散歩の追加は「届きやすいGET(add_walk)」＋「レスポンスで成否確認」。成功でキューから除去、失敗でキューへ退避。
+async function sendWalkAdd(rec){
+  const url=getWebAppUrl();
+  if(!url)return false;
+  const enc=encodeURIComponent;
+  const q=`${url}?action=add_walk&id=${rec.id}&date=${enc(rec.date||'')}&time=${enc(rec.time||0)}&dist=${enc(rec.dist||0)}&course=${enc(rec.course||'')}&weather=${enc(rec.weather||'')}&memo=${enc(rec.memo||'')}`;
+  try{
+    const res=await fetch(q);
+    const j=await res.json();
+    if(!j||j.status!=='ok')throw new Error('bad response');
+    removeUnsyncedWalk(rec.id);
+    return true;
+  }catch(e){
+    console.warn('散歩の同期に失敗（未同期として保持）:',e);
+    addUnsyncedWalk(rec);
+    return false;
+  }
+}
+
 async function syncToSheets(type,record,action){
   const url=getWebAppUrl();
   if(!url)return;
+  // 散歩の追加だけは専用処理（成否確認＋未同期キュー）
+  if(type==='walk'&&action==='add'){return await sendWalkAdd(record);}
   try{
     const params=new URLSearchParams();
     params.set('action',action);params.set('type',type);
@@ -2779,6 +2810,26 @@ async function loadFromSheets(){
     if(json.status!=='ok')throw new Error(json.message||'取得失敗');
     Object.keys(json.data).forEach(type=>{
       if(type==='profile')return;
+      // 散歩は「Sheetsで丸ごと上書き」せず、未同期分を残してマージする（消失防止）
+      if(type==='walk'){
+        const sheetArr=(json.data.walk||[]).map(r=>({...r,id:Number(r.id)||0}));
+        const unsynced=DB.getObj('walkUnsynced');
+        // Sheetsが空を返したときはローカルを消さず維持（一時的な取得失敗から守る）＋未同期を再送
+        if(sheetArr.length===0){
+          Object.values(unsynced).forEach(r=>sendWalkAdd(r));
+          return;
+        }
+        const sheetIds=new Set(sheetArr.map(r=>String(r.id)));
+        const keep={};const extras=[];
+        for(const id in unsynced){
+          if(sheetIds.has(String(id))){/* もうSheetsに届いていた→キューから除去 */}
+          else{extras.push(unsynced[id]);keep[id]=unsynced[id];} // まだ無い→ローカルに残す
+        }
+        DB.setObj('walkUnsynced',keep);
+        DB.set('walk',[...extras,...sheetArr].sort((a,b)=>b.id-a.id));
+        Object.values(keep).forEach(r=>sendWalkAdd(r)); // 未同期分を再送
+        return;
+      }
       if(json.data[type]&&json.data[type].length>0){
         const sorted=json.data[type].map(r=>({...r,id:Number(r.id)||0})).sort((a,b)=>b.id-a.id);
         DB.set(type,sorted);
