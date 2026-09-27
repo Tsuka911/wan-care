@@ -110,13 +110,20 @@
 
 ## 「もうすぐの予定」リマインダー
 - 対象種別は `REMIND_CHECKS` 配列で定義（hospital / vaccine / medicine / trim / filter / symptom / meds）
-- 30日以内の next 日付を持つレコードを抽出して表示
+- 30日先までの next 日付を持つレコードを抽出して表示
+
+### 過ぎた予定（やり忘れ防止）
+- **`next` が過ぎていても、空でない限り＝未実施なので表示し続ける**（`getUpcomingReminders` は未来側の上限だけチェックし、過去側は制限しない）
+- 雨などで開かない日が続いても見逃さないための仕様。何日前までという下限は意図的に設けていない
+- `daysLeft` が負のものに `overdue:true` を付け、並び順は `daysLeft` 昇順なので遅れているものが自動的に一番上に来る
+- 見た目は種別カラーではなく赤系（`.remind-days.overdue` + インラインの赤枠）で「○日 / 遅れ」の2行表示。ラベル幅が52pxしかないのでフォントを小さくして2行にしている
+- 通知本文（`sendUpcomingNotifications`）も「○日遅れ」表記に対応。通知済みフラグは日付ごとなので、実施するまで毎日1回リマインドされる
 
 ### 既存予定カードのボタン
 - カレンダー＋ペン → `editNextDate()`（トグル動作で日付編集）
 - チェックマーク → `markDone()`：**記録フォームを開く**動作
   - グローバル変数 `pendingDoneRef = {key, id}` で「実施済み経由」を識別
-  - 日付は元の next を初期値にセット（今日ではない）。meds は kind も引き継ぐ
+  - **日付の初期値は「今日」**（`localDateStr()`）。予定日より早くても遅くても、アプリを開いて押した日が実施日になるのが自然なため。違う日なら手で直す。meds は kind も引き継ぐ
   - フォーム下部に `#skipDoneBtn`（予定だけキャンセル）が出現。通常記録のときは display:none
   - フォームで保存すると `addRecord()` 末尾で元の next を空に → `update_next` で同期
   - `closeAddSheet()` で `pendingDoneRef` と `#skipDoneBtn` を必ずリセットすること（次の通常記録に引きずらないため）
