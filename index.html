@@ -89,6 +89,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
 .remind-item.normal{background:#f0f9f4;border:1.5px solid #a0d8bc;}
 .remind-days{font-weight:700;font-size:15px;flex-shrink:0;width:52px;text-align:center;}
 .remind-days.urgent{color:#d94f00;} .remind-days.soon{color:#b07a00;} .remind-days.normal{color:#2a8a5a;}
+.remind-days.overdue{color:#c0392b;font-size:12px;line-height:1.25;}
 .remind-label{flex:1;font-weight:600;}
 .remind-date{font-size:11px;color:var(--text-light);margin-top:2px;}
 
@@ -2184,12 +2185,13 @@ function getUpcomingReminders(daysAhead=30){
       if(!rawNext)return;
       const nextDate=new Date(rawNext);nextDate.setHours(0,0,0,0);
       if(isNaN(nextDate.getTime()))return;
-      if(nextDate<today||nextDate>limit)return;
+      // 過ぎてしまった予定も next が残っている＝未実施なので表示対象にする（下限なし）
+      if(nextDate>limit)return;
       const sig=key+'_'+rawNext;
       if(seen.has(sig))return;
       seen.add(sig);
       const daysLeft=Math.round((nextDate-today)/86400000);
-      reminders.push({iconType,label:labelFn(r),date:fmtDate(rawNext),daysLeft,key,id:r.id,rawNext});
+      reminders.push({iconType,label:labelFn(r),date:fmtDate(rawNext),daysLeft,overdue:daysLeft<0,key,id:r.id,rawNext});
     });
   });
   return reminders.sort((a,b)=>a.daysLeft-b.daysLeft);
@@ -2201,12 +2203,14 @@ function renderUpcoming(){
   if(!container)return;
   if(reminders.length===0){container.innerHTML='<p style="font-size:13px;color:var(--text-light);">30日以内の予定はありません</p>';return;}
   container.innerHTML=reminders.map(r=>{
-    const urgCls=r.daysLeft<=2?'urgent':r.daysLeft<=7?'soon':'normal';
-    const dayLabel=r.daysLeft===0?'今日！':r.daysLeft===1?'明日！':r.daysLeft+'日後';
+    const urgCls=r.overdue?'overdue':r.daysLeft<=2?'urgent':r.daysLeft<=7?'soon':'normal';
+    const dayLabel=r.overdue?`${-r.daysLeft}日<br>遅れ`:r.daysLeft===0?'今日！':r.daysLeft===1?'明日！':r.daysLeft+'日後';
     const catColor=(CAT_CFG[r.key]||{}).color||'#e07b54';
     const catBg=catColor.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16));
-    const bgStyle=`rgba(${catBg[0]},${catBg[1]},${catBg[2]},0.12)`;
-    return`<div class="remind-item" id="remind-${r.key}-${r.id}" style="background:${bgStyle};border:1.5px solid ${catColor}44">
+    // 遅れている予定は種別カラーではなく赤系で目立たせる
+    const bgStyle=r.overdue?'rgba(217,79,0,0.10)':`rgba(${catBg[0]},${catBg[1]},${catBg[2]},0.12)`;
+    const borderStyle=r.overdue?'1.5px solid #e2725b':`1.5px solid ${catColor}44`;
+    return`<div class="remind-item" id="remind-${r.key}-${r.id}" style="background:${bgStyle};border:${borderStyle}">
       <div class="remind-days ${urgCls}">${dayLabel}</div>
       <div style="display:flex;align-items:center;gap:8px;flex:1">${csWrap(r.iconType,16)}<div><div class="remind-label">${r.label}</div><div class="remind-date remind-date-val" data-key="${r.key}" data-id="${r.id}">${r.date}</div></div></div>
       <div style="display:flex;gap:6px;flex-shrink:0">
@@ -2239,11 +2243,11 @@ function markDone(key,id){
   document.getElementById('addSheet').classList.add('open');
   document.getElementById('addStepSuccess').classList.remove('active');
   selectCat(key);
-  // 日付の初期値を「元の予定日」にしておく（今日ではなく）
+  // 日付の初期値は「今日」。予定日より早く／遅く実施しても開いた日が入る（必要なら手で直せる）
   const dateInputId=CAT_DATE_INPUT_ID[key];
-  if(dateInputId && rec.next){
+  if(dateInputId){
     const dateEl=document.getElementById(dateInputId);
-    if(dateEl) dateEl.value=normalizeDate(rec.next)||rec.next;
+    if(dateEl) dateEl.value=localDateStr();
   }
   // meds の場合は kind を引き継ぐ
   if(key==='meds' && rec.kind){
@@ -3004,7 +3008,7 @@ function sendUpcomingNotifications(){
     const sig=r.key+'_'+r.id+'_'+r.rawNext;
     if(sent[sig])return; // 今日は既に通知済み
     setTimeout(()=>{
-      const dl=r.daysLeft===0?'今日':r.daysLeft+'日後';
+      const dl=r.daysLeft<0?`${-r.daysLeft}日遅れ`:r.daysLeft===0?'今日':r.daysLeft+'日後';
       const emoji=REMIND_EMOJI[r.iconType]||'🐾';
       new Notification('🐾 わんケア リマインダー',{body:`${emoji} ${r.label}(${dl}：${r.date})`,tag:'wancare-'+sig});
     },delay);
