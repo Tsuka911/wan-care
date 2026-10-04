@@ -242,6 +242,10 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
 .chip:active{transform:scale(0.95);}
 .chip.hospital{border-color:var(--health);color:var(--health);background:#fff5f2;}
 .chip.salon{border-color:var(--daily);color:var(--daily);background:#f0faf5;}
+.chip.health{border-color:var(--health);color:var(--health);background:#fff5f2;}
+.chip.travel{border-color:var(--travel);color:var(--travel);background:#f1f7fd;}
+.chip.violet{border-color:var(--violet);color:var(--violet);background:#f5f3fc;}
+.chip.symptom{border-color:#d95f75;color:#d95f75;background:#fdf1f4;}
 .chip-del{font-size:11px;opacity:.5;flex-shrink:0;padding:0 2px;}
 .chip-del:hover{opacity:1;color:#ff4d4d;}
 
@@ -726,7 +730,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
           <div class="form-card">
             <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="hosp-date"></div>
             <div class="form-group"><label class="form-label">病院名</label><input type="text" class="form-input" id="hosp-name" placeholder="○○動物病院" onfocus="renderChips('hosp-name','savedHospitals','hospital')" oninput="renderChips('hosp-name','savedHospitals','hospital')"><div class="suggestion-chips" id="chips-hosp-name"></div></div>
-            <div class="form-group"><label class="form-label">受診内容</label><input type="text" class="form-input" id="hosp-reason" placeholder="定期健診など"></div>
+            <div class="form-group"><label class="form-label">受診内容</label><input type="text" class="form-input" id="hosp-reason" placeholder="定期健診など" onfocus="renderChips('hosp-reason','savedHospReasons','health')" oninput="renderChips('hosp-reason','savedHospReasons','health')"><div class="suggestion-chips" id="chips-hosp-reason"></div></div>
             <div class="form-group"><label class="form-label">診断・処置</label><textarea class="form-textarea" id="hosp-result" placeholder="診断内容など"></textarea></div>
             <div class="form-row">
               <div class="form-group"><label class="form-label">費用（円）</label><input type="number" class="form-input" id="hosp-cost" placeholder="3000"></div>
@@ -797,14 +801,14 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
             </div>
             <!-- 投薬時のみ表示 -->
             <div id="meds-med-fields" style="display:none">
-              <div class="form-group"><label class="form-label">薬の名前</label><input type="text" class="form-input" id="meds-name" placeholder="フィラリア予防薬など"></div>
+              <div class="form-group"><label class="form-label">薬の名前</label><input type="text" class="form-input" id="meds-name" placeholder="フィラリア予防薬など" onfocus="renderChips('meds-name','savedMedNames','health')" oninput="renderChips('meds-name','savedMedNames','health')"><div class="suggestion-chips" id="chips-meds-name"></div></div>
               <div class="form-group"><label class="form-label">種類</label>
                 <select class="form-select" id="meds-med-type">
                   <option value="">選択してください</option>
                   <option>フィラリア予防薬</option><option>ノミ・ダニ予防薬</option><option>消炎剤</option><option>抗生物質</option><option>ビタミン剤</option><option>その他</option>
                 </select>
               </div>
-              <div class="form-group"><label class="form-label">投与量</label><input type="text" class="form-input" id="meds-dose" placeholder="1錠"></div>
+              <div class="form-group"><label class="form-label">投与量</label><input type="text" class="form-input" id="meds-dose" placeholder="1錠" onfocus="renderChips('meds-dose','savedMedDoses','health')" oninput="renderChips('meds-dose','savedMedDoses','health')"><div class="suggestion-chips" id="chips-meds-dose"></div></div>
             </div>
             <div class="form-group"><label class="form-label">次回予定日</label><input type="date" class="form-input" id="meds-next"></div>
             <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="meds-memo" placeholder="気になる点など"></textarea></div>
@@ -878,8 +882,8 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <div id="form-filter" class="form-section">
           <div class="form-card">
             <div class="form-group"><label class="form-label">交換日</label><input type="date" class="form-input" id="filter-date" onchange="autoSetNextDate('filter-date','filter-next','month',1)"></div>
-            <div class="form-group"><label class="form-label">給水機の種類</label><input type="text" class="form-input" id="filter-machine" placeholder="ピュアクリスタルなど"></div>
-            <div class="form-group"><label class="form-label">フィルターの種類</label><input type="text" class="form-input" id="filter-type" placeholder="軟水化フィルターなど"></div>
+            <div class="form-group"><label class="form-label">給水機の種類</label><input type="text" class="form-input" id="filter-machine" placeholder="ピュアクリスタルなど" onfocus="renderChips('filter-machine','savedFilterMachines','travel')" oninput="renderChips('filter-machine','savedFilterMachines','travel')"><div class="suggestion-chips" id="chips-filter-machine"></div></div>
+            <div class="form-group"><label class="form-label">フィルターの種類</label><input type="text" class="form-input" id="filter-type" placeholder="軟水化フィルターなど" onfocus="renderChips('filter-type','savedFilterTypes','travel')" oninput="renderChips('filter-type','savedFilterTypes','travel')"><div class="suggestion-chips" id="chips-filter-type"></div></div>
             <div class="form-group"><label class="form-label">次回交換予定日</label><input type="date" class="form-input" id="filter-next"></div>
             <div class="form-group"><label class="form-label">メモ</label><input type="text" class="form-input" id="filter-memo" placeholder="備考"></div>
           </div>
@@ -890,7 +894,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <div id="form-other" class="form-section">
           <div class="form-card">
             <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="other-date"></div>
-            <div class="form-group"><label class="form-label">ケアの種類</label><input type="text" class="form-input" id="other-type" placeholder="歯磨き、耳掃除など"></div>
+            <div class="form-group"><label class="form-label">ケアの種類</label><input type="text" class="form-input" id="other-type" placeholder="歯磨き、耳掃除など" onfocus="renderChips('other-type','savedCareTypes','violet')" oninput="renderChips('other-type','savedCareTypes','violet')"><div class="suggestion-chips" id="chips-other-type"></div></div>
             <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="other-memo" placeholder="状態、気になる点など"></textarea></div>
           </div>
           <div id="other-records"></div>
@@ -921,7 +925,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <div id="form-symptom" class="form-section">
           <div class="form-card">
             <div class="form-group"><label class="form-label">気になり始めた日 <span style="color:#d95f75">*</span></label><input type="date" class="form-input" id="symp-date"></div>
-            <div class="form-group"><label class="form-label">症状の概要 <span style="color:#d95f75">*</span></label><input type="text" class="form-input" id="symp-name" placeholder="嘔吐、食欲不振、足を引きずるなど"></div>
+            <div class="form-group"><label class="form-label">症状の概要 <span style="color:#d95f75">*</span></label><input type="text" class="form-input" id="symp-name" placeholder="嘔吐、食欲不振、足を引きずるなど" onfocus="renderChips('symp-name','savedSymptoms','symptom')" oninput="renderChips('symp-name','savedSymptoms','symptom')"><div class="suggestion-chips" id="chips-symp-name"></div></div>
             <div class="form-group"><label class="form-label">程度</label>
               <select class="form-select" id="symp-severity">
                 <option value="">選択</option>
@@ -930,7 +934,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
                 <option>重篤（すぐ病院へ）</option>
               </select>
             </div>
-            <div class="form-group"><label class="form-label">部位・様子</label><input type="text" class="form-input" id="symp-body" placeholder="お腹、左後足、全体的にぐったりなど"></div>
+            <div class="form-group"><label class="form-label">部位・様子</label><input type="text" class="form-input" id="symp-body" placeholder="お腹、左後足、全体的にぐったりなど" onfocus="renderChips('symp-body','savedSympBodies','symptom')" oninput="renderChips('symp-body','savedSympBodies','symptom')"><div class="suggestion-chips" id="chips-symp-body"></div></div>
             <div class="form-group"><label class="form-label">詳しい経過</label><textarea class="form-textarea" id="symp-detail" placeholder="いつから・何回・どんな様子か&#10;（獣医さんへの説明メモとして使えます）"></textarea></div>
             <div class="form-group"><label class="form-label">現在の状態</label>
               <select class="form-select" id="symp-status">
@@ -1451,6 +1455,7 @@ function addRecord(type){
     record.memo=document.getElementById('hosp-memo').value;
     if(!record.reason&&!record.name){alert('病院名または受診内容を入力してください');return;}
     saveSuggestion('savedHospitals',record.name);
+    saveSuggestion('savedHospReasons',record.reason);
     key='hospital';
     clearForm(['hosp-name','hosp-reason','hosp-result','hosp-cost','hosp-next','hosp-memo']);
   } else if(type==='vaccine'){
@@ -1526,6 +1531,8 @@ function addRecord(type){
     record.filterType=document.getElementById('filter-type').value;
     record.next=document.getElementById('filter-next').value;
     record.memo=document.getElementById('filter-memo').value;
+    saveSuggestion('savedFilterMachines',record.machine);
+    saveSuggestion('savedFilterTypes',record.filterType);
     key='filter';
     clearForm(['filter-machine','filter-type','filter-next','filter-memo']);
   } else if(type==='other'){
@@ -1533,6 +1540,7 @@ function addRecord(type){
     record.type=document.getElementById('other-type').value;
     record.memo=document.getElementById('other-memo').value;
     if(!record.type){alert('ケアの種類を入力してください');return;}
+    saveSuggestion('savedCareTypes',record.type);
     key='other';
     clearForm(['other-type','other-memo']);
   } else if(type==='trip'){
@@ -1558,6 +1566,8 @@ function addRecord(type){
     record.next=document.getElementById('symp-next').value;
     record.memo=document.getElementById('symp-memo').value;
     if(!record.name){alert('症状の概要を入力してください');return;}
+    saveSuggestion('savedSymptoms',record.name);
+    saveSuggestion('savedSympBodies',record.body);
     key='symptom';
     clearForm(['symp-date','symp-name','symp-body','symp-detail','symp-next','symp-memo']);
     document.getElementById('symp-severity').value='';
@@ -1577,6 +1587,8 @@ function addRecord(type){
       record.medType=document.getElementById('meds-med-type').value;
       record.dose=document.getElementById('meds-dose').value;
       if(!record.name){alert('薬の名前を入力してください');return;}
+      saveSuggestion('savedMedNames',record.name);
+      saveSuggestion('savedMedDoses',record.dose);
     }
     key='meds';
     clearForm(['meds-date','meds-next','meds-memo','meds-hospital','meds-name','meds-dose']);
@@ -1633,7 +1645,10 @@ function addRecord(type){
   showAddSuccess(key);
 }
 
-function clearForm(ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
+function clearForm(ids){ids.forEach(id=>{
+  const el=document.getElementById(id);if(el)el.value='';
+  const chips=document.getElementById('chips-'+id);if(chips){chips.innerHTML='';chips._chipMeta=null;}
+});}
 
 function deleteRecord(key,id){
   const deleted=DB.get(key).find(r=>r.id===id);
@@ -2901,6 +2916,7 @@ async function loadFromSheets(){
       DB.setObj('settings',{...cur,name:json.data.profile.name||cur.name,breed:json.data.profile.breed||cur.breed,birth:json.data.profile.birth||cur.birth,gender:json.data.profile.gender||cur.gender});
       applySettings();
     }
+    seedSuggestions();
     const activePage=document.querySelector('.page.active');
     if(activePage)renderPage(activePage.id.replace('page-',''));
     updateHomeStats();
@@ -3061,6 +3077,42 @@ function renderChips(inputId,storageKey,chipClass){
   };
 }
 
+// 候補チップの元ネタ（localStorageキー ← どの記録のどの項目から集めるか）
+const SUGGEST_SOURCES=[
+  {storageKey:'savedHospitals',     dbKey:'hospital',field:'name'},
+  {storageKey:'savedHospitals',     dbKey:'meds',    field:'hospital'},
+  {storageKey:'savedHospitals',     dbKey:'vaccine', field:'hospital'},
+  {storageKey:'savedHospReasons',   dbKey:'hospital',field:'reason'},
+  {storageKey:'savedSalons',        dbKey:'trim',    field:'salon'},
+  {storageKey:'savedFilterMachines',dbKey:'filter',  field:'machine'},
+  {storageKey:'savedFilterTypes',   dbKey:'filter',  field:'filterType'},
+  {storageKey:'savedMedNames',      dbKey:'meds',    field:'name'},
+  {storageKey:'savedMedNames',      dbKey:'medicine',field:'name'},
+  {storageKey:'savedMedDoses',      dbKey:'meds',    field:'dose'},
+  {storageKey:'savedMedDoses',      dbKey:'medicine',field:'dose'},
+  {storageKey:'savedCareTypes',     dbKey:'other',   field:'type'},
+  {storageKey:'savedSymptoms',      dbKey:'symptom', field:'name'},
+  {storageKey:'savedSympBodies',    dbKey:'symptom', field:'body'},
+];
+
+// 過去の記録から候補を補充する（機能を追加する前のデータでもチップが出るように）
+// 既にある候補の順番は変えず、未登録のものだけ後ろに足す
+function seedSuggestions(){
+  const grouped={};
+  SUGGEST_SOURCES.forEach(src=>{(grouped[src.storageKey]=grouped[src.storageKey]||[]).push(src);});
+  Object.keys(grouped).forEach(storageKey=>{
+    const list=DB.get(storageKey);
+    const seen=new Set(list);
+    grouped[storageKey].forEach(src=>{
+      DB.get(src.dbKey).forEach(r=>{
+        const v=((r&&r[src.field])||'').toString().trim();
+        if(v&&!seen.has(v)){seen.add(v);list.push(v);}
+      });
+    });
+    DB.set(storageKey,list.slice(0,10));
+  });
+}
+
 // ========== トースト ==========
 function showToast(msg){
   const div=document.createElement('div');
@@ -3076,6 +3128,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   setTodayDates();
   applySettings();
   initShoppingCandidates();
+  seedSuggestions();
   applyDogPhoto(localStorage.getItem('dogPhoto'));
   updateHomeStats();
   renderUpcoming();
