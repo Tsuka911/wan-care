@@ -152,6 +152,17 @@
 - ブラウザの `confirm()` はボタン文字を変更できないため自作（「もどる」「OK」表記が出せる）
 - 現状は「予定だけキャンセル」からのみ使用。今後 confirm を置き換える際にも流用可
 
+## 入力候補チップ（前回入力の記憶）
+- テキスト入力欄の下に出る履歴チップ。`saveSuggestion()` で localStorage に保存し、`renderChips(inputId, storageKey, chipClass)` で描画（最大10件・新しい順）
+- **新しい欄に候補を付けるときは3か所セットで追加する**（どれか忘れると動かない）
+  1. HTML：入力欄に `onfocus`/`oninput` で `renderChips(...)` を付け、直後に `<div class="suggestion-chips" id="chips-<入力欄のid>">` を置く（id は必ず `chips-` + 入力欄id）
+  2. `addRecord()` の該当ブロックに `saveSuggestion('<storageKey>', record.<項目>)`
+  3. `SUGGEST_SOURCES` に `{storageKey, dbKey, field}` を追加
+- `SUGGEST_SOURCES` / `seedSuggestions()` は**過去の記録から候補を自動で補充する**仕組み。機能追加より前に保存したデータでも初回からチップが出る。起動時と Sheets 同期完了後に呼ぶ
+- 候補が付いている欄：病院名（通院・ワクチン・お薬）／受診内容／サロン名／給水機の種類／フィルターの種類／薬の名前／投与量／ケアの種類／症状の概要／部位・様子
+- チップの色はカテゴリカラーに合わせたクラス（`hospital` `salon` `health` `travel` `violet` `symptom`）。給水フィルターは `CAT_CFG` が青なので `travel` を使う
+- `clearForm()` は入力欄と一緒に `chips-<id>` の中身も消す（保存後に古い候補が残らないように）
+
 ## 買い物リスト（消耗品）
 - ホームのボタン `#shoppingOpenBtn` → `openShoppingSheet()` で下から出るボトムシート `#shoppingSheet` を開く
 - **このアプリで唯一 Sheets 同期しない機能。データは localStorage のみ**（`DB.get/set` で `shoppingList`＝買うもの / `shoppingCandidates`＝候補）。健康記録とは性質が違う買い物メモなので同期不要と判断。今後も指示がない限り Sheets 連携は追加しない
