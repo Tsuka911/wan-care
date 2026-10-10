@@ -93,14 +93,6 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
 .remind-label{flex:1;font-weight:600;}
 .remind-date{font-size:11px;color:var(--text-light);margin-top:2px;}
 
-/* ===== RECENT (HOME) ===== */
-.recent-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;margin-bottom:6px;}
-.recent-item:last-child{margin-bottom:0;}
-.recent-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.recent-body{flex:1;min-width:0;}
-.recent-text{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.recent-date-badge{display:inline-block;margin-top:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;color:white;}
-
 /* ===== RECORDS TIMELINE ===== */
 .page-sticky-header{background:var(--card);padding:calc(env(safe-area-inset-top,0px) + 56px) 14px 10px;border-bottom:1px solid rgba(0,0,0,0.06);position:sticky;top:0;z-index:10;}
 .page-title{font-size:22px;font-weight:900;margin-bottom:10px;}
@@ -288,6 +280,16 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
 .vis-card{background:var(--card);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:12px;}
 .vis-card-title{font-size:13px;font-weight:800;color:var(--text-light);letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
 .weight-line-svg{width:100%;height:90px;overflow:visible;}
+/* 横幅に合わせて拡大する（高さ固定だと画面が広いとき中央に小さく寄ってしまうため） */
+.walk-pace-svg{width:100%;height:auto;aspect-ratio:320/112;max-height:170px;overflow:visible;}
+.walk-pace-tabs{display:flex;gap:6px;margin:-4px 0 8px;}
+.walk-pace-tab{padding:5px 12px;border-radius:20px;border:none;cursor:pointer;background:#f0e8e0;color:var(--text);font-size:12px;font-weight:600;font-family:inherit;white-space:nowrap;transition:all .15s;}
+.walk-pace-tab.active{background:var(--daily);color:white;}
+.walk-pace-tab:active{transform:scale(0.98);}
+.walk-pace-legend{display:flex;gap:14px;font-size:10px;color:var(--text-light);margin:0 0 6px;}
+.walk-pace-legend span{display:inline-flex;align-items:center;gap:4px;}
+.walk-pace-legend i{display:inline-block;flex-shrink:0;}
+.walk-pace-note{font-size:11px;color:var(--text-light);line-height:1.5;margin-top:6px;}
 .walk-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .walk-sum-cell{text-align:center;background:#f3faf7;border-radius:10px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;}
 .walk-sum-val{font-size:18px;font-weight:900;color:var(--daily);}
@@ -372,6 +374,16 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <div id="tokaidoSection"></div>
       <div class="walk-summary-grid" id="walkSummaryGrid"></div>
     </div>
+    <div id="walkPaceCard" class="vis-card" style="display:none">
+      <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>月ごとの歩き方</div>
+      <div class="walk-pace-tabs">
+        <button type="button" class="walk-pace-tab active" id="walkPaceTabPace" onclick="setWalkPaceView('pace')">距離とペース</button>
+        <button type="button" class="walk-pace-tab" id="walkPaceTabDays" onclick="setWalkPaceView('days')">散歩した日数</button>
+      </div>
+      <div class="walk-pace-legend" id="walkPaceLegend"></div>
+      <svg class="walk-pace-svg" id="walkPaceSvg"></svg>
+      <div class="walk-pace-note" id="walkPaceNote"></div>
+    </div>
     <div id="weightLineCard" class="vis-card" style="display:none">
       <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>体重の推移</div>
       <svg class="weight-line-svg" id="weightLineSvg"></svg>
@@ -380,12 +392,6 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <div class="memory-card-label">📷 思い出</div>
       <div class="memory-card-title" id="memoryCardTitle"></div>
       <div class="memory-card-sub" id="memoryCardSub"></div>
-    </div>
-    <div class="card" style="background:linear-gradient(160deg,#fffaf7,#fff);border:1.5px solid var(--primary-light);">
-      <div class="card-title" style="color:var(--primary-dark);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2.2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="13" y2="18"/></svg>直近の記録</div>
-      <ul class="recent-list" id="recentList" style="list-style:none;display:flex;flex-direction:column;gap:6px;">
-        <li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>
-      </ul>
     </div>
   </div>
 </main>
@@ -1164,7 +1170,7 @@ function showPage(name, btn) {
 }
 
 function renderPage(name) {
-  if(name==='home'){updateHomeStats();renderUpcoming();renderWeightLine();renderWalkSummary();renderMemoryCard();}
+  if(name==='home'){updateHomeStats();renderUpcoming();renderWeightLine();renderWalkSummary();renderWalkPaceCard();renderMemoryCard();}
   else if(name==='records'){renderTimeline();}
   else if(name==='calendar'){
     // 未選択の場合、最新記録日か今日を自動選択
@@ -1408,7 +1414,7 @@ function showAddSuccess(catId) {
     el.style.cssText=`left:${15+Math.random()*70}%;top:${10+Math.random()*80}%;font-size:${12+Math.random()*16}px;transform:rotate(${Math.random()*360}deg);animation-delay:${Math.random()*0.4}s;`;
     wrap.appendChild(el);
   }
-  setTimeout(()=>{ closeAddSheet(); updateHomeStats(); renderWeightLine(); renderWalkSummary(); renderMemoryCard(); renderTimeline(); renderCalendar(); }, 2600);
+  setTimeout(()=>{ closeAddSheet(); updateHomeStats(); renderWeightLine(); renderWalkSummary(); renderWalkPaceCard(); renderMemoryCard(); renderTimeline(); renderCalendar(); }, 2600);
 }
 
 // ========== 日付ユーティリティ ==========
@@ -1529,7 +1535,7 @@ function addRecord(type){
       if(isNotionMode()) notionUpdate('walk',record).catch(e=>{console.warn('Notion更新エラー:',e);showSyncBar('⚠️ Notionを更新できませんでした','error');});
       currentEditId=null;
       document.getElementById('formSaveBtn').textContent='💾 記録を保存';
-      renderRecords('walk');updateHomeStats();renderWeightLine();renderWalkSummary();renderMemoryCard();renderTimeline();renderCalendar();
+      renderRecords('walk');updateHomeStats();renderWeightLine();renderWalkSummary();renderWalkPaceCard();renderMemoryCard();renderTimeline();renderCalendar();
       closeAddSheet();showToast('✅ 散歩記録を更新しました');return;
     }
     clearForm(['walk-time','walk-dist','walk-course','walk-memo']);
@@ -1627,7 +1633,7 @@ function addRecord(type){
     syncEdit(key,record);
     currentEditId=null;
     document.getElementById('formSaveBtn').textContent='💾 記録を保存';
-    renderRecords(key);updateHomeStats();renderWeightLine();renderWalkSummary();renderMemoryCard();renderTimeline();renderCalendar();
+    renderRecords(key);updateHomeStats();renderWeightLine();renderWalkSummary();renderWalkPaceCard();renderMemoryCard();renderTimeline();renderCalendar();
     closeAddSheet();showToast('✅ 記録を更新しました');return;
   }
 
@@ -1675,7 +1681,7 @@ function deleteRecord(key,id){
   DB.set(key,records);
   renderRecords(key);
   updateHomeStats();
-  renderWeightLine();renderWalkSummary();renderMemoryCard();
+  renderWeightLine();renderWalkSummary();renderWalkPaceCard();renderMemoryCard();
   renderTimeline();
   renderCalendar();
   syncDelete(key,id);
@@ -1929,48 +1935,8 @@ function updateHomeStats(){
   if(!dateset2.has(toDateKey2(cur2))) cur2.setDate(cur2.getDate()-1);
   while(dateset2.has(toDateKey2(cur2))){streak2++;cur2.setDate(cur2.getDate()-1);}
   document.getElementById('statWalks').textContent=streak2+'日';
-  // 「予定だけ」（isPlanOnly）レコードは実績ではないので統計・直近の記録から除外
-  const notPlan=r=>!r.isPlanOnly;
   // 3つ目の統計ピルは「今日の日没」（散歩の参考用）
   updateSunsetPill();
-
-  // 直近の記録（isPlanOnly は除外）
-  const all=[
-    ...DB.get('hospital').filter(notPlan).map(r=>({...r,_cat:'health',_type:'hospital',_text:`通院: ${r.reason||r.name||'通院'}`})),
-    ...DB.get('vaccine').filter(notPlan).map(r=>({...r,_cat:'health',_type:'vaccine',_text:`ワクチン: ${r.type||'ワクチン'}`})),
-    ...DB.get('medicine').filter(notPlan).map(r=>({...r,_cat:'health',_type:'medicine',_text:`投薬: ${r.name||'投薬'}`})),
-    ...DB.get('weight').filter(notPlan).map(r=>({...r,_cat:'health',_type:'weight',_text:`体重 ${r.value}kg`})),
-    ...DB.get('walk').filter(notPlan).map(r=>({...r,_cat:'walk',_type:'walk',_text:`散歩 ${r.time?r.time+'分':''}`})),
-    ...DB.get('trim').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'trim',_text:'トリミング'})),
-    ...DB.get('filter').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'filter',_text:'フィルター交換'})),
-    ...DB.get('other').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'other',_text:r.type||'その他ケア'})),
-    ...DB.get('trip').filter(notPlan).map(r=>({...r,_cat:'travel',_type:'trip',_text:r.title||r.dest||'旅行'})),
-    ...DB.get('symptom').filter(notPlan).map(r=>({...r,_cat:'health',_type:'symptom',_text:`症状: ${r.name||'症状'}`})),
-    ...DB.get('meds').filter(notPlan).map(r=>({...r,_cat:'health',_type:'meds',_text:r.kind==='ワクチン'?`ワクチン: ${r.vacType||'ワクチン'}`:`投薬: ${r.name||'投薬'}`})),
-  ].sort((a,b)=>{
-    // 記録日の降順。同日なら登録日時（ID）の新しい順
-    const dateA=normalizeDate(a.date||a.start||'');
-    const dateB=normalizeDate(b.date||b.start||'');
-    const dateDiff=dateB.localeCompare(dateA);
-    if(dateDiff!==0)return dateDiff;
-    return(Number(b.id)||0)-(Number(a.id)||0);
-  }).slice(0,5);
-
-  const colorMap={health:'var(--health)',walk:'var(--daily)',daily:'var(--daily)',travel:'var(--travel)',other:'var(--violet)'};
-  const bgMap={health:'rgba(224,123,84,0.12)',walk:'rgba(106,184,154,0.12)',daily:'rgba(106,184,154,0.12)',travel:'rgba(91,155,213,0.12)',other:'rgba(155,142,213,0.12)'};
-  const recentList=document.getElementById('recentList');
-  if(all.length===0){
-    recentList.innerHTML='<li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>';
-  } else {
-    recentList.innerHTML=all.map(r=>{const col=colorMap[r._type]||colorMap[r._cat]||'#e07b54';const bg=bgMap[r._type]||bgMap[r._cat]||'#f5f0eb';return`
-      <li class="recent-item" style="background:${bg};border-left:3px solid ${col}">
-        ${csWrap(r._type,18,bg)}
-        <div class="recent-body">
-          <div class="recent-text">${r._text}</div>
-          <span class="recent-date-badge" style="background:${col}">${fmtDate(r.date)}</span>
-        </div>
-      </li>`;}).join('');
-  }
 }
 
 // ========== ビジュアルカード ==========
@@ -1999,6 +1965,191 @@ function renderWeightLine(){
   svg.innerHTML=`<polyline points="${polyline}" fill="none" stroke="var(--primary-light)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${polyline}" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/>${dots}${labels}${yMin}${yMax}`;
 }
 
+// ========== 月ごとの歩き方（距離とペース／散歩した日数） ==========
+// 2つの見方をボタンで切り替える。
+//  - pace: 1回の距離とペース（分/km）。歩く速さは体調や加齢が出やすいので、
+//          一定なら元気、じわじわ遅くなってきたら気づける、という見方をする
+//  - days: その月に散歩へ行った日と行かなかった日。雨続きや忙しさで間が空いていないかを見る
+let walkPaceView='pace'; // 画面を離れても保たれるようにモジュール変数で持つ（再読み込みで pace に戻る）
+
+function setWalkPaceView(v){
+  walkPaceView=(v==='days')?'days':'pace';
+  renderWalkPaceCard();
+}
+
+function walkPaceMedian(arr){
+  const s=[...arr].sort((a,b)=>a-b);
+  const n=s.length;
+  return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;
+}
+
+// 共通の下ごしらえ。表示する月を決めて、2つの見方ぶんの数字をまとめて作る。
+// 月のリストは両方の見方で共通にする（切り替えたときに横軸がズレると分かりにくいため）
+function walkPaceData(){
+  // ペース用：「いつもの」コースで、距離と時間が両方そろっている記録だけ
+  // （旅行先の散歩や短縮コースを混ぜると距離がバラバラで月の比較にならない）
+  const paceByMonth={};
+  // 日数用：コースを問わず、散歩に行った日そのもの
+  const daysByMonth={};
+  let firstDay='';
+  DB.get('walk').forEach(r=>{
+    const d=normalizeDate(r.date);
+    if(!d)return;
+    const m=d.slice(0,7);
+    (daysByMonth[m]=daysByMonth[m]||new Set()).add(d);
+    if(!firstDay||d<firstDay) firstDay=d;
+    if(r.course!==USUAL_COURSE)return;
+    const km=parseFloat(r.dist),mn=parseFloat(r.time);
+    if(!(km>0)||!(mn>0))return;
+    (paceByMonth[m]=paceByMonth[m]||[]).push({km,pace:mn/km});
+  });
+  // 3件未満の月は除外（月の傾向として読めない）。直近6ヶ月
+  const months=Object.keys(paceByMonth).sort().filter(m=>paceByMonth[m].length>=3).slice(-6);
+  const today=localDateStr();
+  return months.map(m=>{
+    const g=paceByMonth[m];
+    // 行かなかった日の数え方：記録を始める前の日と、まだ来ていない日は分母に入れない
+    const y=Number(m.slice(0,4)),mo=Number(m.slice(5,7));
+    const monthLast=`${m}-${String(new Date(y,mo,0).getDate()).padStart(2,'0')}`;
+    const from=(firstDay>`${m}-01`)?firstDay:`${m}-01`;
+    const to=(today<monthLast)?today:monthLast;
+    const span=Math.max(0,Math.round((new Date(to)-new Date(from))/86400000)+1);
+    const went=(daysByMonth[m]||new Set()).size;
+    return{
+      label:mo+'月',
+      n:g.length,
+      km:walkPaceMedian(g.map(x=>x.km)),
+      pace:walkPaceMedian(g.map(x=>x.pace)),
+      went,
+      rest:Math.max(0,span-went),
+      span,
+      monthDays:new Date(y,mo,0).getDate(),
+    };
+  });
+}
+
+function renderWalkPaceCard(){
+  const card=document.getElementById('walkPaceCard');
+  const svg=document.getElementById('walkPaceSvg');
+  const note=document.getElementById('walkPaceNote');
+  const legend=document.getElementById('walkPaceLegend');
+  if(!card||!svg)return;
+
+  const data=walkPaceData();
+  if(data.length<2){card.style.display='none';return;}
+  card.style.display='';
+
+  const days=walkPaceView==='days';
+  const tabPace=document.getElementById('walkPaceTabPace');
+  const tabDays=document.getElementById('walkPaceTabDays');
+  if(tabPace) tabPace.classList.toggle('active',!days);
+  if(tabDays) tabDays.classList.toggle('active',days);
+
+  const W=320,H=112,padL=22,padR=22,padT=16,padB=18;
+  const innerW=W-padL-padR,innerH=H-padT-padB;
+  const slot=innerW/data.length;
+  const barW=Math.min(22,slot*0.5);
+  const baseline=`<line x1="${padL-6}" y1="${padT+innerH}" x2="${W-padR+6}" y2="${padT+innerH}" stroke="var(--border)" stroke-width="1"/>`;
+  const xLabels=data.map((d,i)=>`<text x="${(padL+slot*(i+0.5)).toFixed(1)}" y="${H-5}" text-anchor="middle" font-size="9" fill="#8a7a72">${d.label}</text>`).join('');
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+
+  if(days){
+    if(legend) legend.innerHTML=
+      '<span><i style="width:8px;height:8px;border-radius:2px;background:#6AB89A"></i>散歩に行った日</span>'+
+      '<span><i style="width:8px;height:8px;border-radius:2px;background:#ded8d0"></i>行かなかった日</span>';
+    // 積み上げ棒。縦の目盛りは「月の日数」で揃える（28〜31日なのでほぼ同じ高さになる）
+    // 今月はまだ途中で棒が短くなるため、残りの日数を点線の枠で描いて「激減した」と見えないようにする
+    const maxDays=Math.max(...data.map(d=>d.monthDays))*1.12;
+    const bars=data.map((d,i)=>{
+      const cx=padL+slot*(i+0.5),x=(cx-barW/2).toFixed(1);
+      const hw=(d.went/maxDays)*innerH,hr=(d.rest/maxDays)*innerH;
+      const yRest=padT+innerH-hw-hr;
+      const hFull=(d.monthDays/maxDays)*innerH;
+      const yet=(d.span<d.monthDays)
+        ?`<rect x="${x}" y="${(padT+innerH-hFull).toFixed(1)}" width="${barW.toFixed(1)}" height="${(hFull-hw-hr).toFixed(1)}" rx="3" fill="none" stroke="#ded8d0" stroke-width="1" stroke-dasharray="2 2"/>`
+        :'';
+      return yet+
+        (hr>0?`<rect x="${x}" y="${yRest.toFixed(1)}" width="${barW.toFixed(1)}" height="${hr.toFixed(1)}" rx="3" fill="#ded8d0"/>`:'')+
+        `<rect x="${x}" y="${(padT+innerH-hw).toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(hw,1).toFixed(1)}" rx="3" fill="#6AB89A" opacity="${i===data.length-1?1:0.6}"/>`;
+    }).join('');
+    // 行った日数を棒の中に出す。日数は2桁なので棒の中に収まる
+    const nums=data.map((d,i)=>{
+      const cx=padL+slot*(i+0.5);
+      const hw=(d.went/maxDays)*innerH;
+      return hw>12?`<text x="${cx.toFixed(1)}" y="${(padT+innerH-hw+10).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="#2f6b52">${d.went}</text>`:'';
+    }).join('');
+    svg.innerHTML=baseline+bars+nums+xLabels;
+
+    if(note){
+      const last=data[data.length-1];
+      const total=last.went+last.rest;
+      const pct=total?Math.round(last.went/total*100):0;
+      const avg=Math.round(data.reduce((a,d)=>a+(d.went+d.rest?d.went/(d.went+d.rest):0),0)/data.length*100);
+      const diff=pct-avg;
+      const head=`${last.label}は${total}日のうち${last.went}日（${pct}%）散歩に行きました`;
+      if(Math.abs(diff)<10) note.textContent=`${head}。いつもと同じくらいのペースです`;
+      else if(diff>0)       note.textContent=`${head}。いつもより多めです（ふだんは${avg}%）`;
+      else                  note.textContent=`${head}。いつもより少なめです（ふだんは${avg}%）`;
+    }
+    return;
+  }
+
+  if(legend) legend.innerHTML=
+    '<span><i style="width:8px;height:8px;border-radius:2px;background:#6AB89A"></i>1回の距離（km）</span>'+
+    '<span><i style="width:12px;height:2px;background:var(--primary)"></i>ペース（分/km・下ほど速い）</span>';
+
+  // 棒＝距離。0からの高さで量として読ませる
+  const kmMax=Math.max(...data.map(d=>d.km))*1.2;
+  const bars=data.map((d,i)=>{
+    const cx=padL+slot*(i+0.5);
+    const h=(d.km/kmMax)*innerH;
+    return`<rect x="${(cx-barW/2).toFixed(1)}" y="${(padT+innerH-h).toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(h,1).toFixed(1)}" rx="3" fill="#6AB89A" opacity="${i===data.length-1?1:0.45}"/>`;
+  }).join('');
+
+  // 折れ線＝ペース。変化が小さいときに大げさに見えないよう、縦幅は最低3分ぶんを確保する
+  const paces=data.map(d=>d.pace);
+  const mid=(Math.min(...paces)+Math.max(...paces))/2;
+  const span=Math.max(3,(Math.max(...paces)-Math.min(...paces))*2.5);
+  const pTop=mid+span/2,pBottom=mid-span/2;
+  const pts=data.map((d,i)=>({
+    x:padL+slot*(i+0.5),
+    y:padT+(pTop-d.pace)/(pTop-pBottom)*innerH,
+  }));
+  const line=`<polyline points="${pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')}" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const dots=pts.map((p,i)=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="var(--primary)" stroke="var(--card)" stroke-width="1.5"/>`).join('');
+
+  // 数字は最新の月の距離だけ。ペースの数字は折れ線と重なるので、すぐ下の一文に任せる
+  const last=data[data.length-1];
+  const lastKmY=padT+innerH-(last.km/kmMax)*innerH;
+  const valLabel=`<text x="${(padL+slot*(data.length-0.5)).toFixed(1)}" y="${(lastKmY-4).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="#4e8f74">${last.km.toFixed(2)}</text>`;
+
+  svg.innerHTML=baseline+bars+line+dots+xLabels+valLabel;
+
+  // 一言そえる。基準にする月を、それ以前の月の中央値と比べる
+  //
+  // 月の前半はまだ数件しか無く、たまたま坂道が続いただけで中央値が動いてしまう。
+  // そこで NOTE_MIN 件たまるまでは、その月ではなく前の月を基準にする（棒と折れ線は出したまま）。
+  // 毎月コロコロ文が変わると意味が無くなるので、差が0.5分を超えたときだけ「変わった」と言う。
+  if(note){
+    const NOTE_MIN=5;
+    let i=data.length-1;
+    if(data[i].n<NOTE_MIN&&i>0) i--;
+    const cur=data[i];
+    const before=data.slice(0,i).map(d=>d.pace);
+    // 基準が最新の月でないときは、どの月までの話か明記する（グラフの一番右と数字が違うため）
+    const head=(i===data.length-1)?'':`${data[data.length-1].label}はまだ${data[data.length-1].n}件です。${cur.label}まででは`;
+    const kmTxt=`${head}1回あたり約${cur.km.toFixed(2)}km`;
+    const paceTxt=`（${cur.pace.toFixed(1)}分/km）`;
+    if(before.length===0){
+      note.textContent=`${kmTxt}${paceTxt}`;
+      return;
+    }
+    const diff=cur.pace-walkPaceMedian(before);
+    if(Math.abs(diff)<0.5) note.textContent=`${kmTxt}。ペースはこれまでと変わっていません${paceTxt}`;
+    else if(diff>0)        note.textContent=`${kmTxt}。1kmあたり${diff.toFixed(1)}分ほどゆっくりめです${paceTxt}`;
+    else                   note.textContent=`${kmTxt}。1kmあたり${Math.abs(diff).toFixed(1)}分ほど速めです${paceTxt}`;
+  }
+}
 // ========== 日没時刻（散歩の参考用） ==========
 // 主要都市のプリセット座標。設定で選んだ地域の「今日の日没」をホーム統計ピルに表示する
 const SUNSET_CITIES=[
@@ -3521,6 +3672,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   renderUpcoming();
   renderWeightLine();
   renderWalkSummary();
+  renderWalkPaceCard();
   renderMemoryCard();
   initNotifButton();
   if(typeof Notification!=='undefined'&&Notification.permission==='granted') sendUpcomingNotifications();
