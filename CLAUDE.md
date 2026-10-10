@@ -96,7 +96,7 @@
 ### 起動時の表示タイムラグ
 - Sheets同期は数秒かかるため、`DOMContentLoaded` で **localStorageキャッシュから先に描画する**
 - ホーム画面の新しいビジュアルカードを追加したら、起動時の描画リストにも追加すること：
-  `updateHomeStats` / `renderUpcoming` / `renderWeightLine` / `renderWalkSummary` / `renderMemoryCard`
+  `updateHomeStats` / `renderUpcoming` / `renderWeightLine` / `renderWalkSummary` / `renderWalkPaceCard` / `renderMemoryCard`
 - Sheets取得完了後は `renderPage(activePage)` で自動的に再描画される
 
 ### UI挿入位置の罠
@@ -148,14 +148,29 @@
 縦並び順（上から下）：
 1. もうすぐの予定：`renderUpcoming()` → `id="upcomingCard"`
 2. 散歩サマリー（東海道の旅含む）：`renderWalkSummary()` → `id="walkSummaryCard"`
-3. 体重折れ線グラフ：`renderWeightLine()` → `id="weightLineCard"`
-4. 思い出振り返り：`renderMemoryCard()` → `id="memoryCard"`
-5. 直近の記録：`#recentList`（`updateHomeStats` 内で更新）
+3. 月ごとの歩き方：`renderWalkPaceCard()` → `id="walkPaceCard"`
+4. 体重折れ線グラフ：`renderWeightLine()` → `id="weightLineCard"`
+5. 思い出振り返り：`renderMemoryCard()` → `id="memoryCard"`
+6. 直近の記録：`#recentList`（`updateHomeStats` 内で更新）
 
 これらはすべて以下の3パターンで呼ぶ必要がある：
 - `renderPage('home')` 内
 - 記録追加・削除後
 - 起動時（`DOMContentLoaded`）
+
+## 「月ごとの歩き方」カード（散歩サマリーの下）
+月ごとの「1回の距離」と「ペース（分/km）」を並べるカード。歩く速さは体調や加齢が出やすいので、
+一定なら元気・じわじわ遅くなったら気づける、という見方をするためのもの。
+
+- **対象は `USUAL_COURSE`（いつもの）だけ**。旅行先の散歩や短縮コースを混ぜると距離がバラバラで月の比較にならない
+- **平均ではなく中央値**（`walkPaceMedian()`）。雨で途中で帰った日が1回あるだけで平均が大きく下がるため。
+  実際 2026-08 には 0.5km の日が1件あり、平均だと 2.14km・中央値だと 2.29km とズレる
+- 3件未満の月は除外（月の傾向として読めない）。表示は直近6ヶ月。残る月が2つ未満ならカードごと非表示
+- 距離と時間の**両方が入っている記録だけ**使う（片方だけだとペースが出せない）
+- ペースの縦幅は最低3分ぶんを確保している。確保しないと、わずかな差が急な山谷に見えて不安を煽ってしまう
+- 折れ線は**下ほど速い**（分/kmなので小さいほど速い）。直感と逆になりうるので凡例に明記している
+- ペースの数字はカード内に出さない（折れ線と重なるため）。下の一文（`#walkPaceNote`）に任せる
+- `.walk-pace-svg` は `aspect-ratio` で横幅に追従させる。高さ固定だと画面の広いMacで中央に小さく寄ってしまう
 
 ### 散歩の「コース」欄
 - ほぼ毎回同じコースを歩くため、入力は「いつもの」／「その他」の2択トグル（`setWalkCourseMode()` / `isWalkCourseOther()`）。**既定は「いつもの」**、「その他」を選んだときだけ自由入力欄 `#walk-course-input-wrap` が出る

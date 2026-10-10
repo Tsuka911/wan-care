@@ -288,6 +288,12 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
 .vis-card{background:var(--card);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:12px;}
 .vis-card-title{font-size:13px;font-weight:800;color:var(--text-light);letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
 .weight-line-svg{width:100%;height:90px;overflow:visible;}
+/* 横幅に合わせて拡大する（高さ固定だと画面が広いとき中央に小さく寄ってしまうため） */
+.walk-pace-svg{width:100%;height:auto;aspect-ratio:320/112;max-height:170px;overflow:visible;}
+.walk-pace-legend{display:flex;gap:14px;font-size:10px;color:var(--text-light);margin:-4px 0 6px;}
+.walk-pace-legend span{display:inline-flex;align-items:center;gap:4px;}
+.walk-pace-legend i{display:inline-block;flex-shrink:0;}
+.walk-pace-note{font-size:11px;color:var(--text-light);line-height:1.5;margin-top:6px;}
 .walk-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
 .walk-sum-cell{text-align:center;background:#f3faf7;border-radius:10px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:3px;}
 .walk-sum-val{font-size:18px;font-weight:900;color:var(--daily);}
@@ -371,6 +377,15 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg>これまでの散歩記録</div>
       <div id="tokaidoSection"></div>
       <div class="walk-summary-grid" id="walkSummaryGrid"></div>
+    </div>
+    <div id="walkPaceCard" class="vis-card" style="display:none">
+      <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>月ごとの歩き方</div>
+      <div class="walk-pace-legend">
+        <span><i style="width:8px;height:8px;border-radius:2px;background:#6AB89A"></i>1回の距離（km）</span>
+        <span><i style="width:12px;height:2px;background:var(--primary)"></i>ペース（分/km・下ほど速い）</span>
+      </div>
+      <svg class="walk-pace-svg" id="walkPaceSvg"></svg>
+      <div class="walk-pace-note" id="walkPaceNote"></div>
     </div>
     <div id="weightLineCard" class="vis-card" style="display:none">
       <div class="vis-card-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>体重の推移</div>
@@ -1164,7 +1179,7 @@ function showPage(name, btn) {
 }
 
 function renderPage(name) {
-  if(name==='home'){updateHomeStats();renderUpcoming();renderWeightLine();renderWalkSummary();renderMemoryCard();}
+  if(name==='home'){updateHomeStats();renderUpcoming();renderWeightLine();renderWalkSummary();renderWalkPaceCard();renderMemoryCard();}
   else if(name==='records'){renderTimeline();}
   else if(name==='calendar'){
     // 未選択の場合、最新記録日か今日を自動選択
@@ -1408,7 +1423,7 @@ function showAddSuccess(catId) {
     el.style.cssText=`left:${15+Math.random()*70}%;top:${10+Math.random()*80}%;font-size:${12+Math.random()*16}px;transform:rotate(${Math.random()*360}deg);animation-delay:${Math.random()*0.4}s;`;
     wrap.appendChild(el);
   }
-  setTimeout(()=>{ closeAddSheet(); updateHomeStats(); renderWeightLine(); renderWalkSummary(); renderMemoryCard(); renderTimeline(); renderCalendar(); }, 2600);
+  setTimeout(()=>{ closeAddSheet(); updateHomeStats(); renderWeightLine(); renderWalkSummary(); renderWalkPaceCard(); renderMemoryCard(); renderTimeline(); renderCalendar(); }, 2600);
 }
 
 // ========== 日付ユーティリティ ==========
@@ -1529,7 +1544,7 @@ function addRecord(type){
       if(isNotionMode()) notionUpdate('walk',record).catch(e=>{console.warn('Notion更新エラー:',e);showSyncBar('⚠️ Notionを更新できませんでした','error');});
       currentEditId=null;
       document.getElementById('formSaveBtn').textContent='💾 記録を保存';
-      renderRecords('walk');updateHomeStats();renderWeightLine();renderWalkSummary();renderMemoryCard();renderTimeline();renderCalendar();
+      renderRecords('walk');updateHomeStats();renderWeightLine();renderWalkSummary();renderWalkPaceCard();renderMemoryCard();renderTimeline();renderCalendar();
       closeAddSheet();showToast('✅ 散歩記録を更新しました');return;
     }
     clearForm(['walk-time','walk-dist','walk-course','walk-memo']);
@@ -1627,7 +1642,7 @@ function addRecord(type){
     syncEdit(key,record);
     currentEditId=null;
     document.getElementById('formSaveBtn').textContent='💾 記録を保存';
-    renderRecords(key);updateHomeStats();renderWeightLine();renderWalkSummary();renderMemoryCard();renderTimeline();renderCalendar();
+    renderRecords(key);updateHomeStats();renderWeightLine();renderWalkSummary();renderWalkPaceCard();renderMemoryCard();renderTimeline();renderCalendar();
     closeAddSheet();showToast('✅ 記録を更新しました');return;
   }
 
@@ -1675,7 +1690,7 @@ function deleteRecord(key,id){
   DB.set(key,records);
   renderRecords(key);
   updateHomeStats();
-  renderWeightLine();renderWalkSummary();renderMemoryCard();
+  renderWeightLine();renderWalkSummary();renderWalkPaceCard();renderMemoryCard();
   renderTimeline();
   renderCalendar();
   syncDelete(key,id);
@@ -1997,6 +2012,91 @@ function renderWeightLine(){
   const yMax=`<text x="2" y="${padT+4}" font-size="8" fill="#8a7a72">${maxV}</text>`;
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.innerHTML=`<polyline points="${polyline}" fill="none" stroke="var(--primary-light)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><polyline points="${polyline}" fill="none" stroke="var(--primary)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="none"/>${dots}${labels}${yMin}${yMax}`;
+}
+
+// ========== 月ごとの歩き方（距離とペース） ==========
+// 「1kmあたり何分かかったか」を月ごとに並べる。歩く速さは体調や年齢の変化が出やすいので、
+// 一定なら元気、じわじわ遅くなってきたら気づける、という見方をするためのカード。
+//
+// 対象は「いつもの」コースだけ。旅行先の散歩や短縮コースを混ぜると距離がバラバラで比較にならない。
+// 平均ではなく中央値を使う。雨で途中で帰った日が1回あるだけで平均は大きく下がってしまうため。
+function walkPaceMedian(arr){
+  const s=[...arr].sort((a,b)=>a-b);
+  const n=s.length;
+  return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;
+}
+
+function renderWalkPaceCard(){
+  const card=document.getElementById('walkPaceCard');
+  const svg=document.getElementById('walkPaceSvg');
+  const note=document.getElementById('walkPaceNote');
+  if(!card||!svg)return;
+
+  // 距離と時間が両方そろっている「いつもの」コースだけを集める
+  const byMonth={};
+  DB.get('walk').forEach(r=>{
+    if(r.course!==USUAL_COURSE)return;
+    const d=normalizeDate(r.date);
+    const km=parseFloat(r.dist),mn=parseFloat(r.time);
+    if(!d||!(km>0)||!(mn>0))return;
+    const m=d.slice(0,7);
+    (byMonth[m]=byMonth[m]||[]).push({km,pace:mn/km});
+  });
+  // 3件以上ある月だけ（1〜2件だと月の傾向として読めない）、直近6ヶ月
+  const months=Object.keys(byMonth).sort().filter(m=>byMonth[m].length>=3).slice(-6);
+  if(months.length<2){card.style.display='none';return;}
+  card.style.display='';
+
+  const data=months.map(m=>({
+    label:Number(m.slice(5,7))+'月',
+    km:walkPaceMedian(byMonth[m].map(x=>x.km)),
+    pace:walkPaceMedian(byMonth[m].map(x=>x.pace)),
+  }));
+
+  const W=320,H=112,padL=22,padR=22,padT=16,padB=18;
+  const innerW=W-padL-padR,innerH=H-padT-padB;
+  const slot=innerW/data.length;
+
+  // 棒＝距離。0からの高さで量として読ませる
+  const kmMax=Math.max(...data.map(d=>d.km))*1.2;
+  const barW=Math.min(22,slot*0.5);
+  const bars=data.map((d,i)=>{
+    const cx=padL+slot*(i+0.5);
+    const h=(d.km/kmMax)*innerH;
+    return`<rect x="${(cx-barW/2).toFixed(1)}" y="${(padT+innerH-h).toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(h,1).toFixed(1)}" rx="3" fill="#6AB89A" opacity="${i===data.length-1?1:0.45}"/>`;
+  }).join('');
+
+  // 折れ線＝ペース。変化が小さいときに大げさに見えないよう、縦幅は最低3分ぶんを確保する
+  const paces=data.map(d=>d.pace);
+  const mid=(Math.min(...paces)+Math.max(...paces))/2;
+  const span=Math.max(3,(Math.max(...paces)-Math.min(...paces))*2.5);
+  const pTop=mid+span/2,pBottom=mid-span/2;
+  const pts=data.map((d,i)=>({
+    x:padL+slot*(i+0.5),
+    y:padT+(pTop-d.pace)/(pTop-pBottom)*innerH,
+  }));
+  const line=`<polyline points="${pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')}" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const dots=pts.map((p,i)=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${i===pts.length-1?4:2.5}" fill="var(--primary)" stroke="var(--card)" stroke-width="1.5"/>`).join('');
+
+  const baseline=`<line x1="${padL-6}" y1="${padT+innerH}" x2="${W-padR+6}" y2="${padT+innerH}" stroke="var(--border)" stroke-width="1"/>`;
+  const xLabels=data.map((d,i)=>`<text x="${(padL+slot*(i+0.5)).toFixed(1)}" y="${H-5}" text-anchor="middle" font-size="9" fill="#8a7a72">${d.label}</text>`).join('');
+  // 数字は最新の月の距離だけ。ペースの数字は折れ線と重なるので、すぐ下の一文に任せる
+  const last=data[data.length-1];
+  const lastKmY=padT+innerH-(last.km/kmMax)*innerH;
+  const valLabel=`<text x="${(padL+slot*(data.length-0.5)).toFixed(1)}" y="${(lastKmY-4).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="#4e8f74">${last.km.toFixed(2)}</text>`;
+
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  svg.innerHTML=baseline+bars+line+dots+xLabels+valLabel;
+
+  // 最新の月を、それ以前の月の中央値と比べて一言そえる
+  if(note){
+    const before=data.slice(0,-1).map(d=>d.pace);
+    const diff=last.pace-walkPaceMedian(before);
+    const kmTxt=`1回あたり約${last.km.toFixed(2)}km`;
+    if(Math.abs(diff)<0.5) note.textContent=`${kmTxt}。ペースはこれまでと変わっていません（${last.pace.toFixed(1)}分/km）`;
+    else if(diff>0)        note.textContent=`${kmTxt}。1kmあたり${diff.toFixed(1)}分ほどゆっくりめです（${last.pace.toFixed(1)}分/km）`;
+    else                   note.textContent=`${kmTxt}。1kmあたり${Math.abs(diff).toFixed(1)}分ほど速めです（${last.pace.toFixed(1)}分/km）`;
+  }
 }
 
 // ========== 日没時刻（散歩の参考用） ==========
@@ -3521,6 +3621,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   renderUpcoming();
   renderWeightLine();
   renderWalkSummary();
+  renderWalkPaceCard();
   renderMemoryCard();
   initNotifButton();
   if(typeof Notification!=='undefined'&&Notification.permission==='granted') sendUpcomingNotifications();
