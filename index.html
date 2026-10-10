@@ -93,14 +93,6 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
 .remind-label{flex:1;font-weight:600;}
 .remind-date{font-size:11px;color:var(--text-light);margin-top:2px;}
 
-/* ===== RECENT (HOME) ===== */
-.recent-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;margin-bottom:6px;}
-.recent-item:last-child{margin-bottom:0;}
-.recent-icon-wrap{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.recent-body{flex:1;min-width:0;}
-.recent-text{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.recent-date-badge{display:inline-block;margin-top:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;color:white;}
-
 /* ===== RECORDS TIMELINE ===== */
 .page-sticky-header{background:var(--card);padding:calc(env(safe-area-inset-top,0px) + 56px) 14px 10px;border-bottom:1px solid rgba(0,0,0,0.06);position:sticky;top:0;z-index:10;}
 .page-title{font-size:22px;font-weight:900;margin-bottom:10px;}
@@ -395,12 +387,6 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <div class="memory-card-label">📷 思い出</div>
       <div class="memory-card-title" id="memoryCardTitle"></div>
       <div class="memory-card-sub" id="memoryCardSub"></div>
-    </div>
-    <div class="card" style="background:linear-gradient(160deg,#fffaf7,#fff);border:1.5px solid var(--primary-light);">
-      <div class="card-title" style="color:var(--primary-dark);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="18" rx="2.2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="13" y2="18"/></svg>直近の記録</div>
-      <ul class="recent-list" id="recentList" style="list-style:none;display:flex;flex-direction:column;gap:6px;">
-        <li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>
-      </ul>
     </div>
   </div>
 </main>
@@ -1944,48 +1930,8 @@ function updateHomeStats(){
   if(!dateset2.has(toDateKey2(cur2))) cur2.setDate(cur2.getDate()-1);
   while(dateset2.has(toDateKey2(cur2))){streak2++;cur2.setDate(cur2.getDate()-1);}
   document.getElementById('statWalks').textContent=streak2+'日';
-  // 「予定だけ」（isPlanOnly）レコードは実績ではないので統計・直近の記録から除外
-  const notPlan=r=>!r.isPlanOnly;
   // 3つ目の統計ピルは「今日の日没」（散歩の参考用）
   updateSunsetPill();
-
-  // 直近の記録（isPlanOnly は除外）
-  const all=[
-    ...DB.get('hospital').filter(notPlan).map(r=>({...r,_cat:'health',_type:'hospital',_text:`通院: ${r.reason||r.name||'通院'}`})),
-    ...DB.get('vaccine').filter(notPlan).map(r=>({...r,_cat:'health',_type:'vaccine',_text:`ワクチン: ${r.type||'ワクチン'}`})),
-    ...DB.get('medicine').filter(notPlan).map(r=>({...r,_cat:'health',_type:'medicine',_text:`投薬: ${r.name||'投薬'}`})),
-    ...DB.get('weight').filter(notPlan).map(r=>({...r,_cat:'health',_type:'weight',_text:`体重 ${r.value}kg`})),
-    ...DB.get('walk').filter(notPlan).map(r=>({...r,_cat:'walk',_type:'walk',_text:`散歩 ${r.time?r.time+'分':''}`})),
-    ...DB.get('trim').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'trim',_text:'トリミング'})),
-    ...DB.get('filter').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'filter',_text:'フィルター交換'})),
-    ...DB.get('other').filter(notPlan).map(r=>({...r,_cat:'daily',_type:'other',_text:r.type||'その他ケア'})),
-    ...DB.get('trip').filter(notPlan).map(r=>({...r,_cat:'travel',_type:'trip',_text:r.title||r.dest||'旅行'})),
-    ...DB.get('symptom').filter(notPlan).map(r=>({...r,_cat:'health',_type:'symptom',_text:`症状: ${r.name||'症状'}`})),
-    ...DB.get('meds').filter(notPlan).map(r=>({...r,_cat:'health',_type:'meds',_text:r.kind==='ワクチン'?`ワクチン: ${r.vacType||'ワクチン'}`:`投薬: ${r.name||'投薬'}`})),
-  ].sort((a,b)=>{
-    // 記録日の降順。同日なら登録日時（ID）の新しい順
-    const dateA=normalizeDate(a.date||a.start||'');
-    const dateB=normalizeDate(b.date||b.start||'');
-    const dateDiff=dateB.localeCompare(dateA);
-    if(dateDiff!==0)return dateDiff;
-    return(Number(b.id)||0)-(Number(a.id)||0);
-  }).slice(0,5);
-
-  const colorMap={health:'var(--health)',walk:'var(--daily)',daily:'var(--daily)',travel:'var(--travel)',other:'var(--violet)'};
-  const bgMap={health:'rgba(224,123,84,0.12)',walk:'rgba(106,184,154,0.12)',daily:'rgba(106,184,154,0.12)',travel:'rgba(91,155,213,0.12)',other:'rgba(155,142,213,0.12)'};
-  const recentList=document.getElementById('recentList');
-  if(all.length===0){
-    recentList.innerHTML='<li class="empty-state"><div class="empty-icon">🐾</div><div class="empty-text">記録を追加してみましょう！</div></li>';
-  } else {
-    recentList.innerHTML=all.map(r=>{const col=colorMap[r._type]||colorMap[r._cat]||'#e07b54';const bg=bgMap[r._type]||bgMap[r._cat]||'#f5f0eb';return`
-      <li class="recent-item" style="background:${bg};border-left:3px solid ${col}">
-        ${csWrap(r._type,18,bg)}
-        <div class="recent-body">
-          <div class="recent-text">${r._text}</div>
-          <span class="recent-date-badge" style="background:${col}">${fmtDate(r.date)}</span>
-        </div>
-      </li>`;}).join('');
-  }
 }
 
 // ========== ビジュアルカード ==========
@@ -2049,6 +1995,7 @@ function renderWalkPaceCard(){
 
   const data=months.map(m=>({
     label:Number(m.slice(5,7))+'月',
+    n:byMonth[m].length,
     km:walkPaceMedian(byMonth[m].map(x=>x.km)),
     pace:walkPaceMedian(byMonth[m].map(x=>x.pace)),
   }));
@@ -2088,14 +2035,29 @@ function renderWalkPaceCard(){
   svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
   svg.innerHTML=baseline+bars+line+dots+xLabels+valLabel;
 
-  // 最新の月を、それ以前の月の中央値と比べて一言そえる
+  // 一言そえる。基準にする月を、それ以前の月の中央値と比べる
+  //
+  // 月の前半はまだ数件しか無く、たまたま坂道が続いただけで中央値が動いてしまう。
+  // そこで NOTE_MIN 件たまるまでは、その月ではなく前の月を基準にする（棒と折れ線は出したまま）。
+  // 毎月コロコロ文が変わると意味が無くなるので、差が0.5分を超えたときだけ「変わった」と言う。
   if(note){
-    const before=data.slice(0,-1).map(d=>d.pace);
-    const diff=last.pace-walkPaceMedian(before);
-    const kmTxt=`1回あたり約${last.km.toFixed(2)}km`;
-    if(Math.abs(diff)<0.5) note.textContent=`${kmTxt}。ペースはこれまでと変わっていません（${last.pace.toFixed(1)}分/km）`;
-    else if(diff>0)        note.textContent=`${kmTxt}。1kmあたり${diff.toFixed(1)}分ほどゆっくりめです（${last.pace.toFixed(1)}分/km）`;
-    else                   note.textContent=`${kmTxt}。1kmあたり${Math.abs(diff).toFixed(1)}分ほど速めです（${last.pace.toFixed(1)}分/km）`;
+    const NOTE_MIN=5;
+    let i=data.length-1;
+    if(data[i].n<NOTE_MIN&&i>0) i--;
+    const cur=data[i];
+    const before=data.slice(0,i).map(d=>d.pace);
+    // 基準が最新の月でないときは、どの月までの話か明記する（グラフの一番右と数字が違うため）
+    const head=(i===data.length-1)?'':`${data[data.length-1].label}はまだ${data[data.length-1].n}件です。${cur.label}まででは`;
+    const kmTxt=`${head}1回あたり約${cur.km.toFixed(2)}km`;
+    const paceTxt=`（${cur.pace.toFixed(1)}分/km）`;
+    if(before.length===0){
+      note.textContent=`${kmTxt}${paceTxt}`;
+      return;
+    }
+    const diff=cur.pace-walkPaceMedian(before);
+    if(Math.abs(diff)<0.5) note.textContent=`${kmTxt}。ペースはこれまでと変わっていません${paceTxt}`;
+    else if(diff>0)        note.textContent=`${kmTxt}。1kmあたり${diff.toFixed(1)}分ほどゆっくりめです${paceTxt}`;
+    else                   note.textContent=`${kmTxt}。1kmあたり${Math.abs(diff).toFixed(1)}分ほど速めです${paceTxt}`;
   }
 }
 
