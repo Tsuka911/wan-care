@@ -995,6 +995,26 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
     <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:16px">Web アプリのURLを登録すると、入力が自動的にGoogle スプレッドシートに同期されます。</p>
 
     <div style="margin-top:4px;padding-top:12px;border-top:1px dashed var(--border);margin-bottom:12px">
+      <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h12l4 4v12H4z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>Notion連携</div>
+      <div class="form-group">
+        <label class="form-label">Notionのトークン</label>
+        <input type="password" class="form-input" id="set-notion-token" placeholder="ntn_... または secret_..." autocomplete="off" spellcheck="false">
+        <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-top:6px">Notionで作った「内部コネクション」のトークンを貼ってください。この端末のブラウザにだけ保存され、アプリのコードには入りません。</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">記録の保存先</label>
+        <select class="form-select" id="set-storage">
+          <option value="sheets">Google スプレッドシート</option>
+          <option value="notion">Notion（スプレッドシートにも保存）</option>
+        </select>
+        <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-top:6px">Notionに切り替えても、お試し期間の保険としてスプレッドシートにも書き続けます。</p>
+      </div>
+      <button type="button" id="notionUploadBtn" onclick="uploadAllToNotion()" style="width:100%;padding:11px;background:none;border:1.5px solid var(--primary);color:var(--primary);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer">Notionへ一括アップロード（差分のみ）</button>
+      <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-top:6px">アプリにある記録のうち、Notionにまだ無いものだけを送ります。何度押しても同じ記録が重複することはありません。</p>
+      <div id="notionUploadLog" style="display:none;margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:10px;font-size:12px;line-height:1.7"></div>
+    </div>
+
+    <div style="margin-top:4px;padding-top:12px;border-top:1px dashed var(--border);margin-bottom:12px">
       <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.2" y1="10.2" x2="5.6" y2="11.6"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.4" y1="11.6" x2="19.8" y2="10.2"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 9 16 6"/></svg>日没時刻の表示</div>
       <div class="form-group">
         <label class="form-label">日没を表示する地域</label>
@@ -1506,6 +1526,7 @@ function addRecord(type){
         fetch(`${url}?action=delete_walk&id=${record.id}`,{mode:'no-cors'}).catch(()=>{});
         fetch(`${url}?action=add_walk&id=${record.id}&date=${enc(record.date)}&time=${enc(record.time||0)}&dist=${enc(record.dist||0)}&course=${enc(record.course||'')}&weather=${enc(record.weather||'')}&memo=${enc(record.memo||'')}`,{mode:'no-cors'}).catch(()=>{});
       }
+      if(isNotionMode()) notionUpdate('walk',record).catch(e=>{console.warn('Notion更新エラー:',e);showSyncBar('⚠️ Notionを更新できませんでした','error');});
       currentEditId=null;
       document.getElementById('formSaveBtn').textContent='💾 記録を保存';
       renderRecords('walk');updateHomeStats();renderWeightLine();renderWalkSummary();renderMemoryCard();renderTimeline();renderCalendar();
@@ -1603,10 +1624,7 @@ function addRecord(type){
     record.id=currentEditId;
     const existing=DB.get(key).filter(r=>r.id!==currentEditId);
     DB.set(key,[record,...existing]);
-    if(getWebAppUrl()){
-      syncToSheets(key,{id:currentEditId},'delete');
-      syncToSheets(key,record,'add');
-    }
+    syncEdit(key,record);
     currentEditId=null;
     document.getElementById('formSaveBtn').textContent='💾 記録を保存';
     renderRecords(key);updateHomeStats();renderWeightLine();renderWalkSummary();renderMemoryCard();renderTimeline();renderCalendar();
@@ -1618,8 +1636,11 @@ function addRecord(type){
   DB.set(key,records);
   renderRecords(key);
 
-  // Google Sheets同期
-  if(getWebAppUrl()){
+  // 保存先へ同期（Notionモードのあいだは保険としてSheetsにも書く）
+  if(isNotionMode()){
+    showSyncBar('📤 Notionに送信中...','syncing');
+    syncAdd(key,record).then(ok=>{if(ok)showSyncBar('✅ Notionに保存しました','success');});
+  } else if(getWebAppUrl()){
     showSyncBar('📤 Google Sheetsに送信中...','syncing');
     syncToSheets(key,record,'add').then(ok=>{
       if(key==='walk'&&ok===false) showSyncBar('📴 今は送れませんでした。次回の同期で自動的に送ります','error');
@@ -1634,10 +1655,7 @@ function addRecord(type){
     if(oldIdx>=0){
       oldRecords[oldIdx].next='';
       DB.set(pendingDoneRef.key,oldRecords);
-      const url=getWebAppUrl();
-      if(url){
-        fetch(`${url}?action=update_next&type=${encodeURIComponent(pendingDoneRef.key)}&id=${encodeURIComponent(pendingDoneRef.id)}&next=&t=${Date.now()}`).catch(e=>console.warn('next クリア失敗:',e));
-      }
+      syncNext(pendingDoneRef.key,pendingDoneRef.id,'');
     }
     pendingDoneRef=null;
   }
@@ -1660,12 +1678,13 @@ function deleteRecord(key,id){
   renderWeightLine();renderWalkSummary();renderMemoryCard();
   renderTimeline();
   renderCalendar();
-  syncToSheets(key,{id},'delete');
+  syncDelete(key,id);
   showUndoToast('削除しました',()=>{
     const cur=DB.get(key);
     cur.unshift(deleted);
     cur.sort((a,b)=>(Number(b.id)||0)-(Number(a.id)||0));
     DB.set(key,cur);
+    syncAdd(key,deleted); // 取り消したら保存先にも戻す（次の同期で消えないように）
     renderRecords(key);
     updateHomeStats();
     renderTimeline();
@@ -2299,12 +2318,7 @@ function skipDoneRecord(){
     if(idx>=0){
       records[idx].next='';
       DB.set(key,records);
-      const url=getWebAppUrl();
-      if(url){
-        try{
-          await fetch(`${url}?action=update_next&type=${encodeURIComponent(key)}&id=${encodeURIComponent(id)}&next=&t=${Date.now()}`);
-        }catch(e){ console.warn('next クリア失敗:',e); }
-      }
+      await syncNext(key,id,'');
     }
     pendingDoneRef=null;
     closeAddSheet();
@@ -2461,7 +2475,7 @@ function saveNewUpcoming(){
   const records=DB.get(key);
   records.unshift(record);
   DB.set(key,records);
-  if(getWebAppUrl()) syncToSheets(key,record,'add');
+  syncAdd(key,record);
   closeNewUpcoming();
   renderUpcoming();
   updateHomeStats();
@@ -2497,12 +2511,7 @@ async function confirmNextDate(key, id, newDate){
   const normalizedDate = normalizeDate(newDate) || newDate;
   records[idx].next = normalizedDate;
   DB.set(key, records);
-  const url = getWebAppUrl();
-  if(url){
-    try{
-      await fetch(`${url}?action=update_next&type=${encodeURIComponent(key)}&id=${encodeURIComponent(id)}&next=${encodeURIComponent(normalizedDate)}&t=${Date.now()}`);
-    }catch(e){ console.warn('next更新エラー:',e); }
-  }
+  await syncNext(key, id, normalizedDate);
   renderUpcoming();
   updateHomeStats();
   showToast('予定日を更新しました');
@@ -2674,6 +2683,10 @@ function openSettings(){
   document.getElementById('set-gender').value=s.gender||'オス';
   document.getElementById('set-gs-url').value=s.gsUrl||'';
   document.getElementById('set-webapp-url').value=s.webAppUrl||'';
+  document.getElementById('set-notion-token').value=s.notionToken||'';
+  document.getElementById('set-storage').value=s.storage==='notion'?'notion':'sheets';
+  const upLog=document.getElementById('notionUploadLog');
+  if(upLog){upLog.style.display='none';upLog.innerHTML='';}
   // 日没の地域ドロップダウンを生成して現在値を選択
   const citySel=document.getElementById('set-sunset-city');
   if(citySel){
@@ -2699,6 +2712,14 @@ function closeSettings(e){
 }
 
 function saveSettings(){
+  const notionToken=(document.getElementById('set-notion-token').value||'').trim();
+  let storage=document.getElementById('set-storage').value||'sheets';
+  // トークンが無いままNotionを選んでも動かないので、Sheetsのままにして知らせる
+  if(storage==='notion'&&!notionToken){
+    storage='sheets';
+    document.getElementById('set-storage').value='sheets';
+    showToast('Notionのトークンを入れてから切り替えてください');
+  }
   const s={
     name:document.getElementById('set-name').value||'わんこ',
     breed:document.getElementById('set-breed').value,
@@ -2706,6 +2727,8 @@ function saveSettings(){
     gender:document.getElementById('set-gender').value,
     gsUrl:document.getElementById('set-gs-url').value,
     webAppUrl:document.getElementById('set-webapp-url').value,
+    notionToken:notionToken,
+    storage:storage,
     sunsetCity:document.getElementById('set-sunset-city').value||SUNSET_DEFAULT_CITY
   };
   DB.setObj('settings',s);
@@ -2766,8 +2789,8 @@ function applySettings(){
   if(hasGs){
     document.getElementById('gsLink2').href=s.gsUrl;
   }
-  // 同期ボタン opacity
-  const opacity=s.webAppUrl?'1':'0.5';
+  // 同期ボタン opacity（Notionモードならトークンがあれば有効）
+  const opacity=(s.webAppUrl||isNotionMode())?'1':'0.5';
   document.getElementById('syncBtn').style.opacity=opacity;
   const sb2=document.getElementById('syncBtn2');
   if(sb2) sb2.style.opacity=opacity;
@@ -2781,7 +2804,8 @@ async function exportSettings(){
   const str=btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
   try{
     await navigator.clipboard.writeText(str);
-    showToast('📋 クリップボードにコピーしました');
+    // この文字列にはGASのURLとNotionのトークンが入っている。人に見える場所に貼らないよう注意を出す
+    showToast('📋 コピーしました（トークンを含むので共有しないでください）');
   }catch(e){
     // クリップボードAPIが使えない場合はプロンプトで表示
     prompt('以下の文字列をコピーして保存してください：',str);
@@ -2807,15 +2831,19 @@ async function importSettings(){
     showToast('⚠️ わんケアの設定データではありません');return;
   }
   if(!confirm('設定を上書きします。よろしいですか？'))return;
-  DB.setObj('settings',payload.settings);
+  // Notionのトークンを持たない古いエクスポートを読み込んでも、この端末のトークンは消さない
+  const cur=DB.getObj('settings');
+  const next={...payload.settings};
+  if(!next.notionToken&&cur.notionToken) next.notionToken=cur.notionToken;
+  DB.setObj('settings',next);
   if(payload.photo)localStorage.setItem('dogPhoto',payload.photo);
   else localStorage.removeItem('dogPhoto');
   applySettings();
   applyDogPhoto(localStorage.getItem('dogPhoto'));
   closeSettings();
   showToast('✅ 設定を復元しました');
-  if(payload.settings.webAppUrl){
-    setTimeout(()=>loadFromSheets(),500);
+  if(isNotionMode()||payload.settings.webAppUrl){
+    setTimeout(()=>manualSync(),500);
   }
 }
 
@@ -2935,10 +2963,369 @@ async function loadFromSheets(){
   }
 }
 
+
+// ========== Notion 同期 ==========
+// Notion API はブラウザから直接呼べる（CORS対応済み）。no-cors が不要なので
+// レスポンスで成否を確認できる。walkUnsynced のような「送りっぱなし」対策は不要。
+const NOTION_VERSION='2025-09-03';
+const NOTION_DS={
+  record:'f128631f-c051-4251-86f3-4d4d826c4870', // わんケア記録（通院/お薬/体重/トリミング/給水フィルター/その他ケア/症状）
+  walk:  'a4e5d8d5-d9a1-4041-98da-363be64643d5', // わんケア散歩
+  trip:  'e5df7a10-a9d6-4099-be13-3cfceb8a149c', // わんケア旅行
+};
+// 「わんケア記録」にまとめる種別 → Notion の「種別」セレクト値
+const NOTION_KIND={hospital:'通院',meds:'お薬',vaccine:'お薬',medicine:'お薬',weight:'体重',trim:'トリミング',filter:'給水フィルター',other:'その他ケア',symptom:'症状'};
+// Notion の「種別」→ アプリのキー。vaccine/medicine は旧キーなので読み戻しでは meds に寄せる
+const NOTION_KIND_REV={'通院':'hospital','お薬':'meds','体重':'weight','トリミング':'trim','給水フィルター':'filter','その他ケア':'other','症状':'symptom'};
+// 一括アップロードで「わんケア記録」に送るキー（旧キーもIDで重複排除されるので安全）
+const NOTION_RECORD_KEYS=['hospital','meds','vaccine','medicine','weight','trim','filter','other','symptom'];
+
+function getNotionToken(){return (DB.getObj('settings').notionToken||'').trim();}
+function getStorageMode(){return DB.getObj('settings').storage==='notion'?'notion':'sheets';}
+// Notionモード（保存先がNotion かつ トークンあり）。トークンが無いときは安全側でSheetsのまま
+function isNotionMode(){return getStorageMode()==='notion'&&!!getNotionToken();}
+function notionDsFor(key){return key==='walk'?NOTION_DS.walk:(key==='trip'?NOTION_DS.trip:NOTION_DS.record);}
+function notionBucketFor(key){return key==='walk'?'walk':(key==='trip'?'trip':'record');}
+
+// 移行時に直すと決めたコース名の打ち間違い（「いつもよ」→「いつもの」）
+function fixCourseTypo(course){return String(course||'')==='いつもよ'?USUAL_COURSE:(course||'');}
+
+async function notionApi(path,method='GET',body=null){
+  const token=getNotionToken();
+  if(!token) throw new Error('Notionトークンが未設定です');
+  for(let attempt=0;attempt<3;attempt++){
+    const res=await fetch('https://api.notion.com/v1'+path,{
+      method,
+      headers:{'Authorization':'Bearer '+token,'Notion-Version':NOTION_VERSION,'Content-Type':'application/json'},
+      body:body?JSON.stringify(body):undefined
+    });
+    // レート制限（180req/分）に当たったら待って再試行
+    if(res.status===429&&attempt<2){
+      const wait=Number(res.headers.get('Retry-After'))||1;
+      await new Promise(r=>setTimeout(r,wait*1000));
+      continue;
+    }
+    const json=await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error((json&&json.message)||('Notion API エラー HTTP '+res.status));
+    return json;
+  }
+  throw new Error('Notion API が混み合っています。しばらくしてからお試しください');
+}
+
+// --- プロパティの組み立て（アプリ → Notion） ---
+const nTitle=v=>({title:[{text:{content:String(v==null?'':v).slice(0,2000)}}]});
+const nText =v=>({rich_text:(v==null||v==='')?[]:[{text:{content:String(v).slice(0,2000)}}]});
+const nNum  =v=>{const n=Number(v);return{number:(v===''||v==null||isNaN(n))?null:n};};
+const nSel  =v=>({select:(v==null||v==='')?null:{name:String(v)}});
+const nCheck=v=>({checkbox:!!v});
+const nDate =v=>{const d=normalizeDate(v);return{date:d?{start:d}:null};};
+const nRange=(s,e)=>{const a=normalizeDate(s),b=normalizeDate(e);return{date:a?{start:a,end:(b&&b!==a)?b:null}:null};};
+
+// Notion一覧の見出し（既存41件と同じ書き方に揃える）
+function notionTitleText(key,r){
+  const join=(head,tail)=>tail?`${head} / ${tail}`:(r.isPlanOnly?`${head}（予定）`:head);
+  if(key==='hospital') return join('通院',r.name);
+  if(key==='weight')   return r.value?`体重 ${r.value}kg`:'体重';
+  if(key==='trim')     return join('トリミング',r.salon);
+  if(key==='filter')   return join('フィルター交換',r.machine);
+  if(key==='other')    return r.type||'その他ケア';
+  if(key==='symptom')  return r.name||'症状';
+  if(key==='meds')     return r.kind==='ワクチン'?join('ワクチン',r.vacType):join('投薬',r.name);
+  if(key==='vaccine')  return join('ワクチン',r.type);
+  if(key==='medicine') return join('投薬',r.name);
+  return '記録';
+}
+
+function notionProps(key,r){
+  if(key==='walk'){
+    return {
+      '名前':nTitle(normalizeDate(r.date)||''),
+      '記録ID':nText(r.id),
+      '日付':nDate(r.date),
+      '時間':nNum(r.time),
+      '距離':nNum(r.dist),
+      'コース':nText(fixCourseTypo(r.course)),
+      '天気':nSel(r.weather),
+      'メモ':nText(r.memo),
+    };
+  }
+  if(key==='trip'){
+    return {
+      '旅行タイトル':nTitle(r.title||r.dest||'旅行'),
+      '記録ID':nText(r.id),
+      '期間':nRange(r.start,r.end),
+      '行き先':nText(r.dest),
+      '宿泊施設':nText(r.hotel),
+      '評価':nSel(r.hotelRating),
+      '思い出':nText(r.memo),
+    };
+  }
+  const p={
+    '名前':nTitle(notionTitleText(key,r)),
+    '記録ID':nText(r.id),
+    '種別':nSel(NOTION_KIND[key]||'その他ケア'),
+    '日付':nDate(r.date),
+    '次回予定':nDate(r.next),
+    'メモ':nText(r.memo),
+    '予定のみ':nCheck(r.isPlanOnly),
+  };
+  if(key==='hospital'){p['病院・サロン名']=nText(r.name);p['内容']=nText(r.reason);p['詳細']=nText(r.result);p['費用']=nNum(r.cost);}
+  else if(key==='weight'){p['体重kg']=nNum(r.value);}
+  else if(key==='trim'){p['病院・サロン名']=nText(r.salon);p['内容']=nText(r.menu);p['費用']=nNum(r.cost);}
+  else if(key==='filter'){p['給水機']=nText(r.machine);p['フィルター種類']=nText(r.filterType);}
+  else if(key==='other'){p['内容']=nText(r.type);}
+  else if(key==='symptom'){p['内容']=nText(r.name);p['程度']=nSel(r.severity);p['部位・様子']=nText(r.body);p['詳細']=nText(r.detail);p['状態']=nSel(r.status);}
+  else if(key==='meds'){p['お薬の種類']=nSel(r.kind);p['ワクチン種類']=nText(r.vacType);p['病院・サロン名']=nText(r.hospital);p['薬の名前']=nText(r.name);p['薬の分類']=nText(r.medType);p['投与量']=nText(r.dose);}
+  else if(key==='vaccine'){p['お薬の種類']=nSel('ワクチン');p['ワクチン種類']=nText(r.type);p['病院・サロン名']=nText(r.hospital);}
+  else if(key==='medicine'){p['お薬の種類']=nSel('投薬');p['薬の名前']=nText(r.name);p['薬の分類']=nText(r.type);p['投与量']=nText(r.dose);}
+  return p;
+}
+
+// --- プロパティの読み取り（Notion → アプリ） ---
+const gTitle=p=>(p&&p.title&&p.title.length)?p.title.map(t=>t.plain_text).join(''):'';
+const gText =p=>(p&&p.rich_text&&p.rich_text.length)?p.rich_text.map(t=>t.plain_text).join(''):'';
+const gNum  =p=>(p&&p.number!=null)?p.number:'';
+const gSel  =p=>(p&&p.select&&p.select.name)?p.select.name:'';
+const gCheck=p=>!!(p&&p.checkbox);
+const gDate =p=>(p&&p.date&&p.date.start)?String(p.date.start).slice(0,10):'';
+const gDateEnd=p=>(p&&p.date&&p.date.end)?String(p.date.end).slice(0,10):'';
+
+function notionToRecord(bucket,page){
+  const p=page.properties||{};
+  const id=Number(gText(p['記録ID']))||0;
+  if(bucket==='walk'){
+    return{key:'walk',rec:{id,date:gDate(p['日付']),time:gNum(p['時間']),dist:gNum(p['距離']),course:gText(p['コース']),weather:gSel(p['天気']),memo:gText(p['メモ'])}};
+  }
+  if(bucket==='trip'){
+    const s=gDate(p['期間']);
+    return{key:'trip',rec:{id,title:gTitle(p['旅行タイトル']),start:s,end:gDateEnd(p['期間'])||s,date:s,dest:gText(p['行き先']),hotel:gText(p['宿泊施設']),hotelRating:gSel(p['評価']),memo:gText(p['思い出'])}};
+  }
+  const key=NOTION_KIND_REV[gSel(p['種別'])]||'other';
+  const rec={id,date:gDate(p['日付']),next:gDate(p['次回予定']),memo:gText(p['メモ'])};
+  if(gCheck(p['予定のみ'])) rec.isPlanOnly=true;
+  if(key==='hospital'){rec.name=gText(p['病院・サロン名']);rec.reason=gText(p['内容']);rec.result=gText(p['詳細']);rec.cost=gNum(p['費用']);}
+  else if(key==='weight'){rec.value=gNum(p['体重kg']);}
+  else if(key==='trim'){rec.salon=gText(p['病院・サロン名']);rec.menu=gText(p['内容']);rec.cost=gNum(p['費用']);}
+  else if(key==='filter'){rec.machine=gText(p['給水機']);rec.filterType=gText(p['フィルター種類']);}
+  else if(key==='other'){rec.type=gText(p['内容']);}
+  else if(key==='symptom'){rec.name=gText(p['内容']);rec.severity=gSel(p['程度']);rec.body=gText(p['部位・様子']);rec.detail=gText(p['詳細']);rec.status=gSel(p['状態']);}
+  else if(key==='meds'){rec.kind=gSel(p['お薬の種類']);rec.vacType=gText(p['ワクチン種類']);rec.hospital=gText(p['病院・サロン名']);rec.name=gText(p['薬の名前']);rec.medType=gText(p['薬の分類']);rec.dose=gText(p['投与量']);}
+  return{key,rec};
+}
+
+// --- ページIDの対応表（記録ID → NotionページID）---
+// 編集・削除・次回予定の更新にはNotionのページIDが必要。読み込み時と作成時にここへ覚えさせる。
+// 記録IDは Date.now() なので種別をまたいで一意。見つからなければNotionに問い合わせる。
+function setNotionPageId(recId,pageId){const m=DB.getObj('notionPageIds');m[String(recId)]=pageId;DB.setObj('notionPageIds',m);}
+function clearNotionPageId(recId){const m=DB.getObj('notionPageIds');if(m[String(recId)]){delete m[String(recId)];DB.setObj('notionPageIds',m);}}
+async function notionFindPageId(key,recId){
+  const cached=DB.getObj('notionPageIds')[String(recId)];
+  if(cached) return cached;
+  const json=await notionApi('/data_sources/'+notionDsFor(key)+'/query','POST',{
+    page_size:1,
+    filter:{property:'記録ID',rich_text:{equals:String(recId)}}
+  });
+  const pid=(json.results&&json.results[0])?json.results[0].id:'';
+  if(pid) setNotionPageId(recId,pid);
+  return pid;
+}
+
+// --- 書き込み ---
+async function notionAdd(key,record){
+  const json=await notionApi('/pages','POST',{
+    parent:{type:'data_source_id',data_source_id:notionDsFor(key)},
+    properties:notionProps(key,record)
+  });
+  if(json&&json.id) setNotionPageId(record.id,json.id);
+  return json;
+}
+async function notionUpdate(key,record){
+  const pid=await notionFindPageId(key,record.id);
+  if(!pid) return await notionAdd(key,record); // Notionに無ければ新規作成
+  return await notionApi('/pages/'+pid,'PATCH',{properties:notionProps(key,record)});
+}
+async function notionDelete(key,recId){
+  const pid=await notionFindPageId(key,recId);
+  if(!pid) return;
+  await notionApi('/pages/'+pid,'PATCH',{in_trash:true}); // Notionのゴミ箱へ（完全削除はしない）
+  clearNotionPageId(recId);
+}
+async function notionUpdateNext(key,recId,next){
+  const pid=await notionFindPageId(key,recId);
+  if(!pid) return;
+  await notionApi('/pages/'+pid,'PATCH',{properties:{'次回予定':nDate(next)}});
+}
+
+// --- 読み込み ---
+async function notionQueryAll(ds){
+  const out=[];let cursor='';
+  for(let i=0;i<60;i++){
+    const body={page_size:100};
+    if(cursor) body.start_cursor=cursor;
+    const json=await notionApi('/data_sources/'+ds+'/query','POST',body);
+    out.push(...(json.results||[]));
+    if(!json.has_more) break;
+    cursor=json.next_cursor;
+  }
+  return out;
+}
+
+async function loadFromNotion(){
+  if(!getNotionToken()) return false;
+  const btn=document.getElementById('syncBtn');
+  const btn2=document.getElementById('syncBtn2');
+  if(btn) btn.classList.add('spinning');
+  if(btn2) btn2.classList.add('spinning');
+  showSyncBar('🔄 Notionと同期中...','syncing');
+  try{
+    const buckets={};
+    const pageIds=DB.getObj('notionPageIds');
+    for(const bucket of ['record','walk','trip']){
+      for(const page of await notionQueryAll(NOTION_DS[bucket])){
+        const {key,rec}=notionToRecord(bucket,page);
+        if(!rec.id) continue;
+        (buckets[key]=buckets[key]||[]).push(rec);
+        pageIds[String(rec.id)]=page.id;
+      }
+    }
+    DB.setObj('notionPageIds',pageIds);
+    // Notionが0件の種別はローカルを消さずに維持する（一括アップロード前の取り違えで記録が消えないように）
+    [...Object.values(NOTION_KIND_REV),'walk','trip'].forEach(key=>{
+      const arr=buckets[key]||[];
+      if(arr.length===0&&DB.get(key).length>0) return;
+      DB.set(key,arr.sort((a,b)=>(Number(b.id)||0)-(Number(a.id)||0)));
+    });
+    seedSuggestions();
+    const activePage=document.querySelector('.page.active');
+    if(activePage) renderPage(activePage.id.replace('page-',''));
+    updateHomeStats();
+    renderUpcoming();
+    renderTimeline();
+    renderCalendar();
+    showSyncBar('✅ Notionと同期しました','success');
+    return true;
+  }catch(e){
+    console.warn('Notion同期エラー:',e);
+    showSyncBar('⚠️ Notionと同期できませんでした（'+(e.message||'通信エラー')+'）','error');
+    return false;
+  }finally{
+    if(btn) btn.classList.remove('spinning');
+    if(btn2) btn2.classList.remove('spinning');
+  }
+}
+
+// ========== 保存先の振り分け ==========
+// Notionモードのあいだも、お試し期間の保険としてSheetsにも書き続ける。
+// GAS関連コードを消すときに、ここのSheets呼び出しをまとめて外せばよい。
+async function syncAdd(key,record){
+  if(getWebAppUrl()) syncToSheets(key,record,'add');
+  if(!isNotionMode()) return true;
+  try{ await notionAdd(key,record); return true; }
+  catch(e){ console.warn('Notion保存エラー:',e); showSyncBar('⚠️ Notionに保存できませんでした（'+(e.message||'通信エラー')+'）','error'); return false; }
+}
+async function syncEdit(key,record){
+  if(getWebAppUrl()){ syncToSheets(key,{id:record.id},'delete'); syncToSheets(key,record,'add'); }
+  if(!isNotionMode()) return true;
+  try{ await notionUpdate(key,record); return true; }
+  catch(e){ console.warn('Notion更新エラー:',e); showSyncBar('⚠️ Notionを更新できませんでした（'+(e.message||'通信エラー')+'）','error'); return false; }
+}
+async function syncDelete(key,recId){
+  if(getWebAppUrl()) syncToSheets(key,{id:recId},'delete');
+  if(!isNotionMode()) return true;
+  try{ await notionDelete(key,recId); return true; }
+  catch(e){ console.warn('Notion削除エラー:',e); return false; }
+}
+// 次回予定だけの更新（実施済み／予定日変更／予定キャンセル）
+async function syncNext(key,recId,next){
+  const url=getWebAppUrl();
+  if(url){
+    try{ await fetch(`${url}?action=update_next&type=${encodeURIComponent(key)}&id=${encodeURIComponent(recId)}&next=${encodeURIComponent(next||'')}&t=${Date.now()}`); }
+    catch(e){ console.warn('next更新エラー:',e); }
+  }
+  if(!isNotionMode()) return true;
+  try{ await notionUpdateNext(key,recId,next); return true; }
+  catch(e){ console.warn('Notionのnext更新エラー:',e); return false; }
+}
+
+// 同期ボタン：保存先に応じてNotion／Sheetsから読み込む
 async function manualSync(){
+  if(isNotionMode()){ await loadFromNotion(); return; }
   const url=getWebAppUrl();
   if(!url){showSyncBar('⚙️ 設定でWebアプリURLを登録してください','error');setTimeout(()=>{document.getElementById('syncBar').className='sync-bar';},3000);return;}
   await loadFromSheets();
+}
+
+// ========== Notionへの一括アップロード ==========
+// アプリの localStorage にある記録のうち、Notionにまだ無いもの（記録IDで照合）だけを作る。
+// 散歩129件の初回投入にも、Sheetsだけに増えた分の追加にも、同じ処理で使える。
+function setUploadLog(html){const el=document.getElementById('notionUploadLog');if(el){el.innerHTML=html;el.style.display='block';}}
+
+async function uploadAllToNotion(){
+  if(!getNotionToken()){ setUploadLog('<b>Notionトークンが未設定です。</b><br>上の欄にトークンを入れて「設定を保存」してから実行してください。'); return; }
+  const btn=document.getElementById('notionUploadBtn');
+  if(btn){btn.disabled=true;btn.textContent='確認中...';}
+  try{
+    // 1. Notionに既にある記録IDを集める
+    setUploadLog('Notionの既存データを確認しています...');
+    const existing={record:new Set(),walk:new Set(),trip:new Set()};
+    const pageIds=DB.getObj('notionPageIds');
+    for(const bucket of ['record','walk','trip']){
+      for(const page of await notionQueryAll(NOTION_DS[bucket])){
+        const rid=gText((page.properties||{})['記録ID']).trim();
+        if(!rid) continue;
+        existing[bucket].add(rid);
+        pageIds[rid]=page.id;
+      }
+    }
+    DB.setObj('notionPageIds',pageIds);
+
+    // 2. 送るものを決める（同じIDは1件に寄せる＝散歩の重複3件もここで解消される）
+    const plan=[];const dup={};const seen=new Set();
+    for(const key of [...NOTION_RECORD_KEYS,'walk','trip']){
+      const bucket=notionBucketFor(key);
+      for(const r of DB.get(key)){
+        const id=String(r.id||'').trim();
+        if(!id||id==='0') continue;
+        if(seen.has(bucket+':'+id)){ dup[key]=(dup[key]||0)+1; continue; }
+        seen.add(bucket+':'+id);
+        if(existing[bucket].has(id)) continue;
+        plan.push({key,rec:r});
+      }
+    }
+
+    if(plan.length===0){
+      setUploadLog('<b>Notionはすでに最新です。</b><br>新しく送るものはありませんでした。');
+      return;
+    }
+
+    // 3. 1件ずつ作成（レート制限180req/分に余裕を持たせて間隔をあける）
+    const okCount={};const errors=[];
+    for(let i=0;i<plan.length;i++){
+      const {key,rec}=plan[i];
+      if(btn) btn.textContent=`送信中 ${i+1}/${plan.length}...`;
+      setUploadLog(`Notionへ送信中... ${i+1} / ${plan.length} 件`);
+      try{
+        await notionAdd(key,rec);
+        okCount[key]=(okCount[key]||0)+1;
+      }catch(e){
+        errors.push(`${(CAT_CFG[key]&&CAT_CFG[key].label)||key} ${rec.date||rec.start||''}：${e.message||'エラー'}`);
+      }
+      await new Promise(r=>setTimeout(r,120));
+    }
+
+    // 4. 結果の報告
+    const lines=Object.keys(okCount).map(k=>`${(CAT_CFG[k]&&CAT_CFG[k].label)||k}：${okCount[k]}件`);
+    let html=`<b>${Object.values(okCount).reduce((a,b)=>a+b,0)}件をNotionに追加しました。</b>`;
+    if(lines.length) html+='<br>'+lines.join(' / ');
+    const dupLines=Object.keys(dup).map(k=>`${(CAT_CFG[k]&&CAT_CFG[k].label)||k} ${dup[k]}件`);
+    if(dupLines.length) html+=`<br><span style="color:var(--text-light)">同じIDの重複は1件にまとめました（${dupLines.join('、')}）</span>`;
+    if(errors.length) html+=`<br><span style="color:#c0392b">送れなかったもの ${errors.length}件：<br>${errors.slice(0,5).join('<br>')}</span>`;
+    setUploadLog(html);
+  }catch(e){
+    setUploadLog(`<span style="color:#c0392b">エラー：${e.message||'通信に失敗しました'}</span><br>トークンが正しいか、「わんケア」ページにコネクションを接続したかを確認してください。`);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='Notionへ一括アップロード（差分のみ）';}
+  }
 }
 
 // ========== 犬の写真 ==========
@@ -3137,7 +3524,11 @@ window.addEventListener('DOMContentLoaded',async()=>{
   renderMemoryCard();
   initNotifButton();
   if(typeof Notification!=='undefined'&&Notification.permission==='granted') sendUpcomingNotifications();
-  if(getWebAppUrl()){
+  // 保存先から最新データを読み込む（Notionモードならnotion、そうでなければSheets）
+  if(isNotionMode()){
+    await loadFromNotion();
+    renderUpcoming();
+  } else if(getWebAppUrl()){
     await loadFromSheets();
     renderUpcoming();
   }
