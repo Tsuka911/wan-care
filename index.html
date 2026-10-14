@@ -16,7 +16,7 @@
 <style>
 :root {
   --primary:#e07b54; --primary-light:#f5c4a8; --primary-dark:#b85c35;
-  --health:#e07b54; --daily:#6ab89a; --travel:#5b9bd5; --violet:#9b8ed5;
+  --health:#e07b54; --daily:#6ab89a; --travel:#5b9bd5; --violet:#9b8ed5; --away:#7f8fa6;
   --bg:#fdf6f0; --card:#ffffff; --text:#3a2e28; --text-light:#8a7a72;
   --border:#e8ddd6; --shadow:0 2px 12px rgba(0,0,0,0.08); --radius:14px;
   --tab-h:68px;
@@ -406,7 +406,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <button class="filter-chip c-special" data-filter="special" onclick="setFilter('special',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5B9BD5" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>特別コース</button>
       <button class="filter-chip c-health" data-filter="health" onclick="setFilter('health',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/><rect x="14" y="13" width="4" height="10" rx="2" fill="white"/><rect x="11" y="16" width="10" height="4" rx="2" fill="white"/></svg>健康</button>
       <button class="filter-chip c-daily" data-filter="daily" onclick="setFilter('daily',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><circle cx="9" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/><circle cx="23" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/><line x1="12" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><line x1="16" y1="16" x2="16" y2="8" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/></svg>ケア</button>
-      <button class="filter-chip c-travel" data-filter="travel" onclick="setFilter('travel',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/></svg>旅行</button>
+      <button class="filter-chip c-travel" data-filter="travel" onclick="setFilter('travel',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/></svg>旅行・お預け</button>
     </div>
   </div>
   <div class="timeline" id="timeline"></div>
@@ -427,7 +427,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
       <button class="filter-chip c-walk" data-filter="walk" onclick="setCalFilter('walk',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><ellipse cx="8" cy="25" rx="4.5" ry="3.5" fill="#6AB89A"/><circle cx="5.5" cy="21.5" r="1.6" fill="#6AB89A"/><circle cx="8" cy="20.5" r="1.6" fill="#6AB89A"/><circle cx="10.5" cy="21.5" r="1.6" fill="#6AB89A"/><ellipse cx="20" cy="16" rx="4.5" ry="3.5" fill="#6AB89A" opacity="0.7"/><circle cx="17.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="20" cy="11.5" r="1.6" fill="#6AB89A" opacity="0.7"/><circle cx="22.5" cy="12.5" r="1.6" fill="#6AB89A" opacity="0.7"/></svg>散歩</button>
       <button class="filter-chip c-health" data-filter="health" onclick="setCalFilter('health',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><rect x="5" y="7" width="22" height="20" rx="4" fill="#E07B54"/><rect x="14" y="13" width="4" height="10" rx="2" fill="white"/><rect x="11" y="16" width="10" height="4" rx="2" fill="white"/></svg>健康</button>
       <button class="filter-chip c-daily" data-filter="daily" onclick="setCalFilter('daily',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><circle cx="9" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/><circle cx="23" cy="22" r="4" stroke="#6AB89A" stroke-width="2.5" fill="none"/><line x1="12" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="20" x2="16" y2="16" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/><line x1="16" y1="16" x2="16" y2="8" stroke="#6AB89A" stroke-width="2.5" stroke-linecap="round"/></svg>ケア</button>
-      <button class="filter-chip c-travel" data-filter="travel" onclick="setCalFilter('travel',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/></svg>旅行</button>
+      <button class="filter-chip c-travel" data-filter="travel" onclick="setCalFilter('travel',this)" style="display:inline-flex;align-items:center;gap:4px"><svg width="14" height="14" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/></svg>旅行・お預け</button>
     </div>
     <div class="cal-weekdays">
       <div class="cal-wd">日</div><div class="cal-wd">月</div><div class="cal-wd">火</div>
@@ -665,19 +665,6 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
             <div class="cat-label">トリミング</div>
           </button>
 
-          <!-- 給水フィルター -->
-          <button class="cat-btn" onclick="selectCat('filter')">
-            <div class="cat-icon" style="background:#ebf3fd;">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <path d="M16 5 C16 5 7 15 7 20 a9 9 0 0 0 18 0 C25 15 16 5 16 5Z" fill="#5B9BD5"/>
-                <ellipse cx="12" cy="18" rx="2" ry="3.5" fill="white" opacity="0.35" transform="rotate(-15 12 18)"/>
-                <circle cx="22" cy="8" r="1.5" fill="#5B9BD5" opacity="0.5"/>
-                <circle cx="24" cy="13" r="1" fill="#5B9BD5" opacity="0.4"/>
-              </svg>
-            </div>
-            <div class="cat-label">給水ﾌｨﾙﾀｰ</div>
-          </button>
-
           <!-- その他ケア -->
           <button class="cat-btn" onclick="selectCat('other')">
             <div class="cat-icon" style="background:#f5f0fb;">
@@ -691,7 +678,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
                 <line x1="25.5" y1="8" x2="26.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
             </div>
-            <div class="cat-label">その他ケア</div>
+            <div class="cat-label">ケア・ﾌｨﾙﾀｰ</div>
           </button>
 
           <!-- 旅行 -->
@@ -707,6 +694,18 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
               </svg>
             </div>
             <div class="cat-label">旅行</div>
+          </button>
+
+          <!-- お預け -->
+          <button class="cat-btn" onclick="selectCat('away')">
+            <div class="cat-icon" style="background:#eef1f5;">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M16 3 L29.5 14 l-2.2 2.7 L16 7.6 4.7 16.7 2.5 14Z" fill="#7F8FA6"/>
+                <rect x="6.5" y="14.5" width="19" height="14" rx="2.5" fill="#7F8FA6"/>
+                <path d="M16 26 c0 0-4.8-3.2-4.8-6.4 a2.5 2.5 0 0 1 4.8-0.9 2.5 2.5 0 0 1 4.8 0.9 C20.8 22.8 16 26 16 26Z" fill="white" opacity="0.9"/>
+              </svg>
+            </div>
+            <div class="cat-label">お預け</div>
           </button>
 
           <!-- 症状 -->
@@ -891,26 +890,32 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
           <div id="trim-records"></div>
         </div>
 
-        <!-- 給水フィルター -->
-        <div id="form-filter" class="form-section">
-          <div class="form-card">
-            <div class="form-group"><label class="form-label">交換日</label><input type="date" class="form-input" id="filter-date" onchange="autoSetNextDate('filter-date','filter-next','month',1)"></div>
-            <div class="form-group"><label class="form-label">給水機の種類</label><input type="text" class="form-input" id="filter-machine" placeholder="ピュアクリスタルなど" onfocus="renderChips('filter-machine','savedFilterMachines','travel')" oninput="renderChips('filter-machine','savedFilterMachines','travel')"><div class="suggestion-chips" id="chips-filter-machine"></div></div>
-            <div class="form-group"><label class="form-label">フィルターの種類</label><input type="text" class="form-input" id="filter-type" placeholder="軟水化フィルターなど" onfocus="renderChips('filter-type','savedFilterTypes','travel')" oninput="renderChips('filter-type','savedFilterTypes','travel')"><div class="suggestion-chips" id="chips-filter-type"></div></div>
-            <div class="form-group"><label class="form-label">次回交換予定日</label><input type="date" class="form-input" id="filter-next"></div>
-            <div class="form-group"><label class="form-label">メモ</label><input type="text" class="form-input" id="filter-memo" placeholder="備考"></div>
-          </div>
-          <div id="filter-records"></div>
-        </div>
-
         <!-- その他ケア -->
         <div id="form-other" class="form-section">
           <div class="form-card">
-            <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="other-date"></div>
-            <div class="form-group"><label class="form-label">ケアの種類</label><input type="text" class="form-input" id="other-type" placeholder="歯磨き、耳掃除など" onfocus="renderChips('other-type','savedCareTypes','violet')" oninput="renderChips('other-type','savedCareTypes','violet')"><div class="suggestion-chips" id="chips-other-type"></div></div>
-            <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="other-memo" placeholder="状態、気になる点など"></textarea></div>
+            <div class="form-group"><label class="form-label">何の記録？</label>
+              <select class="form-select" id="other-kind" onchange="onOtherKindChange()">
+                <option value="other">その他のケア（歯磨き・耳掃除など）</option>
+                <option value="filter">給水フィルターの交換</option>
+              </select>
+            </div>
+            <!-- その他のケア -->
+            <div id="other-normal-fields">
+              <div class="form-group"><label class="form-label">日付</label><input type="date" class="form-input" id="other-date"></div>
+              <div class="form-group"><label class="form-label">ケアの種類</label><input type="text" class="form-input" id="other-type" placeholder="歯磨き、耳掃除など" onfocus="renderChips('other-type','savedCareTypes','violet')" oninput="renderChips('other-type','savedCareTypes','violet')"><div class="suggestion-chips" id="chips-other-type"></div></div>
+              <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="other-memo" placeholder="状態、気になる点など"></textarea></div>
+            </div>
+            <!-- 給水フィルター（保存先は今までどおり filter。次回予定のリマインドを残すため） -->
+            <div id="other-filter-fields" style="display:none">
+              <div class="form-group"><label class="form-label">交換日</label><input type="date" class="form-input" id="filter-date" onchange="autoSetNextDate('filter-date','filter-next','month',1)"></div>
+              <div class="form-group"><label class="form-label">給水機の種類</label><input type="text" class="form-input" id="filter-machine" placeholder="ピュアクリスタルなど" onfocus="renderChips('filter-machine','savedFilterMachines','travel')" oninput="renderChips('filter-machine','savedFilterMachines','travel')"><div class="suggestion-chips" id="chips-filter-machine"></div></div>
+              <div class="form-group"><label class="form-label">フィルターの種類</label><input type="text" class="form-input" id="filter-type" placeholder="軟水化フィルターなど" onfocus="renderChips('filter-type','savedFilterTypes','travel')" oninput="renderChips('filter-type','savedFilterTypes','travel')"><div class="suggestion-chips" id="chips-filter-type"></div></div>
+              <div class="form-group"><label class="form-label">次回交換予定日</label><input type="date" class="form-input" id="filter-next"></div>
+              <div class="form-group"><label class="form-label">メモ</label><input type="text" class="form-input" id="filter-memo" placeholder="備考"></div>
+            </div>
           </div>
           <div id="other-records"></div>
+          <div id="filter-records"></div>
         </div>
 
         <!-- 旅行 -->
@@ -932,6 +937,20 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
             <div class="form-group"><label class="form-label">思い出・コメント</label><textarea class="form-textarea" id="trip-memo" placeholder="エピソードを記録しましょう！"></textarea></div>
           </div>
           <div id="trip-records"></div>
+        </div>
+
+        <!-- お預け -->
+        <div id="form-away" class="form-section">
+          <div class="form-card">
+            <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-bottom:10px">仕事などで他の人に世話を頼んだ期間を記録します。この期間は散歩の「連続」日数と「散歩した日数」の計算から外れます（連続は途切れず、預けた日数は数に入りません）。</p>
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">預けた日 <span style="color:#d95f75">*</span></label><input type="date" class="form-input" id="away-start"></div>
+              <div class="form-group"><label class="form-label">戻った日</label><input type="date" class="form-input" id="away-end"></div>
+            </div>
+            <div class="form-group"><label class="form-label">預け先</label><input type="text" class="form-input" id="away-place" placeholder="実家、○○ペットホテルなど" onfocus="renderChips('away-place','savedAwayPlaces','travel')" oninput="renderChips('away-place','savedAwayPlaces','travel')"><div class="suggestion-chips" id="chips-away-place"></div></div>
+            <div class="form-group"><label class="form-label">メモ</label><textarea class="form-textarea" id="away-memo" placeholder="帰ってきてからの様子など"></textarea></div>
+          </div>
+          <div id="away-records"></div>
         </div>
 
         <!-- 症状 -->
@@ -1035,6 +1054,7 @@ body{font-family:-apple-system,'Hiragino Sans','Yu Gothic',sans-serif;background
         <p style="font-size:11px;color:var(--text-light);line-height:1.5;margin-top:6px">散歩の参考に、選んだ地域の「今日の日没時刻」をホーム上部に表示します。</p>
       </div>
     </div>
+
 
     <div style="margin-top:4px;padding-top:12px;border-top:1px dashed var(--border)">
       <div style="font-size:13px;font-weight:700;color:var(--text-light);margin-bottom:8px;display:inline-flex;align-items:center;gap:6px"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.2a1.4 1.4 0 0 0-1.4 1.4v.6A6.6 6.6 0 0 0 5.4 10.6v3.1l-1.3 2.2a1 1 0 0 0 .86 1.5h14.08a1 1 0 0 0 .86-1.5l-1.3-2.2v-3.1a6.6 6.6 0 0 0-5.2-6.4v-.6A1.4 1.4 0 0 0 12 2.2z"/><path d="M10 19a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>通知設定</div>
@@ -1146,6 +1166,9 @@ const CAT_CFG = {
   trip:    {label:'旅行',      color:'#5b9bd5',cat:'travel'},
   symptom: {label:'症状',      color:'#d95f75',cat:'health'},
   meds:    {label:'お薬',      color:'#e07b54',cat:'health'},
+  // お預け＝他の人に世話を頼んだ期間。旅行と同じ「期間の記録」なので cat は travel、
+  // ただしカレンダーで旅行と見分けたいので色だけスモーキーブルーにしている
+  away:    {label:'お預け',    color:'#7f8fa6',cat:'travel'},
 };
 
 // SVGアイコン定義（各所で共通利用）
@@ -1160,12 +1183,13 @@ const CAT_SVG={
   other:   s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 25 C16 25 6 18 6 12 a5 5 0 0 1 10-1.5 a5 5 0 0 1 10 1.5 C26 18 16 25 16 25Z" fill="#9B8ED5"/><path d="M10 11 Q12 9 14 11" stroke="white" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.6"/><circle cx="24" cy="8" r="1.5" fill="#9B8ED5"/><line x1="24" y1="5.5" x2="24" y2="6.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="24" y1="9.5" x2="24" y2="10.5" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="21.5" y1="8" x2="22.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/><line x1="25.5" y1="8" x2="26.5" y2="8" stroke="#9B8ED5" stroke-width="1.5" stroke-linecap="round"/></svg>`,
   trip:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 4 a8 8 0 0 1 8 8 c0 6-8 16-8 16 s-8-10-8-16 a8 8 0 0 1 8-8Z" fill="#5B9BD5"/><circle cx="16" cy="12" r="3.5" fill="white"/><circle cx="16" cy="12" r="1.5" fill="#5B9BD5"/><circle cx="13.5" cy="10" r="1" fill="#5B9BD5"/><circle cx="16" cy="9.5" r="1" fill="#5B9BD5"/><circle cx="18.5" cy="10" r="1" fill="#5B9BD5"/></svg>`,
   symptom: s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="13" y="3" width="6" height="14" rx="3" fill="#D95F75"/><rect x="14.5" y="4.5" width="3" height="4" rx="1.5" fill="white" opacity="0.45"/><rect x="9" y="15" width="14" height="7" rx="3" fill="#D95F75"/><line x1="13" y1="18.5" x2="19" y2="18.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/><line x1="16" y1="16" x2="16" y2="21" stroke="white" stroke-width="1.5" stroke-linecap="round"/><rect x="14" y="17" width="4" height="6" rx="1" fill="#D95F75" opacity="0.01"/><path d="M16 22 l-4 6 h8 z" fill="#D95F75"/></svg>`,
+  away:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><path d="M16 3 L29.5 14 l-2.2 2.7 L16 7.6 4.7 16.7 2.5 14Z" fill="#7F8FA6"/><rect x="6.5" y="14.5" width="19" height="14" rx="2.5" fill="#7F8FA6"/><path d="M16 26 c0 0-4.8-3.2-4.8-6.4 a2.5 2.5 0 0 1 4.8-0.9 2.5 2.5 0 0 1 4.8 0.9 C20.8 22.8 16 26 16 26Z" fill="white" opacity="0.9"/></svg>`,
   meds:    s=>`<svg width="${s}" height="${s}" viewBox="0 0 32 32" fill="none"><rect x="4" y="11" width="24" height="10" rx="5" fill="#E07B54"/><path d="M16 11v10" stroke="white" stroke-width="1.8"/><rect x="4" y="11" width="12" height="10" rx="5" fill="#E07B54" opacity="0.55"/><rect x="7" y="14.5" width="5" height="3" rx="1.5" fill="white" opacity="0.5"/><circle cx="24" cy="7" r="2.5" fill="#F0A080"/><circle cx="8" cy="26" r="2.5" fill="#F0A080"/></svg>`,
 };
 // 短縮ヘルパー: cs('hospital',20) → SVG文字列
 function cs(type,size=16){return CAT_SVG[type]?CAT_SVG[type](size):'';}
 // アイコンラップ用: 背景色付きの丸いSVGアイコンdiv
-function csWrap(type,size=20,bg=''){const b=bg||{hospital:'rgba(224,123,84,0.15)',vaccine:'rgba(224,123,84,0.15)',medicine:'rgba(224,123,84,0.15)',meds:'rgba(224,123,84,0.15)',weight:'rgba(224,123,84,0.15)',walk:'rgba(106,184,154,0.15)',trim:'rgba(106,184,154,0.15)',filter:'rgba(91,155,213,0.15)',other:'rgba(155,142,213,0.15)',trip:'rgba(91,155,213,0.15)',symptom:'rgba(217,95,117,0.15)'}[type]||'rgba(224,123,84,0.12)';return`<div style="width:36px;height:36px;border-radius:10px;background:${b};display:flex;align-items:center;justify-content:center;flex-shrink:0">${cs(type,size)}</div>`;}
+function csWrap(type,size=20,bg=''){const b=bg||{hospital:'rgba(224,123,84,0.15)',vaccine:'rgba(224,123,84,0.15)',medicine:'rgba(224,123,84,0.15)',meds:'rgba(224,123,84,0.15)',weight:'rgba(224,123,84,0.15)',walk:'rgba(106,184,154,0.15)',trim:'rgba(106,184,154,0.15)',filter:'rgba(91,155,213,0.15)',other:'rgba(155,142,213,0.15)',trip:'rgba(91,155,213,0.15)',symptom:'rgba(217,95,117,0.15)',away:'rgba(127,143,166,0.15)'}[type]||'rgba(224,123,84,0.12)';return`<div style="width:36px;height:36px;border-radius:10px;background:${b};display:flex;align-items:center;justify-content:center;flex-shrink:0">${cs(type,size)}</div>`;}
 
 // ========== ページ切替 ==========
 function showPage(name, btn) {
@@ -1328,6 +1352,11 @@ function editRecord(key, id) {
     document.getElementById('trip-hotel').value=r.hotel||'';
     document.getElementById('trip-hotel-rating').value=r.hotelRating||'';
     document.getElementById('trip-memo').value=r.memo||'';
+  } else if(key==='away'){
+    document.getElementById('away-start').value=normalizeDate(r.start)||'';
+    document.getElementById('away-end').value=normalizeDate(r.end)||'';
+    document.getElementById('away-place').value=r.place||'';
+    document.getElementById('away-memo').value=r.memo||'';
   } else if(key==='symptom'){
     document.getElementById('symp-date').value=r.date||'';
     document.getElementById('symp-name').value=r.name||'';
@@ -1361,7 +1390,11 @@ function closeSheetOverlay(e) {
 function selectCat(catId) {
   currentCat = catId;
   document.querySelectorAll('.form-section').forEach(el=>el.classList.remove('active'));
-  document.getElementById('form-'+catId).classList.add('active');
+  // 給水フィルターは「ケア・フィルター」のフォームを種類＝フィルターの状態で開く
+  // （メニューのタイルは9つに揃えたが、保存先のキーは filter のまま分かれている）
+  const formId = (catId==='filter') ? 'other' : catId;
+  document.getElementById('form-'+formId).classList.add('active');
+  if(formId==='other') setOtherKind(catId==='filter'?'filter':'other');
   const cfg = CAT_CFG[catId];
   const titleEl=document.getElementById('formStepTitle');
   titleEl.innerHTML='';
@@ -1377,7 +1410,13 @@ function selectCat(catId) {
   document.getElementById('addStepCats').classList.remove('active');
   document.getElementById('addStepForm').classList.add('active');
   setTodayDates();
-  // カテゴリの記録を表示
+  // カテゴリの記録を表示（ケア・フィルターは選んでいる種類のぶんだけ）
+  if(formId==='other'){
+    const fr=document.getElementById('filter-records');
+    const orc=document.getElementById('other-records');
+    if(fr) fr.style.display=(catId==='filter')?'':'none';
+    if(orc) orc.style.display=(catId==='filter')?'none':'';
+  }
   renderRecords(catId);
   if(catId==='weight') renderWeightChart();
 }
@@ -1428,6 +1467,20 @@ function showAddSuccess(catId) {
 function addMonths(date,months){const d=new Date(date);d.setMonth(d.getMonth()+months);return localDateStr(d);}
 function addYears(date,years){const d=new Date(date);d.setFullYear(d.getFullYear()+years);return localDateStr(d);}
 function autoSetNextDate(srcId,tgtId,unit,n){const src=document.getElementById(srcId);const tgt=document.getElementById(tgtId);if(!src||!tgt||!src.value)return;tgt.value=unit==='month'?addMonths(src.value,n):addYears(src.value,n);}
+// 「ケア・フィルター」の種類切り替え。表示を変えるだけでなく、保存先のキー（currentCat）も切り替わる
+function setOtherKind(kind){
+  const sel=document.getElementById('other-kind');
+  if(sel) sel.value=kind;
+  const nf=document.getElementById('other-normal-fields');
+  const ff=document.getElementById('other-filter-fields');
+  if(nf) nf.style.display=(kind==='filter')?'none':'';
+  if(ff) ff.style.display=(kind==='filter')?'':'none';
+}
+function onOtherKindChange(){
+  const sel=document.getElementById('other-kind');
+  selectCat((sel&&sel.value==='filter')?'filter':'other'); // 見出し・保存ボタン・一覧もまとめて切り替わる
+}
+
 function onMedsKindChange(){
   const kind=document.getElementById('meds-kind').value;
   document.getElementById('meds-vac-fields').style.display=kind==='ワクチン'?'':'none';
@@ -1442,7 +1495,8 @@ function onMedsDateChange(){
 function localDateStr(d){const t=d||new Date();return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;}
 function setTodayDates(){
   const today=localDateStr();
-  const nextIds=new Set(['vac-next','med-next','trim-next','filter-next','symp-next','meds-next']);
+  // 次回予定の欄と、お預けの期間には今日を入れない（あとから過去の期間を入れることが多いため）
+  const nextIds=new Set(['vac-next','med-next','trim-next','filter-next','symp-next','meds-next','away-start','away-end']);
   document.querySelectorAll('input[type="date"]').forEach(el=>{if(!el.value&&!nextIds.has(el.id))el.value=today;});
   [{src:'vac-date',tgt:'vac-next',unit:'year',n:1},{src:'med-date',tgt:'med-next',unit:'month',n:1},{src:'trim-date',tgt:'trim-next',unit:'month',n:1},{src:'filter-date',tgt:'filter-next',unit:'month',n:1}]
     .forEach(({src,tgt,unit,n})=>{const se=document.getElementById(src);const te=document.getElementById(tgt);if(se&&te&&se.value&&!te.value)te.value=unit==='month'?addMonths(se.value,n):addYears(se.value,n);});
@@ -1590,6 +1644,18 @@ function addRecord(type){
     key='trip';
     clearForm(['trip-title','trip-start','trip-end','trip-dest','trip-hotel','trip-memo']);
     document.getElementById('trip-hotel-rating').value='';
+  } else if(type==='away'){
+    // 期間の記録。date には開始日を入れて、他の記録と同じ並び順・絞り込みに乗せる
+    record.start=normalizeDate(document.getElementById('away-start').value);
+    record.end=normalizeDate(document.getElementById('away-end').value)||record.start;
+    record.date=record.start;
+    record.place=document.getElementById('away-place').value;
+    record.memo=document.getElementById('away-memo').value;
+    if(!record.start){alert('預けた日を入力してください');return;}
+    if(record.end<record.start){alert('戻った日は預けた日より後にしてください');return;}
+    saveSuggestion('savedAwayPlaces',record.place);
+    key='away';
+    clearForm(['away-start','away-end','away-place','away-memo']);
   } else if(type==='symptom'){
     record.date=document.getElementById('symp-date').value||d;
     record.name=document.getElementById('symp-name').value;
@@ -1653,7 +1719,7 @@ function addRecord(type){
   if(isNotionMode()){
     showSyncBar('📤 Notionに送信中...','syncing');
     syncAdd(key,record).then(ok=>{if(ok)showSyncBar('✅ Notionに保存しました','success');});
-  } else if(getWebAppUrl()){
+  } else if(usesSheets(key)){
     showSyncBar('📤 Google Sheetsに送信中...','syncing');
     syncToSheets(key,record,'add').then(ok=>{
       if(key==='walk'&&ok===false) showSyncBar('📴 今は送れませんでした。次回の同期で自動的に送ります','error');
@@ -1740,6 +1806,7 @@ function getRecordLabel(type, r) {
   if(type==='filter') return 'フィルター交換';
   if(type==='other') return r.type||'ケア';
   if(type==='trip') return r.title||r.dest||'旅行';
+  if(type==='away') return r.place?('お預け：'+r.place):'お預け';
   if(type==='symptom') return r.name||'症状';
   if(type==='meds') return r.kind==='ワクチン'?(r.vacType||'ワクチン'):(r.name||r.medType||'投薬');
   return '記録';
@@ -1760,6 +1827,12 @@ function getRecordSub(type, r) {
     if(r.start) parts.push(fmtDate(r.start)+(r.end?' 〜 '+fmtDate(r.end):''));
     if(r.hotel) parts.push('🏨'+r.hotel+(r.hotelRating?' '+r.hotelRating:''));
     if(r.memo) parts.push('📝'+r.memo);
+    return parts.join(' / ');
+  }
+  if(type==='away'){
+    const parts=[];
+    if(r.start) parts.push(fmtDate(r.start)+' 〜 '+fmtDate(r.end||r.start)+`（${awayLength({start:normalizeDate(r.start),end:normalizeDate(r.end)||normalizeDate(r.start)})}日）`);
+    if(r.memo) parts.push(r.memo);
     return parts.join(' / ');
   }
   if(type==='symptom') return [r.severity, r.body, r.memo].filter(Boolean).join(' / ');
@@ -1793,7 +1866,7 @@ function renderTimeline() {
   else if(currentFilter==='special') records=records.filter(r=>r._type==='walk' && isSpecialCourse(r.course));
   else if(currentFilter==='health') records=records.filter(r=>r._cfg.cat==='health');
   else if(currentFilter==='daily') records=records.filter(r=>r._cfg.cat==='daily');
-  else if(currentFilter==='travel') records=records.filter(r=>r._type==='trip');
+  else if(currentFilter==='travel') records=records.filter(r=>r._type==='trip'||r._type==='away');
 
   if(records.length===0){
     const emptyText = currentFilter==='special' ? 'コースを「その他」で記録した散歩がありません' : '記録がありません';
@@ -1890,6 +1963,7 @@ function renderRecordItem(key,r){
   else if(key==='trim'){title=r.salon||'トリミング';body=[r.menu,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#edfaf3;color:var(--daily)">${ico('trim')}${fmt(r.date)}</span>`;if(r.cost)tags+=`<span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">¥${Number(r.cost).toLocaleString()}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
   else if(key==='filter'){title='フィルター交換';body=[r.machine,r.filterType,r.memo].filter(Boolean).join(' / ');tags=`<span class="record-tag" style="background:#ebf3fd;color:var(--travel)">${ico('filter')}${fmt(r.date)}</span>`;if(r.next)tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;}
   else if(key==='other'){title=r.type||'ケア';body=r.memo||'';tags=`<span class="record-tag" style="background:#f5f0fb;color:#7c6ec9">${ico('other')}${fmt(r.date)}</span>`;}
+  else if(key==='away'){const st=normalizeDate(r.start),en=normalizeDate(r.end)||st;title=r.place?('お預け：'+r.place):'お預け';body=r.memo||'';tags=`<span class="record-tag" style="background:#eef1f5;color:var(--away)">${ico('away')}${fmt(st)} 〜 ${fmt(en)}</span><span class="record-tag" style="background:#f5f5f5;color:var(--text-light)">${awayLength({start:st,end:en})}日</span>`;}
   else if(key==='symptom'){
     title=r.name||'症状';
     const statusColor={'':{bg:'#fce9ed',color:'#c44b68'},'様子見中':{bg:'#fff4e0',color:'#a07000'},'病院受診済':{bg:'#fff0eb',color:'#c0511a'},'回復':{bg:'#edfaf3',color:'#3a8a65'}}[r.status||'']||{bg:'#fce9ed',color:'#c44b68'};
@@ -1907,7 +1981,7 @@ function renderRecordItem(key,r){
     if(r.next) tags+=`<span class="record-tag" style="background:#fff5cc;color:#a07000">次回: ${fmt(r.next)}</span>`;
   }
   const editSvg=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
-  const editBtn=(key==='walk'||key==='symptom'||key==='meds')?`<button class="delete-btn" style="margin-right:4px;color:${key==='symptom'?'#d95f75':'var(--health)'}" onclick="editRecord('${key}',${r.id})">${editSvg}</button>`:'';
+  const editBtn=(key==='walk'||key==='symptom'||key==='meds'||key==='away')?`<button class="delete-btn" style="margin-right:4px;color:${key==='symptom'?'#d95f75':(key==='away'?'var(--away)':'var(--health)')}" onclick="editRecord('${key}',${r.id})">${editSvg}</button>`:'';
   return`<div class="record-item"><div class="record-item-header"><div><div class="record-item-title">${title}</div><div>${tags}</div>${body?`<div class="record-item-body">${body}</div>`:''}</div><div style="display:flex;align-items:center">${editBtn}<button class="delete-btn" onclick="deleteRecord('${key}',${r.id})">✕</button></div></div></div>`;
 }
 
@@ -1928,6 +2002,56 @@ function renderWeightChart(){
   }).join('');
 }
 
+// ========== お預けの期間（記録できない期間を分析から除く） ==========
+// 他の記録と同じく記録メニュー（＋ボタン）から入れる種別 'away'。
+// 犬は散歩できていても記録が残らない期間なので、散歩の「連続」日数と
+// 「散歩した日数」の計算からこの期間を外す。
+// 散歩したことにはしない（本当に行ったか確認できないため）＝数えずにまたぐだけ。
+// 保存先はNotionだけ（usesSheets() でSheetsから除外している）。
+
+// 日付文字列を1日進める。T00:00:00 を付けて端末のタイムゾーンで解釈させる
+// （付けないとUTC扱いになり、地域によって1日ずれる）
+function addOneDay(ds){
+  const d=new Date(ds+'T00:00:00');
+  d.setDate(d.getDate()+1);
+  return`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// 登録されている期間（新しい順）。終了日が空なら開始日と同じ＝1日だけの扱い
+function awayPeriods(){
+  return DB.get('away')
+    .map(r=>{
+      const start=normalizeDate(r.start);
+      let end=normalizeDate(r.end)||start;
+      if(end<start) end=start;
+      return{...r,start,end};
+    })
+    .filter(r=>r.start)
+    .sort((a,b)=>b.start.localeCompare(a.start));
+}
+
+// 預けていた日の集合（YYYY-MM-DD）。期間は開始日・終了日の両方を含む
+function awayDateSet(){
+  const set=new Set();
+  awayPeriods().forEach(p=>{
+    let d=p.start;
+    for(let guard=0;d<=p.end&&guard<400;guard++){set.add(d);d=addOneDay(d);}
+  });
+  return set;
+}
+
+// from〜to（両端を含む）に入っている「預けていた日」の数
+function awayDaysBetween(from,to,set){
+  let n=0;
+  (set||awayDateSet()).forEach(d=>{if(d>=from&&d<=to)n++;});
+  return n;
+}
+
+// 期間の日数（両端を含む）
+function awayLength(p){
+  return Math.round((new Date(p.end+'T00:00:00')-new Date(p.start+'T00:00:00'))/86400000)+1;
+}
+
 // ========== ホーム統計 ==========
 function updateHomeStats(){
   const weights=DB.get('weight');
@@ -1937,10 +2061,18 @@ function updateHomeStats(){
   const today2=localDateStr();
   const dateset2=new Set(walkAll.map(r=>(r.date||'').slice(0,10)).filter(Boolean));
   const toDateKey2=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  // 預けていた日は記録が無くて当然なので、連続を途切れさせず、日数にも数えない（ただまたぐ）
+  const awaySet2=awayDateSet();
   let streak2=0;
   const cur2=new Date(today2);
-  if(!dateset2.has(toDateKey2(cur2))) cur2.setDate(cur2.getDate()-1);
-  while(dateset2.has(toDateKey2(cur2))){streak2++;cur2.setDate(cur2.getDate()-1);}
+  // 今日はまだ散歩前かもしれないので、今日に記録が無ければ前日から数え始める
+  if(!dateset2.has(toDateKey2(cur2))&&!awaySet2.has(toDateKey2(cur2))) cur2.setDate(cur2.getDate()-1);
+  for(let guard=0;guard<4000;guard++){
+    const k=toDateKey2(cur2);
+    if(dateset2.has(k)) streak2++;
+    else if(!awaySet2.has(k)) break; // 記録も無く預けてもいない日＝ここで途切れる
+    cur2.setDate(cur2.getDate()-1);
+  }
   document.getElementById('statWalks').textContent=streak2+'日';
   // 3つ目の統計ピルは「今日の日没」（散歩の参考用）
   updateSunsetPill();
@@ -2013,6 +2145,11 @@ function walkPaceData(){
   // 3件未満の月は除外（月の傾向として読めない）。直近6ヶ月
   const months=Object.keys(paceByMonth).sort().filter(m=>paceByMonth[m].length>=3).slice(-6);
   const today=localDateStr();
+  // 預けていた日は「行かなかった日」に数えない。
+  // ただし記録がある日は家にいたということなので、預け側から外す（戻った当日に散歩した場合など）
+  const walkedAll=new Set();
+  Object.values(daysByMonth).forEach(s=>s.forEach(d=>walkedAll.add(d)));
+  const awaySet=new Set([...awayDateSet()].filter(d=>!walkedAll.has(d)));
   return months.map(m=>{
     const g=paceByMonth[m];
     // 行かなかった日の数え方：記録を始める前の日と、まだ来ていない日は分母に入れない
@@ -2020,8 +2157,13 @@ function walkPaceData(){
     const monthLast=`${m}-${String(new Date(y,mo,0).getDate()).padStart(2,'0')}`;
     const from=(firstDay>`${m}-01`)?firstDay:`${m}-01`;
     const to=(today<monthLast)?today:monthLast;
-    const span=Math.max(0,Math.round((new Date(to)-new Date(from))/86400000)+1);
+    const spanRaw=Math.max(0,Math.round((new Date(to)-new Date(from))/86400000)+1);
     const went=(daysByMonth[m]||new Set()).size;
+    // 預けていた日は分母（span）と月の目盛り（monthDays）の両方から引く。
+    // 引かないと「まだ来ていない日」の点線枠に混ざって、行かなかった日のように見えてしまう
+    const awayIn=awayDaysBetween(from,to,awaySet);
+    const awayMonth=awayDaysBetween(`${m}-01`,monthLast,awaySet);
+    const span=Math.max(0,spanRaw-awayIn);
     return{
       label:mo+'月',
       n:g.length,
@@ -2030,7 +2172,8 @@ function walkPaceData(){
       went,
       rest:Math.max(0,span-went),
       span,
-      monthDays:new Date(y,mo,0).getDate(),
+      away:awayIn,
+      monthDays:Math.max(1,new Date(y,mo,0).getDate()-awayMonth),
     };
   });
 }
@@ -2094,9 +2237,11 @@ function renderWalkPaceCard(){
       const avg=Math.round(data.reduce((a,d)=>a+(d.went+d.rest?d.went/(d.went+d.rest):0),0)/data.length*100);
       const diff=pct-avg;
       const head=`${last.label}は${total}日のうち${last.went}日（${pct}%）散歩に行きました`;
-      if(Math.abs(diff)<10) note.textContent=`${head}。いつもと同じくらいのペースです`;
-      else if(diff>0)       note.textContent=`${head}。いつもより多めです（ふだんは${avg}%）`;
-      else                  note.textContent=`${head}。いつもより少なめです（ふだんは${avg}%）`;
+      // 預けた期間を除いたときは、分母が月の日数と合わないので理由を書き添える
+      const awayTxt=last.away>0?`（お預けの${last.away}日は除いています）`:'';
+      if(Math.abs(diff)<10) note.textContent=`${head}。いつもと同じくらいのペースです${awayTxt}`;
+      else if(diff>0)       note.textContent=`${head}。いつもより多めです（ふだんは${avg}%）${awayTxt}`;
+      else                  note.textContent=`${head}。いつもより少なめです（ふだんは${avg}%）${awayTxt}`;
     }
     return;
   }
@@ -2683,13 +2828,16 @@ let calSelectedDay=null;
 // 種類フィルター（'all'/'walk'/'health'/'daily'/'travel'）。記録タブのチップと同じまとまり。
 // モジュール変数なので再読み込みで 'all' に戻る
 let calFilter='all';
-const CAL_FILTER_LABEL={walk:'散歩',health:'健康',daily:'ケア',travel:'旅行'};
+const CAL_FILTER_LABEL={walk:'散歩',health:'健康',daily:'ケア',travel:'旅行・お預け'};
 
 // その種別がいまのフィルターの対象か（renderTimeline と同じ振り分け）
+// 期間で持つ記録（旅行・お預け）。カレンダーでは start〜end の全日に出す
+function isSpanType(type){return type==='trip'||type==='away';}
+
 function calFilterMatch(type,cfg){
   if(calFilter==='all') return true;
   if(calFilter==='walk') return type==='walk';
-  if(calFilter==='travel') return type==='trip';
+  if(calFilter==='travel') return isSpanType(type);
   return cfg.cat===calFilter; // health / daily
 }
 
@@ -2721,8 +2869,8 @@ function renderCalendar(){
   Object.entries(CAT_CFG).forEach(([type,cfg])=>{
     if(!calFilterMatch(type,cfg))return;
     DB.get(type).forEach(r=>{
-      if(type==='trip'&&r.start&&r.end){
-        // 旅行は start〜end の全日に色をつける
+      if(isSpanType(type)&&r.start&&r.end){
+        // 旅行・お預けは start〜end の全日に色をつける
         const cur=new Date(r.start);const last=new Date(r.end);
         while(cur<=last){
           const ds=`${cur.getFullYear()}-${String(cur.getMonth()+1).padStart(2,'0')}-${String(cur.getDate()).padStart(2,'0')}`;
@@ -2803,7 +2951,7 @@ function renderCalDayRecords(){
   Object.entries(CAT_CFG).forEach(([type,cfg])=>{
     if(!calFilterMatch(type,cfg))return;
     DB.get(type).forEach(r=>{
-      if(type==='trip'&&r.start&&r.end){
+      if(isSpanType(type)&&r.start&&r.end){
         if(ds>=r.start&&ds<=r.end) dayRecords.push({...r,_type:type,_cfg:cfg});
       } else {
         const rds=normalizeDate((r.isPlanOnly&&r.next)?r.next:(r.date||r.start||r.createdAt));
@@ -3155,6 +3303,7 @@ const NOTION_DS={
   record:'f128631f-c051-4251-86f3-4d4d826c4870', // わんケア記録（通院/お薬/体重/トリミング/給水フィルター/その他ケア/症状）
   walk:  'a4e5d8d5-d9a1-4041-98da-363be64643d5', // わんケア散歩
   trip:  'e5df7a10-a9d6-4099-be13-3cfceb8a149c', // わんケア旅行
+  away:  '0ad214de-d964-4b01-82da-508153b9f305', // わんケアお預け（空にするとNotionへ送らず、ローカル保存だけで動く）
 };
 // 「わんケア記録」にまとめる種別 → Notion の「種別」セレクト値
 const NOTION_KIND={hospital:'通院',meds:'お薬',vaccine:'お薬',medicine:'お薬',weight:'体重',trim:'トリミング',filter:'給水フィルター',other:'その他ケア',symptom:'症状'};
@@ -3167,8 +3316,17 @@ function getNotionToken(){return (DB.getObj('settings').notionToken||'').trim();
 function getStorageMode(){return DB.getObj('settings').storage==='notion'?'notion':'sheets';}
 // Notionモード（保存先がNotion かつ トークンあり）。トークンが無いときは安全側でSheetsのまま
 function isNotionMode(){return getStorageMode()==='notion'&&!!getNotionToken();}
-function notionDsFor(key){return key==='walk'?NOTION_DS.walk:(key==='trip'?NOTION_DS.trip:NOTION_DS.record);}
-function notionBucketFor(key){return key==='walk'?'walk':(key==='trip'?'trip':'record');}
+function notionDsFor(key){
+  if(key==='walk') return NOTION_DS.walk;
+  if(key==='trip') return NOTION_DS.trip;
+  if(key==='away') return NOTION_DS.away;
+  return NOTION_DS.record;
+}
+function notionBucketFor(key){return (key==='walk'||key==='trip'||key==='away')?key:'record';}
+// Notionに送るバケットの一覧。お預けはデータベースを作るまで空なので、できてから加わる
+function notionBuckets(){return NOTION_DS.away?['record','walk','trip','away']:['record','walk','trip'];}
+// ログ表示用の名前。away は CAT_CFG に入れていない（記録タブやカレンダーに出さないため）
+function keyLabel(k){return (CAT_CFG[k]&&CAT_CFG[k].label)||(k==='away'?'お預け':k);}
 
 // 移行時に直すと決めたコース名の打ち間違い（「いつもよ」→「いつもの」）
 function fixCourseTypo(course){return String(course||'')==='いつもよ'?USUAL_COURSE:(course||'');}
@@ -3232,6 +3390,15 @@ function notionProps(key,r){
       'メモ':nText(r.memo),
     };
   }
+  if(key==='away'){
+    return {
+      '名前':nTitle(r.place?('お預け / '+r.place):'お預け'),
+      '記録ID':nText(r.id),
+      '期間':nRange(r.start,r.end),
+      '預け先':nText(r.place),
+      'メモ':nText(r.memo),
+    };
+  }
   if(key==='trip'){
     return {
       '旅行タイトル':nTitle(r.title||r.dest||'旅行'),
@@ -3278,6 +3445,10 @@ function notionToRecord(bucket,page){
   const id=Number(gText(p['記録ID']))||0;
   if(bucket==='walk'){
     return{key:'walk',rec:{id,date:gDate(p['日付']),time:gNum(p['時間']),dist:gNum(p['距離']),course:gText(p['コース']),weather:gSel(p['天気']),memo:gText(p['メモ'])}};
+  }
+  if(bucket==='away'){
+    const s=gDate(p['期間']);
+    return{key:'away',rec:{id,start:s,end:gDateEnd(p['期間'])||s,date:s,place:gText(p['預け先']),memo:gText(p['メモ'])}};
   }
   if(bucket==='trip'){
     const s=gDate(p['期間']);
@@ -3363,7 +3534,7 @@ async function loadFromNotion(){
   try{
     const buckets={};
     const pageIds=DB.getObj('notionPageIds');
-    for(const bucket of ['record','walk','trip']){
+    for(const bucket of notionBuckets()){
       for(const page of await notionQueryAll(NOTION_DS[bucket])){
         const {key,rec}=notionToRecord(bucket,page);
         if(!rec.id) continue;
@@ -3373,7 +3544,7 @@ async function loadFromNotion(){
     }
     DB.setObj('notionPageIds',pageIds);
     // Notionが0件の種別はローカルを消さずに維持する（一括アップロード前の取り違えで記録が消えないように）
-    [...Object.values(NOTION_KIND_REV),'walk','trip'].forEach(key=>{
+    [...Object.values(NOTION_KIND_REV),'walk','trip','away'].forEach(key=>{
       const arr=buckets[key]||[];
       if(arr.length===0&&DB.get(key).length>0) return;
       DB.set(key,arr.sort((a,b)=>(Number(b.id)||0)-(Number(a.id)||0)));
@@ -3400,20 +3571,23 @@ async function loadFromNotion(){
 // ========== 保存先の振り分け ==========
 // Notionモードのあいだも、お試し期間の保険としてSheetsにも書き続ける。
 // GAS関連コードを消すときに、ここのSheets呼び出しをまとめて外せばよい。
+// お預け（away）はNotionだけに保存する。Sheetsは廃止予定なので新しい種別はつなげない
+function usesSheets(key){return key!=='away'&&!!getWebAppUrl();}
+
 async function syncAdd(key,record){
-  if(getWebAppUrl()) syncToSheets(key,record,'add');
+  if(usesSheets(key)) syncToSheets(key,record,'add');
   if(!isNotionMode()) return true;
   try{ await notionAdd(key,record); return true; }
   catch(e){ console.warn('Notion保存エラー:',e); showSyncBar('⚠️ Notionに保存できませんでした（'+(e.message||'通信エラー')+'）','error'); return false; }
 }
 async function syncEdit(key,record){
-  if(getWebAppUrl()){ syncToSheets(key,{id:record.id},'delete'); syncToSheets(key,record,'add'); }
+  if(usesSheets(key)){ syncToSheets(key,{id:record.id},'delete'); syncToSheets(key,record,'add'); }
   if(!isNotionMode()) return true;
   try{ await notionUpdate(key,record); return true; }
   catch(e){ console.warn('Notion更新エラー:',e); showSyncBar('⚠️ Notionを更新できませんでした（'+(e.message||'通信エラー')+'）','error'); return false; }
 }
 async function syncDelete(key,recId){
-  if(getWebAppUrl()) syncToSheets(key,{id:recId},'delete');
+  if(usesSheets(key)) syncToSheets(key,{id:recId},'delete');
   if(!isNotionMode()) return true;
   try{ await notionDelete(key,recId); return true; }
   catch(e){ console.warn('Notion削除エラー:',e); return false; }
@@ -3450,9 +3624,9 @@ async function uploadAllToNotion(){
   try{
     // 1. Notionに既にある記録IDを集める
     setUploadLog('Notionの既存データを確認しています...');
-    const existing={record:new Set(),walk:new Set(),trip:new Set()};
+    const existing={record:new Set(),walk:new Set(),trip:new Set(),away:new Set()};
     const pageIds=DB.getObj('notionPageIds');
-    for(const bucket of ['record','walk','trip']){
+    for(const bucket of notionBuckets()){
       for(const page of await notionQueryAll(NOTION_DS[bucket])){
         const rid=gText((page.properties||{})['記録ID']).trim();
         if(!rid) continue;
@@ -3464,7 +3638,8 @@ async function uploadAllToNotion(){
 
     // 2. 送るものを決める（同じIDは1件に寄せる＝散歩の重複3件もここで解消される）
     const plan=[];const dup={};const seen=new Set();
-    for(const key of [...NOTION_RECORD_KEYS,'walk','trip']){
+    const uploadKeys=NOTION_DS.away?[...NOTION_RECORD_KEYS,'walk','trip','away']:[...NOTION_RECORD_KEYS,'walk','trip'];
+    for(const key of uploadKeys){
       const bucket=notionBucketFor(key);
       for(const r of DB.get(key)){
         const id=String(r.id||'').trim();
@@ -3491,16 +3666,16 @@ async function uploadAllToNotion(){
         await notionAdd(key,rec);
         okCount[key]=(okCount[key]||0)+1;
       }catch(e){
-        errors.push(`${(CAT_CFG[key]&&CAT_CFG[key].label)||key} ${rec.date||rec.start||''}：${e.message||'エラー'}`);
+        errors.push(`${keyLabel(key)} ${rec.date||rec.start||''}：${e.message||'エラー'}`);
       }
       await new Promise(r=>setTimeout(r,120));
     }
 
     // 4. 結果の報告
-    const lines=Object.keys(okCount).map(k=>`${(CAT_CFG[k]&&CAT_CFG[k].label)||k}：${okCount[k]}件`);
+    const lines=Object.keys(okCount).map(k=>`${keyLabel(k)}：${okCount[k]}件`);
     let html=`<b>${Object.values(okCount).reduce((a,b)=>a+b,0)}件をNotionに追加しました。</b>`;
     if(lines.length) html+='<br>'+lines.join(' / ');
-    const dupLines=Object.keys(dup).map(k=>`${(CAT_CFG[k]&&CAT_CFG[k].label)||k} ${dup[k]}件`);
+    const dupLines=Object.keys(dup).map(k=>`${keyLabel(k)} ${dup[k]}件`);
     if(dupLines.length) html+=`<br><span style="color:var(--text-light)">同じIDの重複は1件にまとめました（${dupLines.join('、')}）</span>`;
     if(errors.length) html+=`<br><span style="color:#c0392b">送れなかったもの ${errors.length}件：<br>${errors.slice(0,5).join('<br>')}</span>`;
     setUploadLog(html);
@@ -3661,6 +3836,7 @@ const SUGGEST_SOURCES=[
   {storageKey:'savedMedDoses',      dbKey:'meds',    field:'dose'},
   {storageKey:'savedMedDoses',      dbKey:'medicine',field:'dose'},
   {storageKey:'savedCareTypes',     dbKey:'other',   field:'type'},
+  {storageKey:'savedAwayPlaces',    dbKey:'away',    field:'place'},
   {storageKey:'savedSymptoms',      dbKey:'symptom', field:'name'},
   {storageKey:'savedSympBodies',    dbKey:'symptom', field:'body'},
 ];
